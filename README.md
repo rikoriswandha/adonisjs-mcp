@@ -8,7 +8,7 @@ The server is named `adonis` and uses Streamable HTTP at `/__adonis/mcp` by defa
 
 ## Requirements and compatibility
 
-Install as a development dependency in an AdonisJS v7 application and run its development HTTP process. The CI matrix below defines the minimum and current tuples to verify; it is not evidence of a completed CI run or a claim of universal driver, platform or patch-version compatibility.
+Install as a development dependency in an AdonisJS v7 application and run its development HTTP process. GitHub Actions runs the [CI matrix](https://github.com/rikoriswandha/adonisjs-mcp/actions/workflows/ci.yml) below on every push and pull request; it is not a claim of universal driver, platform or patch-version compatibility.
 
 | Component          | Version or boundary                                                                                                                                      |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -31,7 +31,7 @@ CI matrix (also reused by release verification against the single packed artifac
 | ubuntu-latest / x64                          | 24.11.1 and latest 24 | 7.6.0 / 22.4.2 (fixture lockfiles) | SQLite; PostgreSQL from apt    | Full integration, including eval/HMR, lifecycle and matrix scenarios |
 | macos-latest / arm64                         | 24.11.1 and latest 24 | 7.6.0 / 22.4.2 (fixture lockfiles) | SQLite; Homebrew postgresql@18 | Full integration, including eval/HMR, lifecycle and matrix scenarios |
 | ubuntu-latest / x64 and macos-latest / arm64 | 24.11.1               | 7.5.2 / 22.4.0                     | SQLite                         | compat-min: pack, database inspection and production-prune smoke     |
-| ubuntu-latest / x64 and macos-latest / arm64 | latest 24             | 7.6.0 / 22.4.2 (fixture lockfiles) | SQLite                         | Pack/production-prune and both protocol-era clients                  |
+| ubuntu-latest / x64 and macos-latest / arm64 | latest 24             | 7.6.0 / 22.4.2 (fixture lockfiles) | SQLite; PostgreSQL as above    | Pack/production-prune, both protocol-era clients, security suite     |
 
 Local evidence additionally covers a Debian bookworm arm64 container on Node 24.21.0 and 24.11.1. PostgreSQL minor versions are not pinned by CI.
 
