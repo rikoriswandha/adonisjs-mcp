@@ -1,0 +1,12 @@
+{{{
+  exports({ to: app.makePath('start/mcp_dev_hooks.ts') })
+}}}
+import app from '@adonisjs/core/services/app'
+import type { HttpContext } from '@adonisjs/core/http'
+
+const hooks = app.inDev ? await import('@rikology/adonisjs-mcp/hooks') : undefined
+hooks?.observeContainer()
+
+export const streamWrite = hooks?.streamWrite ?? ((line: string) => line)
+export const observeException =
+  hooks?.observeException ?? ((_error: unknown, _ctx: HttpContext) => {})

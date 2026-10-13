@@ -28,6 +28,9 @@ import { detectProfile } from '../src/profile.js'
 import { Redactor } from '../src/redaction.js'
 import { DefinitionRegistry } from '../src/registry.js'
 import { profileResource } from '../src/resources/profile.js'
+import { PackageResource, packageResource } from '../src/resources/package.js'
+import { debugRequestPrompt } from '../src/prompts/debug_request.js'
+import { addFeaturePrompt } from '../src/prompts/add_feature.js'
 import { describeCapabilities, type ServerRuntime } from '../src/server.js'
 import { configResource, getConfigTool } from '../src/tools/app/get_config.js'
 import { getContainerBindingsTool } from '../src/tools/app/get_container_bindings.js'
@@ -240,6 +243,11 @@ export default class McpProvider {
     registry.tool(
       searchPackageDocsTool(new PackageDocs(appRoot, config.tools.docs.include, redactor))
     )
+
+    // WP-32: package resource and workflow prompts.
+    registry.resource(packageResource(new PackageResource(app, appRoot, redactor)))
+    registry.prompt(debugRequestPrompt(describe, appRoot))
+    registry.prompt(addFeaturePrompt(describe, appRoot))
   }
 
   async start() {

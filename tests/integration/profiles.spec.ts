@@ -1,6 +1,6 @@
 /*
 |--------------------------------------------------------------------------
-| Profile fixtures and their tool sets (M6 and M7 exit gates)
+| Profile fixtures, their tool sets and prompts (M6, M7 and M8 exit gates)
 |--------------------------------------------------------------------------
 |
 | Each starter kit, configured with the tarball and nothing else, serves
@@ -8,8 +8,9 @@
 | is reported unavailable with the reason a dependency or capability is
 | missing. The profile-independent M7 tools are served on every kit, except
 | project_eval, which needs --experimental-vm-modules (the kits start
-| without it). The API kit without Lucid/auth/views is covered by
-| endpoint.spec.ts.
+| without it). The workflow prompts only reference tools served on the kit,
+| and add_feature on the hybrid kit asks for the surface first. The API kit
+| without Lucid/auth/views is covered by endpoint.spec.ts.
 |
 */
 
@@ -29,6 +30,27 @@ interface ProfilePayload {
   data: ProjectProfile & {
     capabilities: Record<'tools' | 'resources' | 'prompts', CapabilityReport[]>
   }
+}
+
+/**
+ * Text of every message of a prompt.
+ */
+function promptText(prompt: { messages: Array<{ content: unknown }> }): string {
+  return prompt.messages
+    .map((message) => {
+      const content = message.content as { type?: string; text?: string }
+      return content.type === 'text' ? (content.text ?? '') : ''
+    })
+    .join('\n')
+}
+
+/**
+ * Registered tool names the prompt text references in backticks.
+ */
+function referencedTools(text: string, registered: ReadonlySet<string>): string[] {
+  return [...text.matchAll(/`([a-z][a-z0-9_]*)`/g)]
+    .map((match) => match[1])
+    .filter((name) => registered.has(name))
 }
 
 const FRAMEWORK_TOOLS = [
@@ -146,6 +168,7 @@ test.group('Profiles | starter kits serve their framework tools', () => {
         await waitForMcp(app)
         const client = await connectMcpClient(new URL(DEFAULT_PATH, app.url), { era: 'modern' })
         let profile: ProfilePayload
+        const prompts: Record<string, string> = {}
         try {
           profile = toolPayload<ProfilePayload>(
             await client.callTool({ name: 'get_project_profile', arguments: {} })
@@ -155,8 +178,48 @@ test.group('Profiles | starter kits serve their framework tools', () => {
           for (const name of FRAMEWORK_TOOLS) {
             assert.equal(listed.has(name), expected.tools[name] === 'served', name)
           }
+
+          const { prompts: listedPrompts } = await client.listPrompts()
+          assert.includeMembers(
+            listedPrompts.map((prompt) => prompt.name),
+            ['add_feature', 'debug_request']
+          )
+          const requests: Record<string, Record<string, string>> = {
+            'debug_request': { path: '/', method: 'GET' },
+            'add_feature': { feature: 'list invoices' },
+            'add_feature:web': { feature: 'list invoices', surface: 'web' },
+            'add_feature:api': { feature: 'list invoices', surface: 'api' },
+          }
+          for (const [key, args] of Object.entries(requests)) {
+            const name = key.split(':')[0]
+            prompts[key] = promptText(await client.getPrompt({ name, arguments: args }))
+          }
         } finally {
           await client.close()
+        }
+
+        const registered = new Set(profile.data.capabilities.tools.map((entry) => entry.name))
+        const served = new Set(
+          profile.data.capabilities.tools
+            .filter((entry) => entry.status === 'served')
+            .map((entry) => entry.name)
+        )
+        for (const [key, text] of Object.entries(prompts)) {
+          assert.notInclude(text, 'not registered', key)
+          const referenced = referencedTools(text, registered)
+          assert.isAbove(referenced.length, 0, key)
+          for (const name of referenced) {
+            assert.isTrue(served.has(name), `${key} references unserved ${name}`)
+          }
+        }
+        if (expected.kind === 'hybrid') {
+          assert.match(prompts.add_feature, /\bask\b/i)
+          assert.match(prompts.add_feature, /\bboth\b/i)
+          assert.include(prompts['add_feature:web'], '`get_inertia_pages`')
+          assert.notInclude(prompts['add_feature:api'], '`get_inertia_pages`')
+        }
+        if (expected.kind === 'api' || expected.kind === 'edge') {
+          assert.notInclude(prompts.add_feature, 'make:page')
         }
 
         assert.equal(profile.data.kind, expected.kind)

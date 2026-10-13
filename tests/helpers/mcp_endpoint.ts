@@ -117,8 +117,8 @@ console.log(\`MCP_PROBE \${app.getEnvironment()} \${app.container.hasBinding('mc
 
 /**
  * App-local dev gateway for the opt-in capture hooks, in the shape the
- * configure hook is planned to generate (WP-33): the package is imported
- * only in development.
+ * configure hook generates (WP-33): the package is imported only in
+ * development.
  */
 export const DEV_HOOKS_GATEWAY = `import app from '@adonisjs/core/services/app'
 import type { HttpContext } from '@adonisjs/core/http'
@@ -132,8 +132,8 @@ export const observeException =
 `
 
 /**
- * Wires the capture hooks into the API kit: the gateway, `hooks.streamWrite`
- * in the logger config, and one observer call in the exception handler.
+ * Wires the configure-generated capture shape into the API kit: gateway,
+ * logger hooks.streamWrite, and one observer call in the exception handler.
  */
 export async function instrumentCapture(fixture: FixtureApp) {
   await writeFile(join(fixture.root, 'start', 'mcp_dev_hooks.ts'), DEV_HOOKS_GATEWAY)

@@ -48,6 +48,8 @@ const REQUIRED_FILES = [
   'build/stubs/main.js',
   'build/stubs/config/mcp.stub',
   'build/stubs/providers/mcp_dev_provider.stub',
+  'build/stubs/start/mcp_dev_hooks.stub',
+  'skills/adonisjs-mcp/SKILL.md',
 ]
 
 const CONSUMER_SOURCE = `import {
@@ -226,7 +228,11 @@ try {
   const missing = REQUIRED_FILES.filter((file) => !shipped.includes(file))
   const unexpected = shipped.filter(
     (file) =>
-      !(file.startsWith('build/') || ['package.json', 'README.md', 'LICENSE.md'].includes(file)) ||
+      !(
+        file.startsWith('build/') ||
+        file === 'skills/adonisjs-mcp/SKILL.md' ||
+        ['package.json', 'README.md', 'LICENSE.md'].includes(file)
+      ) ||
       /^build\/(tests|bin|scripts)\//.test(file) ||
       (file.endsWith('.ts') && !file.endsWith('.d.ts'))
   )

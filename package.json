@@ -8,7 +8,8 @@
   "type": "module",
   "sideEffects": false,
   "files": [
-    "build"
+    "build",
+    "skills"
   ],
   "main": "build/index.js",
   "types": "build/index.d.ts",
