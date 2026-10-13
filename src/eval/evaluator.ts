@@ -139,8 +139,10 @@ export class ProjectEvaluator {
     const started = performance.now()
     const options = {
       ...INSPECT_OPTIONS,
+      // Never below the 4 KiB failure-message cut, so a secret cannot be shown partially there.
       maxStringLength:
-        context.config.limits.maxResultBytes / 2 + this.redactor.longestEscapedSecretLength,
+        Math.max(context.config.limits.maxResultBytes / 2, 4096) +
+        this.redactor.longestEscapedSecretLength,
     }
     const signal = AbortSignal.any([context.signal, AbortSignal.timeout(timeout)])
     const capture = new ConsoleCapture(

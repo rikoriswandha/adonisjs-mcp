@@ -59,3 +59,26 @@ test('Evaluator | large string arrays are inspected with a bounded per-string ca
   const data = result.data as { displayTruncated: boolean }
   assert.isTrue(data.displayTruncated)
 }).timeout(15000)
+
+test('Evaluator | a small result limit never shows a secret prefix in failures', async ({
+  assert,
+}) => {
+  const secret = 'Str0ngSecret-abcdefghijklmnop'
+  const redactor = new Redactor([secret])
+  const evaluator = new ProjectEvaluator(app, redactor)
+  const small = { ...context, config: resolveConfig({ limits: { maxResultBytes: 4096 } }) }
+  // Former per-string cap for this limit: the secret straddles it at every offset.
+  const formerCap = 2048 + redactor.longestEscapedSecretLength
+  for (let offset = 8; offset < secret.length; offset += 7) {
+    const result = await evaluator
+      .run(
+        `throw { body: 'x'.repeat(${formerCap - offset}) + ${JSON.stringify(secret)} }`,
+        10000,
+        null,
+        small
+      )
+      .catch((error: unknown) => error)
+    const encoded = JSON.stringify(result, Object.getOwnPropertyNames(result as object))
+    assert.notInclude(encoded, secret.slice(0, 8), `offset ${offset}`)
+  }
+})

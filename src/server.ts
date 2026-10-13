@@ -26,7 +26,7 @@ import { callScope } from './call_scope.js'
 import { ToolError } from './errors.js'
 import { isPlainObject } from './define_tool.js'
 import { describeFailure, invokeTool, redactFailure } from './invocation.js'
-import { encodeOutput } from './result.js'
+import { encodeOutput, toJsonValue } from './result.js'
 import type { Redactor } from './redaction.js'
 import type { RegistrySnapshot } from './registry.js'
 import type {
@@ -319,9 +319,10 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
           Number.isInteger(error.code)
             ? Number(error.code)
             : ProtocolErrorCode.InternalError
+        // toJsonValue scrubs keys and normalizes BigInt/cycles; value() masks every string.
         const data =
           error !== null && typeof error === 'object' && 'data' in error
-            ? redactor.value(error.data)
+            ? redactor.value(toJsonValue(error.data, redactor))
             : undefined
         throw new ProtocolError(
           code,

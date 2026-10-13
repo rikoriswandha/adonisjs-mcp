@@ -36,6 +36,8 @@ test('Server | app tool and prompt failures are redacted at the protocol boundar
           get() {
             throw new ProtocolError(ProtocolErrorCode.InvalidParams, `app-derived ${secret}`, {
               nested: { neutral: secret },
+              [secret]: 1,
+              big: 5n,
             })
           },
         },
@@ -64,7 +66,11 @@ test('Server | app tool and prompt failures are redacted at the protocol boundar
       if (!(error instanceof Error) || !('code' in error) || !('data' in error)) throw error
       assert.include(error.message, 'app-derived [REDACTED]')
       assert.equal(error.code, -32602)
-      assert.deepEqual(error.data, { nested: { neutral: '[REDACTED]' } })
+      assert.deepEqual(error.data, {
+        'nested': { neutral: '[REDACTED]' },
+        '[REDACTED]': 1,
+        'big': '5',
+      })
     }
   } finally {
     await client.close()
