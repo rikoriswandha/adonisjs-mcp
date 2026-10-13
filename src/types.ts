@@ -136,6 +136,16 @@ export interface DeadlineToolConfig {
   timeout?: number
 }
 
+export interface HttpToolConfig extends DeadlineToolConfig {
+  /**
+   * Parent domain of tenant hosts when `@rikology/adonisjs-tenant` resolves
+   * tenants by subdomain, e.g. `'tenants.test'`: `http_request` with
+   * `tenant: 'acme'` sends `Host: acme.tenants.test:<port>` to the
+   * application socket. Not needed for the header and path resolvers.
+   */
+  tenantDomain?: string | null
+}
+
 export interface McpLimitsConfig {
   /**
    * Maximum accepted MCP request body, in bytes.
@@ -247,7 +257,7 @@ export interface McpConfig {
     sql?: SqlToolConfig
     logs?: LogsToolConfig
     docs?: DocsToolConfig
-    http?: DeadlineToolConfig
+    http?: HttpToolConfig
     ace?: DeadlineToolConfig
   }
 
@@ -298,7 +308,7 @@ export interface ResolvedMcpConfig {
     readonly docs: {
       readonly include: readonly string[]
     }
-    readonly http: { readonly timeout: number }
+    readonly http: { readonly timeout: number; readonly tenantDomain: string | null }
     readonly ace: { readonly timeout: number }
   }
   readonly extraTools: readonly ExtraToolLoader[]

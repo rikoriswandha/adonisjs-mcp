@@ -207,7 +207,18 @@ const configSchema = z.strictObject({
             .optional(),
         })
         .optional(),
-      http: deadline.optional(),
+      http: z
+        .strictObject({
+          timeout: positiveInteger.optional(),
+          tenantDomain: z
+            .string()
+            .refine((value) => normalizeHost(value) !== undefined && !value.includes(':'), {
+              message: "must be a host name without port such as 'tenants.test'",
+            })
+            .nullable()
+            .optional(),
+        })
+        .optional(),
       ace: deadline.optional(),
     })
     .optional(),
@@ -310,7 +321,13 @@ export function resolveConfig(input: unknown): ResolvedMcpConfig {
       docs: {
         include: unique(tools.docs?.include ?? ['@adonisjs/*', '@rikology/*']),
       },
-      http: { timeout: tools.http?.timeout ?? 30_000 },
+      http: {
+        timeout: tools.http?.timeout ?? 30_000,
+        tenantDomain:
+          tools.http?.tenantDomain === undefined || tools.http.tenantDomain === null
+            ? null
+            : normalizeHost(tools.http.tenantDomain)!,
+      },
       ace: { timeout: tools.ace?.timeout ?? 30_000 },
     },
     extraTools: [...(config.extraTools ?? [])],

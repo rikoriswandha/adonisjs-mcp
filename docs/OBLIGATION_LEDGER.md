@@ -51,12 +51,12 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-09 | `await import('#models/user')` natural pada eval; tanpa chdir/regex rewrite | Plan D09, D26 | SP-E | WP-28 | E08 | TERBUKA |
 | DC-10 | Read-only SQL ditegakkan DB/connection; statement filter hanya lapisan tambahan; tanpa fallback read-write | Plan D10 | SP-G | WP-16 | SEC-10–SEC-12 | SELESAI (M4: reader PostgreSQL READ ONLY + role SELECT-only, SQLite proses readonly; policy hanya lapisan tambahan; tanpa reader/driver capability `CAPABILITY_UNSUPPORTED`, tidak pernah fallback ke pool app; `database.spec`) |
 | DC-11 | Tenant raw SQL tanpa boundary DB terbukti ditolak; bukan string matching | Plan D11 | SP-H | WP-18 | E06, SEC-13 | SELESAI (M4: `tenant` hanya untuk tabel FORCE RLS; tabel TenantScope tanpa RLS dan SQLite → `TENANT_SCOPE_REQUIRED`; `database.spec`) |
-| DC-12 | Tenant `http_request` lewat middleware tenant app dengan mapping tepercaya | Plan D12 | SP-H | WP-21 | E06 | TERBUKA |
+| DC-12 | Tenant `http_request` lewat middleware tenant app dengan mapping tepercaya | Plan D12 | SP-H | WP-21 | E06 | SELESAI (M5: kunci tenant di-lookup lalu dipetakan ke header resolver `X-Tenant-ID` yang dibaca middleware tenant app sebelum auth; header itu tidak dapat diisi caller; A/B konkuren dan anonymous-after-call; `http.spec`) |
 | DC-13 | Evidence `runtime`/`generated`/`source` dipisahkan pada metadata | Plan D13 | SP-I | WP-11, WP-23–WP-25 | golden fixture introspeksi | TERBUKA |
-| DC-14 | Hybrid ditentukan surface terkonfigurasi/teramati, bukan kehadiran package | Plan D14 | SP-I | WP-09, WP-21 | PF-06 | TERBUKA |
+| DC-14 | Hybrid ditentukan surface terkonfigurasi/teramati, bukan kehadiran package | Plan D14 | SP-I | WP-09, WP-21 | PF-06 | SELESAI (M5: kit hybrid Inertia React + route `/api` → `kind: hybrid`, default `null`, request tanpa surface ditolak; `http.spec`) |
 | DC-15 | Origin binding hanya bila framework mengekspos bukti; selain itu `unknown` | Plan D15 | SP-D | WP-12 | E01 | SELESAI (M3: origin binding hanya dari trace `providerRegister` sinkron saat observasi gateway aktif; binding dari `boot()` dan tanpa observasi `origin: null`; `observability.spec`, `endpoint.spec` kit `api-bare`) |
 | DC-16 | Package ekstensi bisa memberi definisi tanpa runtime import; helper di-lazy-import setelah guard | Plan D16 | — | WP-03, WP-05 | E07 | SELESAI (M2: provider ekstensi fixture memberi object literal, `zod`/`ToolError` di-import di dalam `boot()` setelah `hasBinding`; `endpoint.spec`) |
-| DC-17 | Kredensial impersonation sementara via API nyata, cleanup `finally`, tanpa residu | Plan D17 | SP-F | WP-20 | E04 | TERBUKA |
+| DC-17 | Kredensial impersonation sementara via API nyata, cleanup `finally`, tanpa residu | Plan D17 | SP-F | WP-20 | E04 | SELESAI (M5: token dibuat guard dan dihapus per identifier di `finally` pada sukses/500/timeout/cancel; session cookie store tanpa record server; `http.spec`) |
 | DC-18 | SQL default read-only; write opt-in ditandai mutating di annotations dan skill | Plan D18 | SP-G | WP-16, WP-34 | E03 | TERBUKA |
 | DC-19 | Audit eval: status, durasi, call ID, excerpt ter-redaksi; tanpa kode penuh/secret | Plan D19 | SP-C | WP-28 | SEC-20 | TERBUKA |
 | DC-20 | `tools.docs.include` default `['@adonisjs/*', '@rikology/*']` identik di semua contoh/stub | Plan D20 | — | WP-31, WP-33 | E11 | TERBUKA |
@@ -66,9 +66,9 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-24 | Capture log/exception lewat instrumentasi opt-in yang dibuat configure; tidak diklaim zero-config | Plan D24 | SP-C | WP-10, WP-33, WP-35 | E02 | TERBUKA |
 | DC-25 | Inventory container parsial berlabel; events persistent-only; cache tidak hanya invalidasi saat ready | Plan D25 | SP-D | WP-12, WP-14, WP-37 | E01, E09 | TERBUKA |
 | DC-26 | Evaluator `vm` + callback importer framework; flag `--experimental-vm-modules` wajib (keputusan pengguna B-01); tanpa flag `CAPABILITY_UNSUPPORTED` | Plan D26 | SP-E | WP-28, WP-33, WP-35 | E08 | TERBUKA |
-| DC-27 | Impersonation: token handle + delete `finally`; cookie `e:` ber-expiry deadline call; semantik tanpa residu + replay terbatas, bukan revocation | Plan D27 | SP-F | WP-20, WP-35 | E04, E06 | TERBUKA |
+| DC-27 | Impersonation: token handle + delete `finally`; cookie `e:` ber-expiry deadline call; semantik tanpa residu + replay terbatas, bukan revocation | Plan D27 | SP-F | WP-20, WP-35 | E04, E06 | SELESAI untuk WP-20 (M5, D52: token handle + delete `finally`, cookie `e:` dengan expiry deadline dan rewrap setiap cookie `e:` response; `http.spec`); dokumentasi semantik replay tetap WP-35 |
 | DC-28 | Executor SQL milik MCP: PG reader least-privilege + extended protocol + READ ONLY + AST; SQLite child readonly + SIGKILL deadline; tanpa reader PG → capability nonaktif | Plan D28 | SP-G | WP-16, WP-36 | E03, SEC-10–SEC-12 | SELESAI dengan perubahan D46–D47 (M4: koneksi reader per call ditutup alih-alih `DISCARD ALL` + reuse; SQLite diperiksa lewat program terkompilasi native, bukan `sqlite-parser`; `database.spec`, `sql_policy.spec`) |
-| DC-29 | Raw SQL tenant hanya lewat FORCE RLS + reader NOBYPASSRLS + `set_config` parameterized milik MCP; tenant lookup/authorize sebelum run | Plan D29 | SP-H | WP-16, WP-18, WP-21 | E06, SEC-13 | SELESAI untuk WP-16/WP-18 (M4: lookup resolver app sebelum `TenantService.run`, `app.tenant_id` diset MCP, setiap relasi harus FORCE RLS, role BYPASSRLS ditolak; `database.spec`); mapping HTTP tetap WP-21 |
+| DC-29 | Raw SQL tenant hanya lewat FORCE RLS + reader NOBYPASSRLS + `set_config` parameterized milik MCP; tenant lookup/authorize sebelum run | Plan D29 | SP-H | WP-16, WP-18, WP-21 | E06, SEC-13 | SELESAI (M4: lookup resolver app sebelum `TenantService.run`, `app.tenant_id` diset MCP, setiap relasi harus FORCE RLS, role BYPASSRLS ditolak; `database.spec`. M5: mapping HTTP tenant lewat resolver tepercaya, D54; `http.spec`) |
 | DC-30 | Sumber evidence introspeksi per artefak (Vine AST, Tuyau runtime vs type-only, Inertia TS AST, Edge mounted roots) | Plan D30 | SP-I | WP-23–WP-26 | golden fixture | TERBUKA |
 | DC-31 | Ace subprocess + process group + watchdog independen parent; outcome unknown saat hard restart | Plan D31 | SP-J | WP-29, WP-38 | E08 | TERBUKA |
 | DC-32 | Identitas paket opsional: tenant 1.0.2, `@adonisplus/permissions` 0.0.4 (privat), Bouncer 4 alternatif, queue 0.6.2 + boringnode 0.6.0 | Plan D32 | SP-K | WP-09, WP-18, WP-27 | PF-07 | TERBUKA |
@@ -87,7 +87,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | API-07 | Result sukses: text JSON terstruktur + `durationMs`, `truncated`, evidence/limitations | Plan §4.3 | — | WP-05, WP-07 | E01 | SELESAI (M2: `src/result.ts`, `invocation.spec`, `endpoint.spec`) |
 | API-08 | Result gagal: `isError: true`, stable code, pesan ter-redaksi; error protokol tetap milik SDK | Plan §4.3 | SP-A | WP-07 | E12 | SELESAI (M2: `invocation.spec`, `fixture_fail` tanpa APP_KEY; error protokol `-32602`/`-32022`/`-32020`/`-32700` dari SDK di `endpoint.spec`) |
 | API-09 | Annotations sesuai perilaku aktual; tool mutating tidak diberi `readOnlyHint` | Plan §4.3 | — | semua tool WP | review katalog | TERBUKA |
-| API-10 | Error codes minimum: `DEPENDENCY_UNAVAILABLE`, `CAPABILITY_UNSUPPORTED`, `INPUT_INVALID`, `NOT_FOUND`, `READ_ONLY_VIOLATION`, `TENANT_SCOPE_REQUIRED`, `TIMEOUT`, `CANCELLED`, `EXECUTION_FAILED` | Plan §4.3 | — | WP-05 | unit + E02 | TERBUKA |
+| API-10 | Error codes minimum: `DEPENDENCY_UNAVAILABLE`, `CAPABILITY_UNSUPPORTED`, `INPUT_INVALID`, `NOT_FOUND`, `READ_ONLY_VIOLATION`, `TENANT_SCOPE_REQUIRED`, `TIMEOUT`, `CANCELLED`, `EXECUTION_FAILED` | Plan §4.3 | — | WP-05 | unit + E02 | SELESAI (M5: `http_request` mengembalikan `INPUT_INVALID`, `NOT_FOUND`, `TENANT_SCOPE_REQUIRED`, `TIMEOUT`, `DEPENDENCY_UNAVAILABLE` sebagai `isError`; non-2xx app tetap hasil; `http.spec`, `endpoint.spec`) |
 | API-11 | Exports `.`, `./configure`, `./types`, `./providers/mcp_provider` resolve dari tarball | Plan WP-02; Design exports | SP-B | WP-02 | `verify:exports`, `smoke:pack` | TERBUKA |
 | API-12 | Optional peer tidak di-import eager pada public entry | Plan §4.1 | SP-B | WP-01–WP-03 | PF-01, production prune | TERBUKA |
 | LC-01 | Register tanpa I/O/model import; `mcp.registry` tersedia untuk package lain saat `boot()` | Plan §4.2 | SP-D | WP-05, WP-06 | E07 | SELESAI (M2: `providers/mcp_provider.ts`; dua provider ekstensi register dari `boot()`) |
@@ -119,8 +119,8 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | T01 | `get_project_profile` | profile, surfaces, auth, packages, generated, capability reasons; installed vs active | SP-I, SP-K | WP-09 | E01, PF-01–PF-08 | TERBUKA |
 | T02 | `get_routes` | filter; method, pattern, handler, middleware, name, domain, surface + evidence | SP-D | WP-11 | E01, E05 | TERBUKA |
 | T03 | `get_middleware` | server/router/named stack dalam urutan | SP-D | WP-11 | E01 | SELESAI (M3: server stack berurutan termasuk middleware MCP berlabel, router stack diturunkan dari stack route ter-commit, named dengan jumlah route dan sumber export preload; `observability.spec`) |
-| T04 | `get_logs` | tail/level/grep literal; redaction sebelum simpan | SP-C | WP-10 | E02 | TERBUKA |
-| T05 | `get_last_exceptions` | limit; message/stack/route/request ID, dedup | SP-C | WP-10 | E02 | TERBUKA |
+| T04 | `get_logs` | tail/level/grep literal; redaction sebelum simpan | SP-C | WP-10 | E02 | SELESAI (M3 + M5: `http_request` mengembalikan hanya log request id hop-nya di tengah traffic gagal konkuren; `observability.spec`, `http.spec`) |
+| T05 | `get_last_exceptions` | limit; message/stack/route/request ID, dedup | SP-C | WP-10 | E02 | SELESAI (M3 + M5: exception request call dengan status response; `observability.spec`, `http.spec`) |
 | T06 | `get_container_bindings` | pattern; inventory parsial `source-declared+runtime-verified`, kind/origin bila teramati, coverage eksplisit; tanpa instantiate (D25) | SP-D | WP-12 | E01 | SELESAI (M3: lane `source-declared` + `runtime-observed`, verifikasi `hasBinding`, `coverage: partial`, `declaredUnavailable`, counter konstruksi 0; `observability.spec`, `endpoint.spec`) |
 | T07 | `get_events` | event + persistent listener tanpa emit; once/wildcard dilabel tidak tercakup | SP-D | WP-12 | E01 | SELESAI (M3: listener inline/lazy/class dari map persisten, `once()` tidak tercantum dan dilabel, `transportListenerCount`, listener tidak berjalan; `observability.spec`) |
 | T08 | `get_config` | dot key; subtree ter-redaksi, cycle/function aman | — | WP-13 | SEC-18 | SELESAI (M3: traversal own-data, key prototype ditolak, getter/config provider tidak dievaluasi, subtree sentinel ter-redaksi; `introspection.spec`, `redaction.spec`, `observability.spec`) |
@@ -130,7 +130,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | T12 | `execute_sql_query` | bindings/connection/tenant; rows/dialect/returned count/duration; DB enforcement | SP-G, SP-H | WP-16, WP-18 | E03, E06, SEC-10–SEC-13 | SELESAI (M4: `database.spec`, `sql_policy.spec`) |
 | T13 | `get_migrations` | ran/pending/batch/file tanpa menjalankan migration | — | WP-17 | E03 | SELESAI (M4: status dari `sourceFiles` Lucid + tabel histori, tabel histori tidak dibuat bila absen; `database.spec`) |
 | T14 | `diff_schema` | model vs DB physical columns; computed tidak dianggap missing | SP-G | WP-17 | E03 | SELESAI (M4: kolom hilang dari migration pending, kolom tak dideklarasikan, computed terpisah, tabel `schema.table` dan connection model; `database.spec`) |
-| T15 | `http_request` | loopback nyata; method/path/body/headers/as/surface/tenant; safe headers; logs | SP-F, SP-H, SP-A | WP-19–WP-22 | E02, E04–E06 | TERBUKA |
+| T15 | `http_request` | loopback nyata; method/path/body/headers/as/surface/tenant; safe headers; logs | SP-F, SP-H, SP-A | WP-19–WP-22 | E02, E04–E06 | SELESAI (M5, D51–D55: loopback, method/path/body/form/headers/as/surface/tenant/domain, header aman, body summary, validasi, log/exception; `http.spec`, `endpoint.spec`) |
 | T16 | `get_validators` | field/rule/message/reference; dynamic → unknown | SP-I | WP-23 | golden fixture | TERBUKA |
 | T17 | `get_inertia_pages` | route → component/prop evidence tanpa menjalankan controller | SP-I | WP-24 | PF-03, PF-04 | TERBUKA |
 | T18 | `get_shared_props` | declared/observed shared props; lazy tidak dievaluasi | SP-I | WP-24 | PF-03 | TERBUKA |
@@ -161,7 +161,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Fixture | Yang harus terbukti | Gate | Status |
 | --- | --- | --- | --- | --- |
-| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2 dan tool database M4 (kit `api-bare`: lima tool database + `adonis://models` `DEPENDENCY_UNAVAILABLE`, `endpoint.spec`); availability view/impersonation dibuktikan ulang saat tool tersebut ada (M5–M6) |
+| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2, tool database M4, dan impersonation M5 (kit `api-bare`: lima tool database + `adonis://models` `DEPENDENCY_UNAVAILABLE`; `http_request` disajikan, `as` `DEPENDENCY_UNAVAILABLE`; `endpoint.spec`); availability view dibuktikan ulang saat tool tersebut ada (M6) |
 | PF-02 | API + Lucid + token auth + Tuyau | DB tools, JSON default, token cleanup | SP-F, SP-I | TERBUKA |
 | PF-03 | Inertia React + session/Shield | page/shared/transformer, X-Inertia/version, flash, CSRF | SP-F, SP-I | TERBUKA |
 | PF-04 | Inertia Vue | tanpa asumsi React | SP-I | TERBUKA |
@@ -191,8 +191,8 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | SEC-13 | Raw SQL tenant: komentar/string/OR/UNION/join/schema/quoted identifier tidak menjadi bypass; shared-table tanpa RLS ditolak | SP-H | WP-18, WP-36 | SELESAI untuk corpus M4 (OR/komentar/UNION hanya baris tenant via RLS, join ke tabel tanpa RLS dan tabel TenantScope tanpa RLS ditolak, `set_config` ditolak; `database.spec`) |
 | SEC-14 | `allowCrossTenant` eksplisit dan terlabel di output; `tenant` tidak memilih connection global diam-diam | SP-H | WP-18 | SELESAI (M4: tanpa opsi `TENANT_SCOPE_REQUIRED`; dengan opsi `crossTenant: true` + limitation; `database.spec`) |
 | SEC-15 | Batas `query_model` read-only (hooks/serializer app tetap tepercaya) terdokumentasi | — | WP-15, WP-35 | TERBUKA |
-| SEC-16 | HTTP hanya ke origin app; tanpa scheme/host/`//host`/port/unix/file; redirect manual; MCP path + alias encoded ditolak | SP-A | WP-19 | TERBUKA |
-| SEC-17 | Impersonation lewat adapter asli; tanpa token permanen; `Authorization`/`Cookie`/`Set-Cookie` tidak bocor; tenant header internal tidak dipercaya | SP-F, SP-H | WP-20, WP-21 | TERBUKA |
+| SEC-16 | HTTP hanya ke origin app; tanpa scheme/host/`//host`/port/unix/file; redirect manual; MCP path + alias encoded ditolak | SP-A | WP-19 | SELESAI (M5: path saja, alias MCP ter-encode/dot-segment/case/trailing slash, `//host`, URL absolut, backslash, domain tak terdaftar, header Host/forwarded ditolak; redirect lintas origin/ke MCP tidak diikuti; `http.spec`, unit `http.spec`) |
+| SEC-17 | Impersonation lewat adapter asli; tanpa token permanen; `Authorization`/`Cookie`/`Set-Cookie` tidak bocor; tenant header internal tidak dipercaya | SP-F, SP-H | WP-20, WP-21 | SELESAI (M5: kredensial via guard app, token dihapus, cookie ber-expiry deadline; `Set-Cookie`/`Authorization` disembunyikan; echo header app tidak memuat bentuk kredensial yang di-mint; header tenant tidak diterima dari caller; `http.spec`) |
 | SEC-18 | Redaction sebelum buffer dan setiap output (config/logs/errors/resources/HTTP/queue/docs); default-deny path sensitif | SP-C | WP-10, WP-13, WP-36 | TERBUKA |
 | SEC-19 | `get_env` tanpa nilai; docs search tidak membaca `.env`; configure tidak mencetak `.env` | — | WP-13, WP-31, WP-33 | TERBUKA |
 | SEC-20 | Data log/docs/model diperlakukan untrusted di skill; eval didokumentasikan sebagai trusted REPL | SP-E | WP-28, WP-34 | TERBUKA |
@@ -216,9 +216,9 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | ID | Skenario | Gate | Status |
 | --- | --- | --- | --- |
 | E01 | Basic runtime dua era → profile → routes → resources → prompt | SP-A, SP-D | SELESAI (M2 discovery/profile/prompt di `endpoint.spec`; M3 `get_routes` + `adonis://routes` di dua era, `observability.spec`) |
-| E02 | Debug request: status, exception matching, log correlation | SP-C, SP-F | TERBUKA |
+| E02 | Debug request: status, exception matching, log correlation | SP-C, SP-F | SELESAI (M5: request gagal lewat `http_request` → 500, exception cocok, log hanya request id call di tengah enam request gagal lain; `http.spec`) |
 | E03 | Data semantics: scoped/soft-delete/serializeAs vs raw; schema diff; status tanpa migrasi | SP-G | SELESAI (M4: `database.spec`) |
-| E04 | Auth: anonymous ditolak, `as` valid, invalid gagal, cleanup success/error/abort | SP-F | TERBUKA |
+| E04 | Auth: anonymous ditolak, `as` valid, invalid gagal, cleanup success/error/abort | SP-F | SELESAI (M5: anonymous 401/redirect login, `as` token/session valid, user/guard/model invalid gagal eksplisit, cleanup token sukses/500/timeout/cancel, tanpa identitas pada request berikutnya; `http.spec`) |
 | E05 | Surface API JSON / Inertia / Edge, validation mapping, domain route | SP-F, SP-I | TERBUKA |
 | E06 | Tenant concurrency model/eval/HTTP; missing/wrong tenant; raw SQL bypass ditolak | SP-H | TERBUKA |
 | E07 | Extensibility: provider domain register, wrapper sekali, disable menang, duplicate gagal boot | — | SELESAI (M2: `endpoint.spec`) |
@@ -265,14 +265,14 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-16 | Evaluator memakai `importModuleDynamically` callback ke importer framework (`app.import`) dengan filename sintetis app root; regression fresh import, warm-cache control, identitas model/controller pada hot-swap same-PID, dari tarball terpasang | S-E | WP-28 | TERBUKA |
 | OB-17 | API vm eksperimental diuji pada Node minimum/current dan Linux; tanpa flag → `CAPABILITY_UNSUPPORTED` eksplisit dengan remediasi, tanpa fallback regex | S-E | WP-28, WP-38 | TERBUKA |
 | OB-18 | Dokumentasi: timeout kooperatif, late mutation setelah timeout, loop sinkron membekukan HTTP, capture console hanya leksikal, bukan sandbox | S-E | WP-28, WP-34, WP-35 | TERBUKA |
-| OB-19 | Access token: simpan handle hasil create, `await delete` di `finally` (success/error/timeout/cancel); tenant-bound provider bila tenant aktif | S-F | WP-20 | TERBUKA |
-| OB-20 | Cookie session: payload `e:` lewat encryption service dengan purpose session-ID dan expiry terikat deadline absolut; setiap response/XSRF cookie di-rewrap; test versi-terikat format, purpose, `stringify:false`, Set-Cookie string/array | S-F | WP-20 | TERBUKA |
+| OB-19 | Access token: simpan handle hasil create, `await delete` di `finally` (success/error/timeout/cancel); tenant-bound provider bila tenant aktif | S-F | WP-20 | SELESAI (M5: handle token hasil `guard.createToken` dihapus per identifier di `finally`; tenant-bound lewat `TenantService.run` dengan provider token tenant; `http.spec`) |
+| OB-20 | Cookie session: payload `e:` lewat encryption service dengan purpose session-ID dan expiry terikat deadline absolut; setiap response/XSRF cookie di-rewrap; test versi-terikat format, purpose, `stringify:false`, Set-Cookie string/array | S-F | WP-20 | SELESAI dengan perubahan D52 (M5: header Cookie disusun tool, bukan `plainCookie`; data `e:` lewat encryption service purpose session-id + expiry deadline, id ditandatangani `CookieClient`; setiap cookie `e:` response di-rewrap; format diterima app nyata pada flow CSRF/validasi/auth; `http.spec`) |
 | OB-21 | Semantik kredensial didokumentasikan: tanpa residu server + replay window terbatas, bukan revocation instan | S-F | WP-20, WP-35 | TERBUKA |
-| OB-22 | Store session stateful (memory/file/redis) tidak diklaim sebelum bukti HTTP abort/finalization dan mitigasi write-after-destroy | S-F | WP-20 | TERBUKA |
-| OB-23 | Guard/user/tenant membership divalidasi sebelum mint; jar/kredensial per call; `Authorization`/`Cookie`/`Set-Cookie` di-strip; scan log default | S-F | WP-19, WP-20, WP-22 | TERBUKA |
-| OB-24 | Inertia: kirim versi aktual, baca `inputErrorsBag`/props errors, pertahankan status redirect asli (302 teramati) | S-F | WP-21, WP-22 | TERBUKA |
-| OB-25 | Mapping Host/header tenant dari config tepercaya, middleware tenant berjalan sebelum auth; mapping bukan otorisasi; domain route tidak diasumsikan jatuh ke root | S-F, S-H | WP-19, WP-21 | TERBUKA |
-| OB-26 | Gate M5 mempertahankan corpus cross-tenant token/session, cleanup token success/error/abort, anonymous-after-call | S-F | WP-20, WP-21 | TERBUKA |
+| OB-22 | Store session stateful (memory/file/redis) tidak diklaim sebelum bukti HTTP abort/finalization dan mitigasi write-after-destroy | S-F | WP-20 | SELESAI (M5: hanya store `cookie`; store lain `CAPABILITY_UNSUPPORTED` dengan alasan, tidak diklaim) |
+| OB-23 | Guard/user/tenant membership divalidasi sebelum mint; jar/kredensial per call; `Authorization`/`Cookie`/`Set-Cookie` di-strip; scan log default | S-F | WP-19, WP-20, WP-22 | SELESAI (M5: guard/user/membership divalidasi sebelum mint; jar dan kredensial per call; `Authorization`/`Cookie`/`Set-Cookie` tidak dikembalikan; `http.spec`) |
+| OB-24 | Inertia: kirim versi aktual, baca `inputErrorsBag`/props errors, pertahankan status redirect asli (302 teramati) | S-F | WP-21, WP-22 | SELESAI (M5: versi dari `InertiaManager` app → 200 bukan 409; errors dari props Inertia setelah redirect 302 asli; `http.spec`) |
+| OB-25 | Mapping Host/header tenant dari config tepercaya, middleware tenant berjalan sebelum auth; mapping bukan otorisasi; domain route tidak diasumsikan jatuh ke root | S-F, S-H | WP-19, WP-21 | SELESAI (M5: mapping dari `config/tenancy.ts`, middleware tenant app sebelum auth, membership tetap dicek; `domain` wajib domain router terdaftar; `http.spec`) |
+| OB-26 | Gate M5 mempertahankan corpus cross-tenant token/session, cleanup token success/error/abort, anonymous-after-call | S-F | WP-20, WP-21 | SELESAI (M5: corpus A/B token+session konkuren, user/tenant salah ditolak sebelum mint, cleanup token sukses/500/deadline, anonymous-after-call; `http.spec`) |
 | OB-27 | PostgreSQL: reader dedicated NOSUPERUSER SELECT-only, `queryMode:'extended'` untuk setiap statement (`values: []` tidak cukup), `BEGIN READ ONLY`, AST single SELECT/WITH | S-G | WP-16 | SELESAI (M4: role superuser/punya hak tulis ditolak sebelum query; `database.spec`) |
 | OB-28 | PostgreSQL deadline lewat control connection `pg_cancel_backend`, tunggu settlement, `ROLLBACK` lalu `DISCARD ALL`; tutup koneksi bila cleanup gagal; pool app tidak disentuh | S-G | WP-16 | SELESAI dengan perubahan D46 (M4: koneksi reader per call selalu ditutup sesudah ROLLBACK, sehingga sesi tidak pernah dipakai ulang; `database.spec`) |
 | OB-29 | SQLite: child process dengan koneksi `readonly` + `fileMustExist`, `stmt.readonly` + AST single SELECT, deny ATTACH/VACUUM/PRAGMA/function/UDF; JS `loadExtension` tidak diekspos; deadline SIGKILL + await exit; in-memory ditolak | S-G | WP-16 | SELESAI dengan perubahan D47 (M4: AST JS diganti pemeriksaan program `EXPLAIN` native; `database.spec`) |
@@ -401,3 +401,24 @@ Bukti parsial; baris tetap `TERBUKA`:
 | E06 | Model query A/B konkuren terisolasi, tenant hilang/tak dikenal gagal, raw SQL OR/komentar/UNION dibatasi RLS | Eval (WP-28, OB-35) dan HTTP (WP-21) |
 | PF-02 | Tool database dan schema tersedia pada kit API (Lucid SQLite) dan PostgreSQL | JSON default dan cleanup token (M5), Tuyau (WP-25) |
 | PF-07 | Positive adapter tenant 1.0.2 (lookup allowlist header, TenantScope, RLS) | Permission + queue (WP-27) |
+
+## 17. Progres M5 (13 Oktober 2026)
+
+M5 (WP-19–WP-22) diimplementasikan; bukti pada macOS arm64, Node 24.21.0, npm 11.19.0, `@rikology/adonisjs-tenant` 1.0.2: `npm run lint`, `npm run typecheck`, `npm test` (145 unit), `npm run test:integration` (61 integration), `npm run verify:exports`. `http.spec` = `tests/integration/http.spec.ts` (kit baru `hybrid` dan kit API + tenant), unit `http.spec` = `tests/unit/http.spec.ts`. Baris yang berpindah ke `SELESAI`: DC-12, DC-14, DC-17, DC-27 (WP-20), DC-29 (lengkap), API-10, T04, T05, T15, SEC-16, SEC-17, E02, E04, OB-19, OB-20 (perubahan D52), OB-22 (tidak diklaim), OB-23–OB-26; PF-01 diperkuat untuk impersonation.
+
+Bukti parsial; baris tetap `TERBUKA`:
+
+| ID | Sudah terbukti di M5 | Sisa |
+| --- | --- | --- |
+| OB-21 | Limitation setiap call session menyatakan salinan cookie berlaku sampai deadline dan tidak di-revoke di server; token dinyatakan dihapus | README/API reference (WP-35) |
+| CF-06 | Deadline HTTP `tools.http.timeout` 30.000 ms (input tidak boleh melebihi), body dibatasi `limits.maxResultBytes`, `TIMEOUT` tanpa retry | Ace (WP-29) |
+| CF-10 | Config aditif `tools.http.tenantDomain` (host tanpa port, null default) untuk resolver subdomain | Dokumentasi (WP-35); gate integrasi resolver subdomain/path |
+| T02 | Surface per route dipakai `http_request` dengan sumber `route-guard`/`config`/`inferred`/`default` | `get_routes` pada kit Inertia/Edge/hybrid (E05) |
+| PF-02 | JSON default untuk surface api, cleanup token pada kit API (tenant) dan hybrid | Tuyau (WP-25) |
+| PF-03 | Kit hybrid (Inertia React + session/Shield): `X-Inertia` + versi aktual, flash, CSRF, validasi | Introspeksi page/shared/transformer (WP-24) |
+| PF-06 | Surface per route (guard, method, domain `api.*`), hybrid tanpa default meminta surface | Mapping tenant/domain pada kit hybrid yang sama |
+| E05 | API JSON, page Inertia (component/props/version), outline HTML halaman Edge, validasi Inertia, domain route tidak jatuh ke root | Kit Edge-only (hypermedia) dan Inertia Vue (M6) |
+| E06 | HTTP A/B konkuren lewat guard token dan session tenant-aware; tenant hilang/salah/membership ditolak | Eval (WP-28, OB-35) |
+| SEC-18 | Output `http_request` diproyeksikan dengan kredensial yang di-mint dan nilai cookie jar sebagai secret tambahan | Queue/docs (WP-27, WP-31), adversarial suite (WP-36) |
+| NF-03 | Timeout `http_request` tidak memengaruhi request lain; handler app tetap berjalan, tanpa retry | Eval/Ace (WP-28, WP-29) |
+| NF-04 | Body response HTTP dibaca sampai `limits.maxResultBytes` lalu koneksi ditutup (4 MiB → 256 KiB, app tetap melayani) | Mode read-write SQL memuat hasil penuh dari driver (dilabel) |

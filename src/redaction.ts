@@ -80,6 +80,14 @@ export class Redactor {
     )
   }
 
+  /**
+   * Redactor that also masks `secrets`, e.g. credentials minted for one
+   * tool call.
+   */
+  withSecrets(secrets: Iterable<string>): Redactor {
+    return new Redactor([...this.#secrets, ...secrets])
+  }
+
   text(input: string): string {
     let output = input
     for (const secret of this.#secrets) {

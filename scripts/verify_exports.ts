@@ -104,6 +104,7 @@ const config = {
     disabled: ['project_eval'],
     docs: { include: ['@adonisjs/*'] },
     sql: { timeout: 5000, readers: { pg: { user: 'app_reader' } } },
+    http: { timeout: 10_000, tenantDomain: 'tenants.test' },
   },
   extraTools: [loader],
 } satisfies McpConfig

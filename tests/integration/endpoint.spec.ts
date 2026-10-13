@@ -31,6 +31,7 @@ import {
   setMcpProviderEnvironments,
   toolPayload,
   writeMcpConfig,
+  waitForMcp,
 } from '../helpers/mcp_endpoint.js'
 import type { CapabilityReport, ProjectProfile } from '../../src/types.js'
 
@@ -612,6 +613,7 @@ test.group('Endpoint | API starter kit', (group) => {
   test('provider registration order does not change the served tools', async ({ assert }) => {
     await setExtensionProviders(fixture, ['second_mcp_provider', 'fixture_mcp_provider'])
     const reordered = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(reordered)
     try {
       for (const era of ERAS) {
         assert.deepEqual(await toolNames(reordered, era), servedTools, era)
@@ -625,6 +627,7 @@ test.group('Endpoint | API starter kit', (group) => {
   test('a custom path serves the endpoint there only', async ({ assert }) => {
     await writeMcpConfig(fixture, `  path: '/__custom/mcp',\n${BASE_CONFIG}`)
     const custom = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(custom)
     try {
       assert.include(await toolNames(custom, 'legacy', '/__custom/mcp'), 'get_project_profile')
       const old = await custom.fetch(DEFAULT_PATH, {
@@ -745,6 +748,7 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
 
   test('the profile claims no optional integration that is absent', async ({ assert }) => {
     const app = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(app)
     const home = await app.fetch('/')
     assert.equal(home.status, 200)
 
@@ -787,12 +791,33 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
       get_models: 'DEPENDENCY_UNAVAILABLE',
       get_project_profile: 'served',
       get_routes: 'served',
+      http_request: 'served',
       query_model: 'DEPENDENCY_UNAVAILABLE',
     })
     const models = profile.data.capabilities.resources.find((entry) => entry.name === 'models')
     assert.deepInclude(models, { status: 'unavailable', code: 'DEPENDENCY_UNAVAILABLE' })
     const logs = profile.data.capabilities.tools.find((entry) => entry.name === 'get_logs')
     assert.include(logs!.reason, 'hooks: { streamWrite }')
+
+    const plain = await withClient(app, 'modern', async (client) => {
+      const result = await client.callTool({ name: 'http_request', arguments: { path: '/' } })
+      return toolPayload<{
+        data: { response: { status: number }; body: { json: unknown }; auth: unknown }
+      }>(result)
+    })
+    assert.equal(plain.data.response.status, 200)
+    assert.deepEqual(plain.data.body.json, { hello: 'world' })
+    assert.isNull(plain.data.auth)
+    const impersonation = await withClient(app, 'legacy', async (client) => {
+      const result = await client.callTool({
+        name: 'http_request',
+        arguments: { path: '/', as: { userId: 1 } },
+      })
+      assert.isTrue(result.isError)
+      return toolPayload<{ error: { code: string; message: string } }>(result).error
+    })
+    assert.equal(impersonation.code, 'DEPENDENCY_UNAVAILABLE')
+    assert.include(impersonation.message, '@adonisjs/auth')
 
     const bindings = await withClient(app, 'modern', async (client) =>
       toolPayload<{

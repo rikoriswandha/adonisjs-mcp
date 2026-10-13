@@ -29,6 +29,7 @@ import {
   setExtensionProviders,
   toolPayload,
   writeMcpConfig,
+  waitForMcp,
 } from '../helpers/mcp_endpoint.js'
 import { OwnedPostgresCluster } from '../helpers/postgres.js'
 
@@ -340,6 +341,7 @@ $1`
     )
     await writeMcpConfig(fixture, '  tools: { sql: { maxRows: 5 } },')
     app = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(app)
     return () => fixture.dispose()
   })
 
@@ -651,6 +653,7 @@ $1`
     await app.stop()
     await writeMcpConfig(fixture, '  tools: { sql: { maxRows: 5, readOnly: false } },')
     app = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(app)
     await withClient(app, async (client) => {
       const { tools } = await client.listTools()
       const tool = tools.find((entry) => entry.name === 'execute_sql_query')!
@@ -887,6 +890,7 @@ test.group('Database | PostgreSQL with tenants and row level security', (group) 
   },`
       )
       app = await fixture.start({ nodeEnv: 'development' })
+      await waitForMcp(app)
     } catch (error) {
       await fixture.dispose()
       await cluster.stop()
@@ -1150,6 +1154,7 @@ test.group('Database | PostgreSQL with tenants and row level security', (group) 
   },`
     )
     app = await fixture.start({ nodeEnv: 'development' })
+    await waitForMcp(app)
     await withClient(app, async (client) => {
       const invoices = await call<QueryModelData>(client, 'query_model', { model: 'Invoice' })
       assert.equal(invoices.data.returnedRows, 3)

@@ -34,7 +34,7 @@ import {
 } from './process.js'
 import type { PostgresDatabase } from './postgres.js'
 
-export type FixtureKit = 'api' | 'api-bare'
+export type FixtureKit = 'api' | 'api-bare' | 'hybrid'
 export type NodeEnvironment = 'development' | 'test' | 'production'
 
 /**

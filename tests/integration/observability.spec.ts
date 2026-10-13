@@ -739,10 +739,10 @@ export default {
       status: null,
     })
     assert.equal(await statusOf(production.fetch(DEFAULT_PATH, { method: 'POST' })), 404)
-    const printed = production.logs.records.filter(
-      (record) => record.probe === 'ctx' && record.id === '1'
-    )
-    assert.lengthOf(printed, 1)
+    const isWorkLog = (record: Record<string, unknown> | undefined) =>
+      record?.probe === 'ctx' && record.id === '1'
+    await production.logs.waitFor((line) => isWorkLog(line.record), 10_000)
+    assert.lengthOf(production.logs.records.filter(isWorkLog), 1)
     assert.notInclude(production.logs.text(), 'ERR_MODULE_NOT_FOUND')
     await production.stop()
   })

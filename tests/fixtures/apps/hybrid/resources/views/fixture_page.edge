@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Fixture &amp; page</title>
+  </head>
+  <body>
+    <h1>Fixture page</h1>
+    <h2>Sign in</h2>
+    <form method="POST" action="/login">
+      {{ csrfField() }}
+      <input type="email" name="email" />
+      <input type="password" name="password" />
+      <button type="submit">Sign in</button>
+    </form>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/signup">Create an account</a>
+    <script>console.log('not part of the outline')</script>
+  </body>
+</html>

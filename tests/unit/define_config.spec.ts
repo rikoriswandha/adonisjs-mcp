@@ -44,7 +44,7 @@ test.group('resolveConfig | defaults and merge', () => {
           exceptionBufferBytes: 1024 * 1024,
         },
         docs: { include: ['@adonisjs/*', '@rikology/*'] },
-        http: { timeout: 30_000 },
+        http: { timeout: 30_000, tenantDomain: null },
         ace: { timeout: 30_000 },
       },
       extraTools: [],
@@ -67,7 +67,7 @@ test.group('resolveConfig | defaults and merge', () => {
       exceptionBufferSize: 100,
       exceptionBufferBytes: 1024 * 1024,
     })
-    assert.deepEqual(config.tools.http, { timeout: 30_000 })
+    assert.deepEqual(config.tools.http, { timeout: 30_000, tenantDomain: null })
   })
 
   test('arrays replace defaults so docs scopes can be narrowed', ({ assert }) => {

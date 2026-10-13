@@ -13,10 +13,18 @@ import { request } from 'node:http'
 import { connect } from 'node:net'
 import { readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import type { FixtureApp } from './fixture_app.js'
+import type { FixtureApp, RunningApp } from './fixture_app.js'
 import { packedPackage } from './package_tarball.js'
 
 export const DEFAULT_PATH = '/__adonis/mcp'
+
+/**
+ * Waits until the provider activated the endpoint. The HTTP server answers
+ * before `ready()` ran, and the endpoint answers 503 until then.
+ */
+export async function waitForMcp(app: RunningApp) {
+  await app.logs.waitFor((line) => line.text.includes('MCP endpoint ready'), 30_000)
+}
 
 const EXTENSIONS_START = '// fixture-extension-providers:start'
 const EXTENSIONS_END = '// fixture-extension-providers:end'

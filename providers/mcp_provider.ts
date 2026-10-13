@@ -39,6 +39,7 @@ import { getModelsTool, modelsResource } from '../src/tools/database/get_models.
 import { ModelQuery, queryModelTool } from '../src/tools/database/query_model.js'
 import { getLastExceptionsTool } from '../src/tools/runtime/get_last_exceptions.js'
 import { getLogsTool } from '../src/tools/runtime/get_logs.js'
+import { HttpRequestService, httpRequestTool } from '../src/tools/http/http_request.js'
 import { TenantIntegration } from '../src/tenant.js'
 import type { ResolvedMcpConfig } from '../src/types.js'
 
@@ -187,6 +188,8 @@ export default class McpProvider {
     registry.tool(getMigrationsTool(migrations))
     registry.tool(diffSchemaTool(new SchemaDiff(lucid, models, migrations)))
     registry.resource(modelsResource(models))
+
+    registry.tool(httpRequestTool(new HttpRequestService({ app, redactor, catalog: models })))
   }
 
   async start() {

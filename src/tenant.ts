@@ -52,6 +52,8 @@ const tenancyConfig = z.object({
         .object({
           lookup: z.custom<Lookup>((value) => typeof value === 'function').optional(),
           tenants: z.record(z.string(), z.unknown()).optional(),
+          header: z.string().min(1).optional(),
+          levels: z.int().positive().optional(),
         })
         .optional(),
     })
@@ -101,6 +103,47 @@ function strategy(app: ApplicationService): Strategy {
     kind: 'none',
     resolver: name,
     reason: `resolver "${name}" has neither a lookup callback nor a tenants allowlist`,
+  }
+}
+
+/**
+ * How an HTTP request reaches the tenant middleware of the application for
+ * one tenant key, derived from the default resolver of config/tenancy.ts.
+ * The mapping only selects a tenant; it does not authorize anybody.
+ */
+export type TenantRequestMapping =
+  | { kind: 'header'; resolver: string; header: string }
+  | { kind: 'subdomain'; resolver: string; levels: number }
+  | { kind: 'path'; resolver: string }
+  | { kind: 'unsupported'; resolver: string | null; reason: string }
+
+export function tenantRequestMapping(app: ApplicationService): TenantRequestMapping {
+  const parsed = tenancyConfig.safeParse(app.config.get('tenancy', undefined))
+  if (!parsed.success) {
+    return {
+      kind: 'unsupported',
+      resolver: null,
+      reason: 'config/tenancy.ts has no "default" resolver with configured "tenants"',
+    }
+  }
+  const name = parsed.data.default
+  const entry = parsed.data.tenants[name]
+  if (!entry) {
+    return { kind: 'unsupported', resolver: name, reason: `resolver "${name}" is not configured` }
+  }
+  switch (entry.resolver) {
+    case 'header':
+      return { kind: 'header', resolver: name, header: entry.options?.header ?? 'X-Tenant-ID' }
+    case 'subdomain':
+      return { kind: 'subdomain', resolver: name, levels: entry.options?.levels ?? 1 }
+    case 'path':
+      return { kind: 'path', resolver: name }
+    default:
+      return {
+        kind: 'unsupported',
+        resolver: name,
+        reason: `the "${entry.resolver}" resolver cannot be addressed from a request without forging credentials`,
+      }
   }
 }
 
