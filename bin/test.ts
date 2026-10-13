@@ -16,6 +16,11 @@ configure({
       files: ['tests/integration/**/*.spec.ts'],
       timeout: 600_000,
     },
+    {
+      name: 'security',
+      files: ['tests/security/**/*.spec.ts'],
+      timeout: 600_000,
+    },
   ],
   plugins: [assert(), expectTypeOf()],
 })
