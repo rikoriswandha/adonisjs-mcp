@@ -2,6 +2,8 @@
 
 Oct 13, 2026 · @Riko
 
+> Revisi 13 Oktober 2026 (keputusan pengguna, plan D75): seluruh keterkaitan dengan AdonisJS Plus (adapter `@adonisplus/permission` dan Flow/`.flow/`) dihapus; `get_permissions` hanya membaca ability dan policy Bouncer.
+
 ## Tujuan dan prinsip
 
 `@rikology/adonisjs-mcp` membuat coding agent (Claude Code, Cursor, dll.) bisa bicara langsung dengan aplikasi AdonisJS yang sedang berjalan, bukan hanya membaca file. Tidewave (Phoenix/Rails) adalah inspirasi awalnya; targetnya lebih jauh: tool yang tahu IoC container, Lucid, VineJS, Inertia, ace, dan paket @rikology lain. MCP server hidup di dalam proses app, di endpoint `http://localhost:3333/__adonis/mcp` (path bisa diganti).
@@ -15,7 +17,7 @@ Prinsip yang mengikat semua keputusan di bawah:
 - **Satu package, tanpa UI.** Package ini server + tools saja. Browser tooling dan UI inspeksi di luar scope v1.
 - **Mengikuti konvensi @rikology.** `node ace configure`, stub untuk `config/mcp.ts`, provider di `providers/`, types di `src/types.ts`.
 
-**Posisi terhadap AdonisJS Plus / Flow.** [Flow AI](https://plus.adonisjs.com/flow) (bagian dari AdonisJS Plus, $149/tahun) adalah *context engineering*: cookbook statis per versi package (`.flow/docs`), skill konvensi, dan alur plan-first (`.flow/changes/<nama>/brief.md`, `blueprint.md`, `assert.md`). Tidak ada komponen runtime; agen tetap menebak state app dari file. Package ini mengisi sisi yang satunya: Flow memberi tahu agen *cara* menulis Adonis, MCP memberi tahu *keadaan* app saat ini (model, route, data, error). Keduanya saling melengkapi, dan `SKILL.md` di package ini harus memakai istilah yang sama dengan Flow (`node ace make:page`, `#generated/controllers`, `@generated/data`, `<Form route>`) agar agen yang memakai keduanya tidak bingung. Dua tool tambahan karena fitur v7 yang Flow andalkan: `get_transformers` (shape `Data.<Resource>` dari `@generated/data`) dan `get_permissions` (`start/permissions.ts` dari `@adonisplus/permission`, `available()` hanya jika terpasang).
+**Posisi terhadap dokumentasi dan skill statis.** Package ini mengekspos *keadaan* app saat ini (model, route, data, error), melengkapi dokumentasi dan skill statis yang memberi tahu agen *cara* menulis AdonisJS. `SKILL.md` memakai istilah AdonisJS v7 (`node ace make:page`, `#generated/controllers`, `@generated/data`, `<Form route>`). Dua tool tambahan mendukung konteks ini: `get_transformers` membaca shape `Data.<Resource>` dari `@generated/data`, dan `get_permissions` membaca ability Bouncer dari `#abilities/main` serta registrasi policy dari `#policies/main`; `available()` hanya true jika `@adonisjs/bouncer` terpasang.
 
 ## Arsitektur
 
@@ -304,7 +306,7 @@ interface ProjectProfile {
   kind: 'api' | 'inertia' | 'edge' | 'hybrid'
   inertia?: { adapter: 'react' | 'vue' | 'svelte' | 'solid'; ssr: boolean }
   auth: { guards: string[]; default: string }          // dari config/auth.ts
-  packages: { lucid: boolean; tuyau: boolean; transmit: boolean; tenant: boolean; permission: boolean; queue: boolean }
+  packages: { lucid: boolean; tuyau: boolean; transmit: boolean; tenant: boolean; bouncer: boolean; queue: boolean }
   generated: { controllers: boolean; data: boolean }   // #generated/* ada?
 }
 ```
@@ -404,7 +406,7 @@ Sediakan juga `skills/adonisjs-mcp/SKILL.md` di repo agar bisa dipasang lewat `n
 
 ## SKILL.md
 
-Ditulis dalam bahasa Inggris karena yang membacanya agen dan calon pemakai di luar Indonesia; istilah mengikuti cookbook Flow agar tidak bertabrakan. Satu sumber, dua jalur kirim: ikut di npm (disalin `configure` ke `.claude/skills/`) dan di repo GitHub untuk `npx skills add`. Nama tool di dalamnya tanpa prefix, sesuai keputusan di bagian Spesifikasi tool.
+Ditulis dalam bahasa Inggris karena yang membacanya agen dan calon pemakai di luar Indonesia; istilah mengikuti dokumentasi AdonisJS v7. Satu sumber, dua jalur kirim: ikut di npm (disalin `configure` ke `.claude/skills/`) dan di repo GitHub untuk `npx skills add`. Nama tool di dalamnya tanpa prefix, sesuai keputusan di bagian Spesifikasi tool.
 
 ```markdown
 ---
@@ -433,7 +435,7 @@ The app you are editing is running. Ask it before you guess.
 ## Workflow
 
 1. Read state with the tools above. Do not infer schema, routes, or props from files when a tool can return them.
-2. Plan the change. If the project has `.flow/`, write the plan there and follow its blueprint format.
+2. Plan the change.
 3. Scaffold with ace (`run_ace_command make:controller`, `make:page`, `make:validator`, `make:migration`), then edit the generated files.
 4. Verify with the runtime: `http_request` the route (use `as` to act as a specific user), check `get_last_exceptions` and `get_logs`, run `diff_schema` after migrations.
 5. Only then report done.

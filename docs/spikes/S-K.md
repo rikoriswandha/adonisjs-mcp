@@ -2,13 +2,15 @@
 Status: LULUS BERSYARAT
 Tanggal: 2026-10-13
 
+> Revisi 13 Oktober 2026: temuan paket `@adonisplus/permissions` dihapus atas keputusan pengguna (plan D75); probe dan raw evidence terkait juga dihapus dari `spikes/s-k/`. Adapter permission yang tersisa adalah Bouncer 4.
+
 ## Pertanyaan
 Cari API aktual paket tenant, permission, queue yang disebut desain. Lulus bila nama package/version, binding, public API, dan fixture nyata ditetapkan; package/API tidak tersedia harus menjadi dependency blocker, bukan mock atau empty success.
 
 ## Lingkungan
 - macOS 27.0, build 26A428, arm64; Node v24.21.0; npm 11.19.0.
 - Fixture API create-adonisjs 3.4.0, SQLite; base tidak diubah. Clone awal `/tmp/adonisjs-mcp-m0/s-k-api`; clone fresh yang dibuktikan `/tmp/adonisjs-mcp-m0/s-k-api-1791855655276`.
-- Exact resolved `npm ls`: `@adonisjs/core@7.6.0`, `@adonisjs/assembler@8.5.2`, `@adonisjs/auth@10.1.0`, `@adonisjs/lucid@22.4.2`, `@adonisjs/bouncer@4.0.1`, `@rikology/adonisjs-tenant@1.0.2`, `@adonisjs/queue@0.6.2`, `@boringnode/queue@0.6.0`, `@adonisplus/permissions@0.0.4`, `better-sqlite3@13.0.3`.
+- Exact resolved `npm ls`: `@adonisjs/core@7.6.0`, `@adonisjs/assembler@8.5.2`, `@adonisjs/auth@10.1.0`, `@adonisjs/lucid@22.4.2`, `@adonisjs/bouncer@4.0.1`, `@rikology/adonisjs-tenant@1.0.2`, `@adonisjs/queue@0.6.2`, `@boringnode/queue@0.6.0`, `better-sqlite3@13.0.3`.
 - HTTP `127.0.0.1:41200`, development; tidak menjalankan worker, Redis, PostgreSQL, scheduler, atau MCP SDK (tidak dibutuhkan untuk identitas API).
 
 ## Skenario dan command
@@ -21,7 +23,7 @@ node spikes/s-k/run.mjs
 node spikes/s-k/run.mjs /tmp/adonisjs-mcp-m0/s-k-api-1791855655276
 ```
 
-Entry script memakai `spikes/clone-fixture.sh api s-k-api-<timestamp>`, memasang provider tenancy, Bouncer dan queue; membuat `config/tenancy.ts`, `config/queue.ts`, serta `start/permissions.ts` dari probe lokal. Server dijalankan dengan `node --import=@poppinss/ts-exec bin/server.ts`, `PORT=41200 HOST=127.0.0.1 NODE_ENV=development`. Runner memanggil GET `/s-k/observe`, menyimpan `s-k-observation.json` di clone, lalu SIGTERM dan fallback SIGKILL. Tidak ada proses yang ditinggalkan.
+Entry script memakai `spikes/clone-fixture.sh api s-k-api-<timestamp>`, memasang provider tenancy, Bouncer dan queue; membuat `config/tenancy.ts` dan `config/queue.ts` dari probe lokal. Server dijalankan dengan `node --import=@poppinss/ts-exec bin/server.ts`, `PORT=41200 HOST=127.0.0.1 NODE_ENV=development`. Runner memanggil GET `/s-k/observe`, menyimpan `s-k-observation.json` di clone, lalu SIGTERM dan fallback SIGKILL. Tidak ada proses yang ditinggalkan.
 
 Probe queue menggunakan database adapter nyata. `QueueSchemaService.createJobsTable()` membuat schema pada SQLite disposable; dua baris fixture (pending dan failed) diinsert langsung melalui Knex sebelum observasi, **bukan dispatch**. `SentinelJob` diload otomatis oleh provider queue. Handler sentinel menaikkan counter dan throw bila dipanggil; counter teramati tetap nol. Tidak ada `Worker.start`, `dispatch`, `pop`, atau evaluasi policy/ability.
 
@@ -32,20 +34,9 @@ npm view @rikology/adonisjs-tenant@1.0.2 version peerDependencies exports reposi
 npm view @adonisjs/queue@0.6.2 version peerDependencies peerDependenciesMeta dist-tags --json
 npm view @nemoventures/adonis-jobs@2.2.1 version peerDependencies peerDependenciesMeta engines --json
 npm view @rikology/adonisjs-queue --registry=https://registry.npmjs.org --json
-npm view @adonisplus/permission --registry=https://registry.npmjs.org --json
-npm view @adonisplus/permission --registry=https://plus.adonisjs.com/registry/ --json
-npm view @adonisplus/permissions --registry=https://plus.adonisjs.com/registry/ --json
 npm view @akago/adonisjs-pg-boss version peerDependencies dependencies repository --json
 npm view pg-boss version engines --json
 ```
-
-Install awal dengan `--registry=https://plus.adonisjs.com/registry/` pada semua dependencies gagal ERESOLVE (`@adonisjs/bouncer@undefined`): registry seluruh package diarahkan salah. Koreksi **scope saja** pada `.npmrc` clone:
-
-```ini
-@adonisplus:registry=https://plus.adonisjs.com/registry/
-```
-
-Lalu `npm install @adonisplus/permissions@0.0.4` sukses; fresh runner juga sukses. Tidak membaca/mengubah token global atau mencetak credential. Keberhasilan pada workstation ini tidak membuktikan registry terbuka untuk semua pengguna; dokumentasi resmi tetap mensyaratkan access token.
 
 ## Hasil teramati
 Tabel acceptance utama:
@@ -53,8 +44,7 @@ Tabel acceptance utama:
 | Domain | Package@version | Binding | Introspection API (public/private) | Backend requirement | Fixture proof |
 | --- | --- | --- | --- | --- | --- |
 | Tenant | `@rikology/adonisjs-tenant@1.0.2` | `tenant.service` → static class `TenantService` | Public `get`, `require`, `run`, `isActive`, `currentId`; standalone `runWithTenant` | Context/resolver tidak wajib DB; ORM Lucid + physical `tenant_id`; RLS executor PostgreSQL | binding true; export identity true; `run` menghasilkan context fixture; di luar context null |
-| Permissions | `@adonisplus/permissions@0.0.4` (plural; private registry) | Tidak ada provider/binding package; exported application singleton `#start/permissions.permissions` | Public `Permissions.all/keys/active/abilities` | Master registry tidak memerlukan DB; role/user mixins memerlukan Lucid columns/pivot | 3 keys, 2 active, metadata inactive+alias nyata; boot HTTP berhasil |
-| Abilities/policies alternatif | `@adonisjs/bouncer@4.0.1` | Tidak ada global binding `bouncer`; instance application/request | Public `bouncer.abilities`, `bouncer.policies`, builder `.abilities`; Object.keys tanpa execution | Tidak memerlukan DB untuk registry | 2 abilities, 1 lazy policy key, counter execution 0 |
+| Permission (abilities/policies Bouncer) | `@adonisjs/bouncer@4.0.1` | Tidak ada global binding `bouncer`; instance application/request | Public `bouncer.abilities`, `bouncer.policies`, builder `.abilities`; Object.keys tanpa execution | Tidak memerlukan DB untuk registry | 2 abilities, 1 lazy policy key, counter execution 0 |
 | Queue terpilih | `@adonisjs/queue@0.6.2` → `@boringnode/queue@0.6.0` | `queue.manager` → `QueueManager` | Public `use().sizeOf(queue)`, `getJob(id,queue)`, `Locator.get(name)`; listing penuh **tidak tersedia**; ledger via opt-in wrapper `Locator.register` bukan API list; status aggregate memakai **internal physical schema** | Database: Lucid PostgreSQL/MySQL/SQLite; Redis optional; sync immediate execution tanpa store durable | auto-registered SentinelJob; pending 1; failed row status failed; counter 0; seluruh baris tidak berubah |
 
 Excerpt output final:
@@ -63,16 +53,6 @@ Excerpt output final:
 {
   "tenant": {"binding":true,"sameExport":true,"context":{"id":"fixture-tenant","name":"Fixture","slug":"fixture"},"outside":null,"runWithTenantMethod":"undefined"},
   "permission": {"globalBinding":false,"abilities":["viewInvoice","refundInvoice"],"policies":["InvoicePolicy"],"policyExecutions":0},
-  "plusPermissions": {
-    "keys":["invoice.view","invoice.refund","invoice.legacy"],
-    "active":["invoice.view","invoice.refund"],
-    "all":[
-      {"key":"invoice.view","description":"View invoices","inactive":false,"aliases":[]},
-      {"key":"invoice.refund","description":"Invoice refund","inactive":false,"aliases":[]},
-      {"key":"invoice.legacy","description":"Invoice legacy","inactive":true,"aliases":["invoice.old"]}
-    ],
-    "abilities":["invoice.view","invoice.refund"]
-  },
   "queue":{"binding":true,"registered":["SentinelJob"],"sentinelRegistered":true,"nativeList":"undefined","pendingTotal":1,"pendingDefault":1,"failed":"failed","stateCountsFromPhysicalSchema":[{"status":"failed","count":1},{"status":"pending","count":1}],"jobExecutions":0},
   "rowsUnchanged":true
 }
@@ -81,10 +61,10 @@ Excerpt output final:
 `pendingTotal` adalah nama field probe, **bukan total semua queue**: source adapter menunjukkan `size()` sama dengan `sizeOf('default')`. Jangan mempertahankan nama misleading ini di kontrak MCP.
 
 - ✅ Tenant: package/version, binding, config, tipe, resolver dan API hidup terbukti. Desain `TenantService.runWithTenant` salah: method bernama `run`; `runWithTenant` adalah standalone export.
-- ✅ Permission: nama aktual plural diketahui, installed dan registry public dibaca tanpa menjalankan policy/ability. Bouncer juga positive fixture alternatif, bukan replacement RBAC yang diam-diam dianggap identik.
+- ✅ Permission: registry ability dan policy Bouncer dibaca tanpa menjalankan policy/ability; adapter Bouncer juga terbukti pada positive tests M6.
 - ✅ Queue: package/version, binding, database driver, registered job nyata dan pending/state terbukti tanpa dispatch/execute; state snapshot sebelum/sesudah identik.
 - ❌ Queue: zero-config native runtime **enumeration semua registered job** belum tersedia. `Locator` mempunyai `#registry`, public get/register/clear saja. Ledger probe adalah instrumentasi opt-in, tidak membuktikan late attach dapat menemukan job terdahulu.
-- ❌ Nama `@adonisplus/permission` singular dan `@rikology/adonisjs-queue` tidak tersedia pada public npm; singular juga E404 pada Plus registry. Ini bukan alasan mengembalikan list kosong.
+- ❌ Nama `@rikology/adonisjs-queue` tidak tersedia pada public npm. Ini bukan alasan mengembalikan list kosong.
 
 Alternatif yang diperiksa:
 
@@ -103,7 +83,6 @@ Semua path berikut relatif terhadap root clone (`node_modules/...`). Public arti
 
 - Tenant 1.0.2: `@rikology/adonisjs-tenant/build/providers/tenancy_provider.js:9-15,30-52` — binding/config lifecycle **public provider**, resolver mapping implementation internal. `build/index.js:15-19` — public exports/defineTenancyConfig. `build/src/types.d.ts:10-40,62-66` — public `TenantContext {id:string|number,name,slug}`, discriminated resolver config subdomain/header/jwt/path, TenancyConfig. `build/src/tenant_service.d.ts:9-29` — public static API. `build/src/resolvers/header_resolver.d.ts:6-19` — public lookup/map options. `build/src/tenant_database_executor.d.ts:10-19` — public PostgreSQL RLS executor, host-owned policy enforcement. `README.md:119-143,206-242` — DB requirements/escape hatches. [Repository](https://github.com/rikoriswandha/adonisjs-tenant), [npm](https://www.npmjs.com/package/@rikology/adonisjs-tenant).
 - Tenant export subpaths metadata: `.`, `./configure`, `./types`, `./database`, `./middleware`, `./guards`, `./mixins`, `./resolvers`, `./extensions`, `./user_providers`, `./providers/tenancy_provider`; public types also `TenantResolverContract`, `TenantConfig`, `TenantUserProviderContract`, `TenantGuardFactory`, `TenancyConfig`.
-- Permission 0.0.4: `@adonisplus/permissions/package.json:16-19` — public exports `.`, `/types`, `/configure`; **no provider**. `build/stubs/start/permissions.stub:4-13` — documented application registry convention. `build/index.d.ts:1-7`, `build/src/define_permissions.d.ts:8-22,51-63` — public classes/functions and enumeration. `build/src/types.d.ts:8-25` — public metadata schema. `build/index.js:330-343,412` — public query implementation; methods do not evaluate abilities. [Official registry installation](https://plus.adonisjs.com/docs/packages/installation), [announcement (historical singular name)](https://adonisjs.com/blog/introducing-persona-and-permission), [terms](https://plus.adonisjs.com/terms). Tidak menyalin source berlisensi privat ke repository.
 - Bouncer 4.0.1: `@adonisjs/bouncer/build/src/bouncer.d.ts:63-88` — public instance registries; `build/src/abilities_builder.d.ts:14-21,34` — public builder. `build/providers/bouncer_provider.js:39-45` — provider hanya emitter/Edge, bukan global ability registry. [npm](https://www.npmjs.com/package/@adonisjs/bouncer).
 - Queue 0.6.2: `@adonisjs/queue/build/index.js:9-14` — public reexports; `build/providers/queue_provider.js:16-49` — public provider lifecycle/binding, internal ordering reviewed. `build/src/drivers.js:18-40` — public Redis/database/sync factories. [Official queue docs](https://docs.adonisjs.com/guides/digging-deeper/queues), [repository](https://github.com/adonisjs/queue).
 - Boringnode queue 0.6.0: `@boringnode/queue/build/index.d.ts:250-270,337-428` — public QueueManager.use and Locator contract. `build/job-C4oyCVxR.d.ts:949,1006-1013` — public Adapter.getJob/size/sizeOf. `build/src/drivers/knex_adapter.js:138-147,337-342` — implementation of public read APIs, confirms pending-only/default semantics. `build/index.js:720-751` — public QueueSchemaService creates **internal physical table layout**. `build/chunk-AHUVTAI7.js:31-46,66-78` — **private** #registry; public register wrapper observes boot loading, unsupported instrumentation seam rather than official observer API.
@@ -112,20 +91,17 @@ Semua path berikut relatif terhadap root clone (`node_modules/...`). Public arti
 
 ## Keterbatasan
 - Tidak menguji tenant isolation/RLS/auth scope, host/header request mapping, worker execution, HMR, production absence, atau MCP protocol. S-H dan spike lain memiliki cakupan itu.
-- `Permissions` adalah singleton aplikasi yang diimport dari path terkonfigurasi; package tidak memberi global binding/discovery. Import file terpercaya dapat menjalankan top-level code pengguna, meski `.all()` sendiri read-only.
 - Bouncer instance `null` user cukup untuk registries; tidak melakukan authorization. Policy names diketahui tanpa memanggil lazy loader; nama actions pada policy dinamis tidak dibuktikan.
 - Queue ledger dipasang **sebelum** provider loadJobs dan dipulihkan saat shutdown. Late attach, overwrites, clear, application-defined registrars dan HMR memerlukan desain/revalidation; jangan mengirim ledger probe sebagai implementasi package.
 - Status count SQL terikat schema queue 0.6.0, bukan generic public queue list API. Hanya known-ID `getJob` dan pending queue count memiliki API publik terbukti.
 - SQLite seeded records adalah data fixture fisik, bukan bukti bahwa dispatch, retry, worker, retention atau BullMQ/PG berjalan. Tidak menggunakan fake adapter.
-- Runner mem-pin integrations tetapi inherited base dependency lock/transitive range dapat berubah; setiap run mencetak resolved versions. Scope registry instalasi pada workstation ini berhasil; access/license universal tidak dibuktikan.
+- Runner mem-pin integrations tetapi inherited base dependency lock/transitive range dapat berubah; setiap run mencetak resolved versions.
 
 ## Keputusan dan dampak
-Tenant lulus; permission dan queue **lulus bersyarat**. Permission fixture bergantung akses Plus berlisensi/credential CI yang sah. Queue configured-location jobs memiliki evidence **config-declared+runtime-verified**, tetapi manual registrations tetap unknown, dan count/filter `status` selain pending memerlukan adapter internal physical table layout yang version-gated. Public `sizeOf` pending dan known-ID `getJob` tidak membuktikan generic all-status enumeration. Putaran 2 menutup blocker Locator dalam supported scope; Putaran 3 memperbaiki cwd semantics. Bukan klaim seluruh private registry dapat dienumerasi atau kontrak `get_queue_jobs(status?)` selesai tanpa syarat.
+Tenant dan permission Bouncer lulus; queue **lulus bersyarat**. Adapter Bouncer terbukti pada positive tests M6. Queue configured-location jobs memiliki evidence **config-declared+runtime-verified**, tetapi manual registrations tetap unknown, dan count/filter `status` selain pending memerlukan adapter internal physical table layout yang version-gated. Public `sizeOf` pending dan known-ID `getJob` tidak membuktikan generic all-status enumeration. Putaran 2 menutup blocker Locator dalam supported scope; Putaran 3 memperbaiki cwd semantics. Bukan klaim seluruh private registry queue dapat dienumerasi atau kontrak `get_queue_jobs(status?)` selesai tanpa syarat.
 
-Pilih adapter tenant 1.0.2, permission plural 0.0.4 + alternatif Bouncer 4.0.1, serta official queue 0.6.2 (SQLite fixture). Tidak mengubah D01–D20: memperjelas D13 evidence config-declared+runtime-verified, D15 binding yang benar-benar ada, D11/D12 tenant identity bukan security boundary. WP-18 memakai `TenantService.run`; WP-27 import registry permission aplikasi terpercaya dan scan **resolved queue.locations yang sama**, lalu verifikasi class identity melalui public `Locator.get`. Public contract `get_permissions` tidak boleh menyamakan ability names dengan RBAC grant user; `get_queue_jobs` harus membedakan configured/registered class, pending count dan persisted state, serta menyatakan manual registrations unknown.
+Pilih adapter tenant 1.0.2, permission Bouncer 4.0.1, serta official queue 0.6.2 (SQLite fixture). Tidak mengubah D01–D20: memperjelas D13 evidence config-declared+runtime-verified, D15 binding yang benar-benar ada, D11/D12 tenant identity bukan security boundary. WP-18 memakai `TenantService.run`; WP-27 membaca ability `#abilities/main` dan registrasi policy `#policies/main`, serta scan **resolved queue.locations yang sama**, lalu verifikasi class identity melalui public `Locator.get`. Public contract `get_permissions` tidak boleh menyamakan ability names dengan RBAC grant user; `get_queue_jobs` harus membedakan configured/registered class, pending count dan persisted state, serta menyatakan manual registrations unknown.
 
-- OBL: Koreksi optional package permission menjadi `@adonisplus/permissions`; resolve exported `permissions` pada configured application module (`#start/permissions` default), jangan mencari binding fiktif atau singular package.
-- OBL: Permission fixture CI memerlukan akses/license Plus yang sah; jangan redistribusi package `UNLICENSED`/private atau menyalin source ke tarball MCP. Bouncer adalah alternatif explicit dengan capability/evidence berbeda, bukan pengganti RBAC diam-diam.
 - OBL: Tenant adapter gunakan static `TenantService.run(context, callback)` atau standalone `runWithTenant`, bukan method `TenantService.runWithTenant`; authorization, tenant lookup dan DB enforcement tetap milik host/S-H.
 - OBL: Queue adapter pin tuple `@adonisjs/queue@0.6.2` + `@boringnode/queue@0.6.0`, pisahkan pending `sizeOf(queue)` dari total/status counts; physical-schema adapter wajib version-gated dan evidence internal eksplisit.
 - OBL: Listing queue dibatasi resolved `queue.locations`, verifikasi `Locator.get(name) === importedClass`, dan keluarkan evidence `config-declared+runtime-verified` beserta limitation manual registrations outside configured locations. Blocker Putaran 1 ditutup; native enumeration private registry tetap tidak tersedia.
@@ -205,10 +181,9 @@ Import ulang file trusted dari config tidak mengeksekusi `Job.execute`, tetapi t
 
 ## Putaran 3 — review
 
-Status akhir **LULUS BERSYARAT**, bukan lulus tanpa syarat. Tiga kondisi release/WP-27 yang harus tetap terlihat:
-1. Permissions 0.0.4 berasal Plus private registry berlisensi. Install workstation teramati sukses, tetapi fixture CI memerlukan lawful access/credentials dan tidak boleh mendistribusikan package privat.
-2. Public queue `sizeOf(queue)` menghitung pending saja; public `getJob(id,queue)` membaca known-ID state. Design `get_queue_jobs(status?)` membutuhkan enumeration/count status lain melalui adapter physical `queue_jobs` layout **internal** yang terikat boringnode 0.6.0, atau API upstream. Bukti satu failed row bukan generic public all-status API.
-3. Config listing tidak mengetahui semua manual registrations. Output menyatakan manual outside configured locations unknown/notEnumerated; manifest host diperlukan untuk coverage tambahan.
+Status akhir **LULUS BERSYARAT**, bukan lulus tanpa syarat; permission Bouncer lulus dan adapter terbukti pada positive tests M6. Dua kondisi release/WP-27 untuk queue harus tetap terlihat:
+1. Public queue `sizeOf(queue)` menghitung pending saja; public `getJob(id,queue)` membaca known-ID state. Design `get_queue_jobs(status?)` membutuhkan enumeration/count status lain melalui adapter physical `queue_jobs` layout **internal** yang terikat boringnode 0.6.0, atau API upstream. Bukti satu failed row bukan generic public all-status API.
+2. Config listing tidak mengetahui semua manual registrations. Output menyatakan manual outside configured locations unknown/notEnumerated; manifest host diperlukan untuk coverage tambahan.
 
 ### Koreksi semantics loader versus listing
 
@@ -268,8 +243,8 @@ Artefak raw response disertakan di repository:
 - `spikes/s-k/s-k-observation.json` — normal cwd, seluruh response observasi.
 - `spikes/s-k/s-k-observation-foreign-cwd.json` — foreign cwd, seluruh response observasi.
 
-Runner menulis response apa adanya ke kedua paths; tidak menyalin `.npmrc`, auth token, private package source, APP_KEY atau cookie. Secret scan kedua JSON dengan pattern `APP_KEY|_authToken|npm_[A-Za-z0-9]+|Bearer |password|cookie|secret|token|authorization|BEGIN .*PRIVATE KEY` (case-insensitive) menghasilkan **No matches found**. Root repository tidak memiliki git, jadi artefak ditambahkan sebagai file deliverable, bukan klaim git commit telah dibuat.
+Runner menulis response apa adanya ke kedua paths; tidak menyalin auth token, APP_KEY atau cookie. Secret scan kedua JSON dengan pattern `APP_KEY|_authToken|npm_[A-Za-z0-9]+|Bearer |password|cookie|secret|token|authorization|BEGIN .*PRIVATE KEY` (case-insensitive) menghasilkan **No matches found**. Root repository tidak memiliki git, jadi artefak ditambahkan sebagai file deliverable, bukan klaim git commit telah dibuat.
 
-- OBL: Pertahankan LULUS BERSYARAT sampai CI Plus memiliki akses berlisensi sah dan adapter all-status physical schema version-gated dibuktikan untuk accepted `status` contract; jangan menyebut public pending API sebagai all-status API.
+- OBL: Pertahankan LULUS BERSYARAT sampai adapter all-status physical schema version-gated dibuktikan untuk accepted `status` contract; jangan menyebut public pending API sebagai all-status API.
 - OBL: Listing mengikuti **process.cwd loader semantics**, raw import URL dan `options.name || class.name`, serta mengeluarkan cwd/appRoot + coverage diagnostics. Manual registrations outside locations tetap unknown tanpa host manifest.
 
