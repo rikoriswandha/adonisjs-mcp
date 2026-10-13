@@ -125,7 +125,16 @@ Place this in `.cursor/mcp.json`:
 }
 ```
 
-[Official Cursor MCP documentation](https://cursor.com/docs/mcp). Verification status: configuration format from official docs, not exercised by this release.
+[Official Cursor MCP documentation](https://cursor.com/docs/mcp). Verification status: **not verified** with Cursor Agent `2026.05.20-2b5dd59` on macOS. The configuration above was installed in a real configured application's `.cursor/mcp.json`; `cursor-agent mcp list` reported `adonis: not loaded (needs approval)`. Headless execution with `--trust --approve-mcps --output-format stream-json` stopped with “Free plans can only use Auto” before any MCP tool call. Retrying with `--model auto` timed out after 240 seconds without tool-call results; a second read-only `--mode ask` attempt timed out after 120 seconds. This is an observed client/account execution blocker, not evidence of a server incompatibility. No tool or prompt execution was verified.
+
+For a headless smoke after starting the app, run from its root:
+
+```sh
+cursor-agent -p --trust --approve-mcps --model auto --output-format stream-json \
+  "Call adonis get_project_profile and get_routes and report their actual results."
+```
+
+`--approve-mcps` approves every configured MCP server; use it only in a trusted workspace. A discovery/approval status alone is not verification.
 
 ### VS Code
 
@@ -142,7 +151,7 @@ Place this in `.vscode/mcp.json`:
 }
 ```
 
-[Official VS Code MCP configuration reference](https://code.visualstudio.com/docs/agents/reference/mcp-configuration). Verification status: configuration format from official docs, not exercised by this release.
+[Official VS Code MCP configuration reference](https://code.visualstudio.com/docs/agents/reference/mcp-configuration). Verification status: **not verified** with VS Code 1.125.1 on macOS. The file above was installed in a running fixture application. `code chat --help` exposes an agent-mode editor chat, not a headless result stream. Background GUI launches (including an isolated `--user-data-dir`) reached the fixture workspace/welcome screen, but the windows disappeared before the MCP server could be started and an agent-mode tool call observed; the isolated MCP log remained empty. The initial workspace screenshot showed the trust dialog and “Unable to resolve your shell environment in a reasonable time.” Neither connection nor tool execution was verified; this is a local GUI execution blocker, not an observed MCP protocol failure.
 
 ### Zed
 
@@ -158,7 +167,9 @@ Merge this into the settings file opened by **zed: open settings file**:
 }
 ```
 
-[Official Zed MCP documentation](https://zed.dev/docs/ai/mcp). Verification status: configuration format from official docs, not exercised by this release. Zed documents tools and prompts support, not full resource support. Its documentation also says URL servers without an `Authorization` header prompt for OAuth. This endpoint has no OAuth, so that client behavior remains an unexercised interoperability caveat; the documented JSON shape is not a guarantee of a working authenticated connection.
+[Official Zed MCP documentation](https://zed.dev/docs/ai/mcp). Verification status: **not verified** with Zed 1.23.3 on macOS. The configuration above was placed in the fixture's `.zed/settings.json`. Repeated background GUI launches, including an isolated `--user-data-dir`, returned a running process but exposed no surviving workspace window to automation. Consequently no server status, OAuth dialog, tool call, or prompt execution was observed.
+
+Zed documents tools and prompts support, not full resource support. Its documentation also says URL servers without an `Authorization` header prompt for OAuth. This endpoint has no OAuth, so that remains a **documentation-only interoperability caveat**, not an observed failure in this smoke. Do not add a fictitious token to work around it; the documented JSON shape is not a guarantee of a working connection.
 
 ## Configuration reference
 
