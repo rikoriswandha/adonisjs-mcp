@@ -70,6 +70,7 @@ const config = defineConfig({ loggers: { app: { hooks: { streamWrite: streamWrit
       )
       assert.isTrue(instrumentExceptions(source))
       assert.match(source.getFullText(), /handle\([^)]*\)\s*\{\s*observeException\(error, ctx\)/)
+      if (body) assert.include(source.getFullText(), 'observeException(error, ctx);')
       const once = source.getFullText()
       assert.isTrue(instrumentExceptions(source))
       assert.equal(source.getFullText(), once)

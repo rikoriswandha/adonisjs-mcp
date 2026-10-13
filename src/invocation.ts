@@ -116,6 +116,7 @@ export async function invokeTool(
     const encoded = encodeOutput(output, {
       maxBytes: options.maxResultBytes,
       durationMs: performance.now() - started,
+      redactor: options.redactor,
     })
     return { isError: false, ...encoded }
   } catch (error) {

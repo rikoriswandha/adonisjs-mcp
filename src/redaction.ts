@@ -88,13 +88,22 @@ export class Redactor {
     return new Redactor([...this.#secrets, ...secrets])
   }
 
-  text(input: string): string {
+  /**
+   * Scrubs only registered secret values, preserving data under neutral or
+   * sensitive-looking keys. Used by the shared success-result serializer.
+   */
+  knownSecrets(input: string): string {
     let output = input
     for (const secret of this.#secrets) {
       if (output.includes(secret)) {
         output = output.split(secret).join(REDACTED)
       }
     }
+    return output
+  }
+
+  text(input: string): string {
+    let output = this.knownSecrets(input)
     for (const [pattern, replacement] of TEXT_PATTERNS) {
       output = output.replace(pattern, replacement)
     }

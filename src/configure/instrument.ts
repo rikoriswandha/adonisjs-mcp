@@ -129,7 +129,7 @@ export function instrumentExceptions(source: SourceFile): boolean {
         .getStatements()
         .some((statement) => statement.getText().replace(/;$/, '') === invocation)
     ) {
-      method.insertStatements(0, invocation)
+      method.insertStatements(0, `${invocation};`)
     }
   } else {
     handler.addMethod({

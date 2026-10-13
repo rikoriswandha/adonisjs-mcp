@@ -11,6 +11,7 @@
 */
 
 import type { ToolErrorCode, ToolOutput } from './types.js'
+import type { Redactor } from './redaction.js'
 
 const MAX_DEPTH = 32
 const MAX_MESSAGE_LENGTH = 4096
@@ -48,15 +49,21 @@ function byteLength(text: string): number {
   return Buffer.byteLength(text, 'utf8')
 }
 
-function convert(value: unknown, depth: number, ancestors: Set<object>): unknown {
+function convert(
+  value: unknown,
+  depth: number,
+  ancestors: Set<object>,
+  redactor?: Redactor
+): unknown {
   switch (typeof value) {
     case 'string':
+      return redactor ? redactor.knownSecrets(value) : value
     case 'boolean':
       return value
     case 'number':
       return Number.isFinite(value) ? value : null
     case 'bigint':
-      return value.toString()
+      return convert(value.toString(), depth, ancestors, redactor)
     case 'undefined':
     case 'function':
     case 'symbol':
@@ -74,7 +81,9 @@ function convert(value: unknown, depth: number, ancestors: Set<object>): unknown
     return '[MaxDepth]'
   }
   if (object instanceof Date) {
-    return Number.isNaN(object.getTime()) ? null : object.toISOString()
+    return Number.isNaN(object.getTime())
+      ? null
+      : convert(object.toISOString(), depth, ancestors, redactor)
   }
   if (ArrayBuffer.isView(object) || object instanceof ArrayBuffer) {
     return `[Binary ${object.byteLength} bytes]`
@@ -84,28 +93,36 @@ function convert(value: unknown, depth: number, ancestors: Set<object>): unknown
   try {
     if ('toJSON' in object && typeof object.toJSON === 'function') {
       try {
-        return convert(object.toJSON(), depth + 1, ancestors)
+        return convert(object.toJSON(), depth + 1, ancestors, redactor)
       } catch (error) {
-        return `[toJSON failed: ${error instanceof Error ? error.message : String(error)}]`
+        return convert(
+          `[toJSON failed: ${error instanceof Error ? error.message : String(error)}]`,
+          depth + 1,
+          ancestors,
+          redactor
+        )
       }
     }
     if (object instanceof Error) {
-      return { name: object.name, message: object.message }
+      return {
+        name: convert(object.name, depth + 1, ancestors, redactor),
+        message: convert(object.message, depth + 1, ancestors, redactor),
+      }
     }
     if (object instanceof Map) {
       return Object.fromEntries(
         [...object.entries()].flatMap(([key, item]) => {
-          const converted = convert(item, depth + 1, ancestors)
+          const converted = convert(item, depth + 1, ancestors, redactor)
           return converted === undefined ? [] : [[String(key), converted]]
         })
       )
     }
     if (object instanceof Set || Array.isArray(object)) {
-      return [...object].map((item) => convert(item, depth + 1, ancestors) ?? null)
+      return [...object].map((item) => convert(item, depth + 1, ancestors, redactor) ?? null)
     }
     return Object.fromEntries(
       Object.entries(object).flatMap(([key, item]) => {
-        const converted = convert(item, depth + 1, ancestors)
+        const converted = convert(item, depth + 1, ancestors, redactor)
         return converted === undefined ? [] : [[key, converted]]
       })
     )
@@ -118,8 +135,8 @@ function convert(value: unknown, depth: number, ancestors: Set<object>): unknown
  * Converts any value to data `JSON.stringify` represents faithfully.
  * `undefined` at the top level becomes `null`.
  */
-export function toJsonValue(value: unknown): unknown {
-  return convert(value, 0, new Set()) ?? null
+export function toJsonValue(value: unknown, redactor?: Redactor): unknown {
+  return convert(value, 0, new Set(), redactor) ?? null
 }
 
 /**
@@ -167,11 +184,16 @@ export function shrinkToFit(
  */
 export function encodeOutput(
   output: ToolOutput,
-  options: { maxBytes: number; durationMs: number }
+  options: { maxBytes: number; durationMs: number; redactor?: Redactor }
 ): EncodedResult {
-  const data = toJsonValue(output.data)
-  const evidence = output.evidence ? [...output.evidence] : undefined
-  const limitations = output.limitations ? [...output.limitations] : []
+  const data = toJsonValue(output.data, options.redactor)
+  const evidence = output.evidence?.map((item) =>
+    options.redactor ? options.redactor.knownSecrets(item) : item
+  )
+  const limitations =
+    output.limitations?.map((item) =>
+      options.redactor ? options.redactor.knownSecrets(item) : item
+    ) ?? []
   const durationMs = Math.round(options.durationMs)
 
   const render = (payload: unknown, truncated: boolean, notes: string[]) =>

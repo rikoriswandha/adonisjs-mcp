@@ -262,6 +262,7 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
         const encoded = encodeOutput(output, {
           maxBytes: config.limits.maxResultBytes,
           durationMs: performance.now() - started,
+          redactor,
         })
         return {
           contents: [{ uri: uri.href, mimeType: 'application/json', text: encoded.text }],
@@ -301,10 +302,12 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
     const build = async (args: unknown) => {
       const output = await prompt.get(args as never, context)
       return {
-        ...(output.description === undefined ? {} : { description: output.description }),
+        ...(output.description === undefined
+          ? {}
+          : { description: redactor.knownSecrets(output.description) }),
         messages: output.messages.map((message) => ({
           role: message.role,
-          content: { type: 'text' as const, text: message.text },
+          content: { type: 'text' as const, text: redactor.knownSecrets(message.text) },
         })),
       }
     }
