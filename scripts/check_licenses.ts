@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { readFile } from 'node:fs/promises'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { runChecked, isolatedEnvironment } from '../tests/helpers/process.js'
 import { packedPackage } from '../tests/helpers/package_tarball.js'
@@ -63,9 +63,7 @@ console.table(
     .sort((left, right) => left.name.localeCompare(right.name))
     .map(({ name, version, license }) => ({ name, version, license }))
 )
-const artifact = process.env.ADONISJS_MCP_TARBALL
-  ? resolve(process.env.ADONISJS_MCP_TARBALL)
-  : await packedPackage()
+const artifact = await packedPackage()
 const listing = await runChecked('tar', ['-tzf', artifact], {
   cwd: root,
   env: isolatedEnvironment(),

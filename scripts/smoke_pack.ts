@@ -1,16 +1,14 @@
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFile, readdir } from 'node:fs/promises'
-import { resolve, join } from 'node:path'
+import { join } from 'node:path'
 import { FixtureApp } from '../tests/helpers/fixture_app.js'
 import { packedPackage } from '../tests/helpers/package_tarball.js'
 import { connectMcpClient } from '../tests/helpers/mcp_client.js'
 import { resourcePayload, toolPayload, waitForMcp } from '../tests/helpers/mcp_endpoint.js'
 import { runChecked } from '../tests/helpers/process.js'
 
-const tarball = process.env.ADONISJS_MCP_TARBALL
-  ? resolve(process.env.ADONISJS_MCP_TARBALL)
-  : await packedPackage()
+const tarball = await packedPackage()
 console.log(`Verified artifact: ${tarball}`)
 const fixture = await FixtureApp.create('api')
 try {

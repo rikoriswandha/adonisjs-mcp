@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict'
-import { resolve } from 'node:path'
 import { FixtureApp } from '../tests/helpers/fixture_app.js'
 import { packedPackage } from '../tests/helpers/package_tarball.js'
 import { connectMcpClient } from '../tests/helpers/mcp_client.js'
@@ -7,9 +6,7 @@ import { resourcePayload, toolPayload, waitForMcp } from '../tests/helpers/mcp_e
 
 const fixture = await FixtureApp.create('api')
 try {
-  const artifact = process.env.ADONISJS_MCP_TARBALL
-    ? resolve(process.env.ADONISJS_MCP_TARBALL)
-    : await packedPackage()
+  const artifact = await packedPackage()
   await fixture.npm(['install', '--save-dev', artifact])
   await fixture.migrate()
   const configured = await fixture.ace(
