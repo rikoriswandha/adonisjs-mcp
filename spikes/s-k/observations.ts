@@ -5,7 +5,6 @@ import { Bouncer } from '@adonisjs/bouncer'
 import { Locator, QueueSchemaService } from '@adonisjs/queue'
 import { TenantService } from '@rikology/adonisjs-tenant'
 import { counters, observedJobs } from '#providers/s_k_probe_provider'
-import { permissions } from '#start/permissions'
 import ManualJob from '../manual_jobs/manual_job.js'
 import { listConfiguredJobs } from '#start/s_k_config_listing'
 
@@ -36,7 +35,6 @@ router.get('/s-k/observe', async () => {
   const result = {
     tenant: { binding: app.container.hasBinding('tenant.service'), sameExport: tenant === TenantService, context: tenantObservation, outside: tenant.get() ?? null, runWithTenantMethod: typeof tenant.runWithTenant },
     permission: { globalBinding: app.container.hasBinding('bouncer'), abilities: Object.keys(bouncer.abilities ?? {}), policies: Object.keys(bouncer.policies ?? {}), policyExecutions: counters.policyExecutions },
-    plusPermissions: { keys: permissions.keys(), active: permissions.active(), all: permissions.all(), abilities: Object.keys(permissions.abilities()) },
     queue: { binding: app.container.hasBinding('queue.manager'), registered: [...observedJobs], sentinelRegistered: !!Locator.get('SentinelJob'), nativeList: 'list' in Locator ? typeof Locator.list : 'undefined', pendingTotal: await adapter.size(), pendingDefault: await adapter.sizeOf('default'), failed: (await adapter.getJob('s-k-failed', 'default'))?.status, stateCountsFromPhysicalSchema: await knex('queue_jobs').select('status').count({ count: '*' }).groupBy('status'), jobExecutions: counters.jobExecutions },
     queueListing: { ...configuredListing, configuredNames, groundTruth, residualGroundTruth, expectedConfiguredCoverage: JSON.stringify(configuredNames) === JSON.stringify(['SentinelJob', 'external.configured']), manualRegisteredLookup: Locator.get('manual.explicit') === ManualJob },
     rowsUnchanged: JSON.stringify(before) === JSON.stringify(await knex('queue_jobs').select('*').orderBy('id')),

@@ -51,7 +51,7 @@ Prompts build instructions; they do not execute HTTP, database queries or evalua
 
 1. Read the profile and the relevant inventories. Separate runtime evidence from source/generated evidence. Preserve reported `unknown`, `partial`, stale and truncated limitations; do not promote inferred metadata to verified behavior.
 2. Identify the request surface. For hybrid features without an explicit surface, ask whether the feature is for web, API or both before planning. Do not silently choose a renderer or guard.
-3. Inspect existing validators, models, routes and serialization patterns. Read source when metadata is partial or an implementation detail matters. If `.flow/` exists, follow its planning/blueprint conventions; do not create or assume Flow files otherwise.
+3. Inspect existing validators, models, routes and serialization patterns. Read source when metadata is partial or an implementation detail matters.
 4. Plan the narrow change and its acceptance checks. Use `run_ace_command` for appropriate non-interactive generators, then edit real files. Treat generators/migrations as mutating operations and inspect their output and resulting state.
 5. Exercise the changed route with `http_request` only when authorized by the task. Pass `as: { userId, guard? }` and `tenant` only when explicitly supplied or established by the task; never invent a user, guard or tenant. Use the path, not an external URL; select `surface`/`domain` when evidence requires it.
 6. Correlate the request with `get_last_exceptions` and `get_logs` when served. Use request/call IDs to isolate evidence. Resolve stack references with `get_source_location`, make the fix and re-run the applicable checks. After migrations, inspect `get_migrations`/`diff_schema`.

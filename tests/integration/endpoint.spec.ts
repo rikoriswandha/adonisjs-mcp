@@ -283,7 +283,7 @@ test.group('Endpoint | API starter kit', (group) => {
     }
     assert.isNull(packages.tuyau.active, 'Tuyau has no runtime signal')
     assert.isString(packages.tuyau.version)
-    for (const key of ['inertia', 'tenant', 'queue', 'transmit', 'permissions'] as const) {
+    for (const key of ['inertia', 'tenant', 'queue', 'transmit', 'bouncer'] as const) {
       assert.deepInclude(packages[key], { version: null, active: false }, key)
     }
     assert.deepEqual(auth, { guards: ['api', 'web'], default: 'api' })

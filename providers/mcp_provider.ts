@@ -246,8 +246,8 @@ export default class McpProvider {
 
     // WP-32: package resource and workflow prompts.
     registry.resource(packageResource(new PackageResource(app, appRoot, redactor)))
-    registry.prompt(debugRequestPrompt(describe, appRoot))
-    registry.prompt(addFeaturePrompt(describe, appRoot))
+    registry.prompt(debugRequestPrompt(describe))
+    registry.prompt(addFeaturePrompt(describe))
   }
 
   async start() {

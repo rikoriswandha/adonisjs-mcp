@@ -1,5 +1,3 @@
-import { stat } from 'node:fs/promises'
-import { join } from 'node:path'
 import type {
   AvailabilityContext,
   CapabilityReport,
@@ -14,20 +12,12 @@ export interface WorkflowCapabilities {
   prompts: readonly CapabilityReport[]
 }
 
-export async function workflowContext(
-  describe: DescribeProject,
-  context: AvailabilityContext,
-  appRoot: string
-) {
+export async function workflowContext(describe: DescribeProject, context: AvailabilityContext) {
   // The provider closure supplies this exact profile-plus-capabilities result.
   const described = (await describe(context)) as ProjectProfile & {
     capabilities: WorkflowCapabilities
   }
-  const flowExists = await stat(join(appRoot, '.flow')).then(
-    (entry) => entry.isDirectory(),
-    () => false
-  )
-  return { profile: described, capabilities: described.capabilities, flowExists }
+  return { profile: described, capabilities: described.capabilities }
 }
 
 export function workflowText(capabilities: WorkflowCapabilities) {

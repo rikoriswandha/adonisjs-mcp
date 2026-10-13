@@ -21,43 +21,6 @@
     ],
     "policyExecutions": 0
   },
-  "plusPermissions": {
-    "keys": [
-      "invoice.view",
-      "invoice.refund",
-      "invoice.legacy"
-    ],
-    "active": [
-      "invoice.view",
-      "invoice.refund"
-    ],
-    "all": [
-      {
-        "key": "invoice.view",
-        "description": "View invoices",
-        "inactive": false,
-        "aliases": []
-      },
-      {
-        "key": "invoice.refund",
-        "description": "Invoice refund",
-        "inactive": false,
-        "aliases": []
-      },
-      {
-        "key": "invoice.legacy",
-        "description": "Invoice legacy",
-        "inactive": true,
-        "aliases": [
-          "invoice.old"
-        ]
-      }
-    ],
-    "abilities": [
-      "invoice.view",
-      "invoice.refund"
-    ]
-  },
   "queue": {
     "binding": true,
     "registered": [

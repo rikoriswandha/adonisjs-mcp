@@ -10,19 +10,19 @@ The server is named `adonis` and uses Streamable HTTP at `/__adonis/mcp` by defa
 
 Install in an AdonisJS v7 application and run its development HTTP process. The tested tuple is deliberately narrower than a claim of universal compatibility:
 
-| Component          | Tested version or boundary                                                         |
-| ------------------ | ---------------------------------------------------------------------------------- |
-| Node.js            | 24.21.0                                                                            |
-| AdonisJS Core      | `@adonisjs/core` 7.6.0                                                             |
-| Lucid              | `@adonisjs/lucid` 22.4.2                                                           |
-| MCP SDK v2         | `@modelcontextprotocol/server` 2.3.1; `@modelcontextprotocol/node` 2.1.1           |
-| MCP protocol       | 2026-07-28 and 2025-11-25                                                          |
-| Operating system   | macOS arm64 only so far                                                            |
-| Raw SQL            | SQLite file databases (`better-sqlite3`); PostgreSQL with a dedicated reader role  |
-| Inertia            | React and Vue tested; Svelte and Solid not claimed                                 |
-| Tenant integration | `@rikology/adonisjs-tenant` 1.0.2                                                  |
-| Queue              | `@adonisjs/queue` 0.6.2 + `@boringnode/queue` 0.6.0, database driver               |
-| Permissions        | `@adonisplus/permissions` 0.0.4 (licensed/private registry); Bouncer 4 alternative |
+| Component          | Tested version or boundary                                                        |
+| ------------------ | --------------------------------------------------------------------------------- |
+| Node.js            | 24.21.0                                                                           |
+| AdonisJS Core      | `@adonisjs/core` 7.6.0                                                            |
+| Lucid              | `@adonisjs/lucid` 22.4.2                                                          |
+| MCP SDK v2         | `@modelcontextprotocol/server` 2.3.1; `@modelcontextprotocol/node` 2.1.1          |
+| MCP protocol       | 2026-07-28 and 2025-11-25                                                         |
+| Operating system   | macOS arm64 only so far                                                           |
+| Raw SQL            | SQLite file databases (`better-sqlite3`); PostgreSQL with a dedicated reader role |
+| Inertia            | React and Vue tested; Svelte and Solid not claimed                                |
+| Tenant integration | `@rikology/adonisjs-tenant` 1.0.2                                                 |
+| Queue              | `@adonisjs/queue` 0.6.2 + `@boringnode/queue` 0.6.0, database driver              |
+| Permissions        | `@adonisjs/bouncer` 4.0.1: abilities and policy registrations                     |
 
 Optional integrations are not prerequisites for boot. Tools that need them are withheld with a reason. Source AST extraction and source symbol lines require the application's TypeScript compiler. Linux, Windows, other Node versions and other database drivers are not covered by the current evidence.
 
@@ -250,7 +250,7 @@ Availability is evaluated per request. Config/registry disabling applies to ever
 | `get_tuyau_schema`       | Runtime routes and generated/type-only declarations; needs Tuyau and application TypeScript; no generation or execution.                                    |
 | `get_views`              | Edge mounted template/component inventory; needs Edge, imports Edge but does not render.                                                                    |
 | `render_view`            | Renders an inventoried Edge view with JSON state; needs Edge; helpers/templates can mutate, request globals may fail.                                       |
-| `get_permissions`        | Permission or Bouncer names; needs either adapter; imports trusted modules, never makes authorization decisions.                                            |
+| `get_permissions`        | Bouncer ability names and policy registrations; needs Bouncer; imports trusted modules, never makes authorization decisions.                                |
 | `get_queue_jobs`         | Configured job registration/counts; needs queue integration; imports trusted modules, never dispatches jobs; expanded status needs tested database adapter. |
 | `project_eval`           | Trusted dev REPL in the running HTTP app; needs VM flag; can change data/files, access secrets/network and freeze the server.                               |
 | `run_ace_command`        | Fresh console process with structured args/flags; requires POSIX runner; generators/migrations/provider boot can mutate.                                    |
@@ -280,7 +280,7 @@ Prompts return one user message, not an automatically executed operation. All ar
 | `debug_request` | Required `path`; optional `method` (GET default), `userId`, `guard`, `tenant`, `surface` (`web`/`api`) | Profile → route → real HTTP request → exceptions/logs → source → fix → re-run; passes impersonation/tenant only when supplied. |
 | `add_feature`   | Required `feature`; optional `surface` (`web`/`api`/`both`)                                            | Profile-aware API, Inertia or Edge plan; hybrid without surface asks the user first.                                           |
 
-For API, plan validator/controller/route/JSON HTTP tests. Inertia adds `node ace make:page`, transformers and Inertia-header tests. Edge adds templates and rendering/HTTP tests. Hybrid `both` uses one validator, one service, a shared transformer and two thin controllers. Generated controller/Data aliases appear only when profile evidence says they exist; `.flow/` is referenced only when present. Building a prompt performs no database query, HTTP request or evaluation.
+For API, plan validator/controller/route/JSON HTTP tests. Inertia adds `node ace make:page`, transformers and Inertia-header tests. Edge adds templates and rendering/HTTP tests. Hybrid `both` uses one validator, one service, a shared transformer and two thin controllers. Generated controller/Data aliases appear only when profile evidence says they exist. Building a prompt performs no database query, HTTP request or evaluation.
 
 ## Extension API
 

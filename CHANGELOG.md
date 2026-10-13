@@ -35,7 +35,7 @@ The [implementation-plan decisions](docs/IMPLEMENTATION_PLAN.md#3-keputusan-dan-
 - **D27/D52:** temporary token cleanup and deadline-bound cookie credentials provide no server residue plus a bounded replay window, not instant cookie revocation.
 - **D28/D46–D47:** PostgreSQL raw SQL requires a dedicated least-privilege reader/read-only connection; SQLite uses a read-only child executor. SQL policy supplements the database boundary; unsupported read-only access never falls back to the app's write pool. Write mode is explicit.
 - **D29:** tenant raw SQL requires proven FORCE RLS with a reader without BYPASSRLS; schema/database-per-tenant strategies are not claimed.
-- **D30/D56–D60:** introspection preserves runtime/source/generated provenance and unknown dynamic cases, rather than claiming complete schema/type inference. React/Vue are tested; four-adapter Inertia support is not claimed. Queue and permissions use the concrete tested package adapters.
+- **D30/D56–D60, D75:** introspection preserves runtime/source/generated provenance and unknown dynamic cases, rather than claiming complete schema/type inference. React/Vue are tested; four-adapter Inertia support is not claimed. Queue uses the concrete tested package adapter; permissions are Bouncer abilities and policy registrations only.
 - **D31/D65–D66:** Ace commands execute in a fresh console subprocess with a POSIX watchdog, not in the HTTP process. Interactive commands are unsupported and exit 0 does not establish interactive completion.
 - **D67–D69:** source lookup uses bounded, verified evidence; package docs search is offline and lexical with explicit package-generation cache limits, not a network or semantic search service.
 

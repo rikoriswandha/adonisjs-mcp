@@ -19,8 +19,7 @@ export type DebugRequestArgs = z.output<typeof schema>
 export function buildDebugRequest(
   args: DebugRequestArgs,
   profile: ProjectProfile,
-  capabilities: WorkflowCapabilities,
-  flowExists: boolean
+  capabilities: WorkflowCapabilities
 ) {
   const text = workflowText(capabilities)
   const request = {
@@ -44,21 +43,17 @@ export function buildDebugRequest(
     ...(args.guard !== undefined && args.userId === undefined
       ? ['The supplied guard is ignored without userId; provide userId to select an auth guard.']
       : []),
-    ...(flowExists ? ['Follow the existing .flow/ project workflow.'] : []),
   ])
 }
 
-export function debugRequestPrompt(
-  describe: DescribeProject,
-  appRoot: string
-): PromptDefinition<typeof schema> {
+export function debugRequestPrompt(describe: DescribeProject): PromptDefinition<typeof schema> {
   return {
     name: 'debug_request',
     description: 'Plan evidence-driven request debugging without executing requests.',
     argsSchema: schema,
     async get(args, context) {
-      const workflow = await workflowContext(describe, context, appRoot)
-      return buildDebugRequest(args, workflow.profile, workflow.capabilities, workflow.flowExists)
+      const workflow = await workflowContext(describe, context)
+      return buildDebugRequest(args, workflow.profile, workflow.capabilities)
     },
   }
 }

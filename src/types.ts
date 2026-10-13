@@ -365,7 +365,6 @@ export type PackageKey =
   | 'tuyau'
   | 'transmit'
   | 'tenant'
-  | 'permissions'
   | 'bouncer'
   | 'queue'
 

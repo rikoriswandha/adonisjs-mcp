@@ -9,8 +9,7 @@ export type AddFeatureArgs = z.output<typeof schema>
 export function buildAddFeature(
   args: AddFeatureArgs,
   profile: ProjectProfile,
-  capabilities: WorkflowCapabilities,
-  flowExists: boolean
+  capabilities: WorkflowCapabilities
 ) {
   const text = workflowText(capabilities)
   const lines = [
@@ -79,21 +78,17 @@ export function buildAddFeature(
   lines.push(
     'HTTP checks perform real requests and may have side effects. Review mutation inputs before executing them.'
   )
-  if (flowExists) lines.push('Follow the existing .flow/ project workflow.')
   return text.finish(lines)
 }
 
-export function addFeaturePrompt(
-  describe: DescribeProject,
-  appRoot: string
-): PromptDefinition<typeof schema> {
+export function addFeaturePrompt(describe: DescribeProject): PromptDefinition<typeof schema> {
   return {
     name: 'add_feature',
     description: 'Plan a feature using the detected project kind and selected surface.',
     argsSchema: schema,
     async get(args, context) {
-      const workflow = await workflowContext(describe, context, appRoot)
-      return buildAddFeature(args, workflow.profile, workflow.capabilities, workflow.flowExists)
+      const workflow = await workflowContext(describe, context)
+      return buildAddFeature(args, workflow.profile, workflow.capabilities)
     },
   }
 }

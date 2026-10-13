@@ -3,7 +3,7 @@
 | Real optional authorization and queue adapters
 |--------------------------------------------------------------------------
 |
-| Licensed Plus dependencies stay in the disposable fixture, never vendored.
+| Optional packages are installed only in the disposable fixture.
 | Jobs are seeded physically, not dispatched. Independent HTTP observations
 | prove handlers/loaders never run and full persisted rows remain unchanged.
 |
@@ -24,20 +24,10 @@ import {
 } from '../helpers/mcp_endpoint.js'
 
 interface PermissionsData {
-  adapters: {
-    permissions: {
-      found: boolean
-      all: Array<{ key: string; description: string; inactive: boolean; aliases: string[] }>
-      keys: string[]
-      active: string[]
-    }
-    bouncer: {
-      abilitiesFound: boolean
-      policiesFound: boolean
-      abilities: string[]
-      policies: Array<{ name: string; reference: string; module: string | null }>
-    }
-  }
+  abilitiesFound: boolean
+  policiesFound: boolean
+  abilities: string[]
+  policies: Array<{ name: string; reference: string; module: string | null }>
 }
 interface QueueData {
   jobs: Array<{ name: string; registered: boolean; changedSinceProcessStart: boolean }>
@@ -75,10 +65,6 @@ async function put(fixture: FixtureApp, path: string, content: string) {
 }
 
 async function configure(fixture: FixtureApp) {
-  await writeFile(
-    join(fixture.root, '.npmrc'),
-    '@adonisplus:registry=https://plus.adonisjs.com/registry/\n'
-  )
   await fixture.npm([
     'install',
     '--save-exact',
@@ -86,13 +72,6 @@ async function configure(fixture: FixtureApp) {
     '@adonisjs/queue@0.6.2',
     '@boringnode/queue@0.6.0',
   ])
-  try {
-    await fixture.npm(['install', '--save-exact', '@adonisplus/permissions@0.0.4'])
-  } catch {
-    throw new Error(
-      'Installing @adonisplus/permissions@0.0.4 requires lawful licensed access to the Adonis Plus registry https://plus.adonisjs.com/registry/; this integration test cannot be skipped.'
-    )
-  }
   await installPackage(fixture)
   await writeMcpConfig(fixture, '')
   await put(
@@ -111,13 +90,6 @@ async function configure(fixture: FixtureApp) {
     'config/queue.ts',
     `import { defineConfig, drivers } from '@adonisjs/queue'
 export default defineConfig({ default: 'database', adapters: { database: drivers.database({ connectionName: 'sqlite', tableName: 'fixture_queue_jobs' }) }, locations: ['./app/jobs/**/*.ts', './custom_jobs/**/*.ts'] })
-`
-  )
-  await put(
-    fixture,
-    'start/permissions.ts',
-    `import { definePermissions } from '@adonisplus/permissions'
-export const permissions = definePermissions({ invoice: { view: 'View invoices', refund: 'Refund invoices', legacy: { description: 'Legacy invoices', inactive: true, aliases: ['invoice.old'] } } })
 `
   )
   await put(
@@ -212,32 +184,11 @@ test.group('Authorization and queue | real API fixture', (group) => {
         const permissions = toolPayload<Envelope<PermissionsData>>(
           await client.callTool({ name: 'get_permissions', arguments: {} })
         )
-        assert.isTrue(permissions.data.adapters.permissions.found)
-        assert.deepEqual(permissions.data.adapters.permissions.keys, [
-          'invoice.view',
-          'invoice.refund',
-          'invoice.legacy',
-        ])
-        assert.deepEqual(permissions.data.adapters.permissions.active, [
-          'invoice.view',
-          'invoice.refund',
-        ])
-        assert.deepEqual(permissions.data.adapters.permissions.all, [
-          { key: 'invoice.view', description: 'View invoices', inactive: false, aliases: [] },
-          { key: 'invoice.refund', description: 'Refund invoices', inactive: false, aliases: [] },
-          {
-            key: 'invoice.legacy',
-            description: 'Legacy invoices',
-            inactive: true,
-            aliases: ['invoice.old'],
-          },
-        ])
-        assert.deepEqual(permissions.data.adapters.bouncer.abilities.sort(), [
-          'refundInvoice',
-          'viewInvoice',
-        ])
+        assert.isTrue(permissions.data.abilitiesFound)
+        assert.isTrue(permissions.data.policiesFound)
+        assert.deepEqual(permissions.data.abilities.sort(), ['refundInvoice', 'viewInvoice'])
         assert.deepEqual(
-          permissions.data.adapters.bouncer.policies.map((policy) => ({
+          permissions.data.policies.map((policy) => ({
             name: policy.name,
             module: policy.module,
           })),
@@ -314,7 +265,7 @@ test.group('Authorization and queue | real API fixture', (group) => {
       await client.close()
     }
     await app.stop()
-    await put(fixture, 'start/permissions.ts', 'export const unrelated = true\n')
+    await put(fixture, 'app/policies/main.ts', 'export const unrelated = true\n')
     await put(
       fixture,
       'app/abilities/main.ts',
@@ -327,8 +278,9 @@ test.group('Authorization and queue | real API fixture', (group) => {
       const permissions = toolPayload<Envelope<PermissionsData>>(
         await next.callTool({ name: 'get_permissions', arguments: {} })
       )
-      assert.isFalse(permissions.data.adapters.permissions.found)
-      assert.deepEqual(permissions.data.adapters.bouncer.abilities, [])
+      assert.isTrue(permissions.data.abilitiesFound)
+      assert.deepEqual(permissions.data.abilities, [])
+      assert.isFalse(permissions.data.policiesFound)
     } finally {
       await next.close()
     }

@@ -65,16 +65,15 @@ test.group('Workflow prompts', () => {
           : entry
       ),
     }
-    const without = buildAddFeature({ feature: 'x' }, profile('api'), unserved, false).messages[0]
-      .text
+    const without = buildAddFeature({ feature: 'x' }, profile('api'), unserved).messages[0].text
     assert.notInclude(without, 'get_tuyau_schema')
-    const withTuyau = buildAddFeature({ feature: 'x' }, profile('api'), capabilities, false)
-      .messages[0].text
+    const withTuyau = buildAddFeature({ feature: 'x' }, profile('api'), capabilities).messages[0]
+      .text
     assert.include(withTuyau, '`get_tuyau_schema`')
   })
   for (const kind of ['api', 'inertia', 'edge'] as const) {
     test(`feature branches for ${kind}`, ({ assert }) => {
-      const result = buildAddFeature({ feature: 'bookings' }, profile(kind), capabilities, false)
+      const result = buildAddFeature({ feature: 'bookings' }, profile(kind), capabilities)
         .messages[0].text
       assert.include(result, '`get_validators`')
       assert.include(result, '`http_request`')
@@ -105,30 +104,21 @@ test.group('Workflow prompts', () => {
   }
   test('hybrid asks before planning and selects each surface', ({ assert }) => {
     const hybrid = profile('hybrid')
-    const unresolved = buildAddFeature({ feature: 'bookings' }, hybrid, capabilities, false)
-      .messages[0].text
+    const unresolved = buildAddFeature({ feature: 'bookings' }, hybrid, capabilities).messages[0]
+      .text
     assert.match(unresolved, /ask.*web, api or both/i)
     assert.notInclude(unresolved, 'Create a thin controller')
-    const api = buildAddFeature(
-      { feature: 'bookings', surface: 'api' },
-      hybrid,
-      capabilities,
-      false
-    ).messages[0].text
+    const api = buildAddFeature({ feature: 'bookings', surface: 'api' }, hybrid, capabilities)
+      .messages[0].text
     assert.include(api, 'JSON')
     assert.notInclude(api, '`get_inertia_pages`')
-    const web = buildAddFeature(
-      { feature: 'bookings', surface: 'web' },
-      hybrid,
-      capabilities,
-      false
-    ).messages[0].text
+    const web = buildAddFeature({ feature: 'bookings', surface: 'web' }, hybrid, capabilities)
+      .messages[0].text
     assert.include(web, '`get_inertia_pages`')
     const both = buildAddFeature(
       { feature: 'bookings', surface: 'both' },
       profile('hybrid', true),
-      capabilities,
-      false
+      capabilities
     ).messages[0].text
     assert.include(both, 'one validator, one service')
     assert.include(both, 'two thin controllers')
@@ -138,45 +128,35 @@ test.group('Workflow prompts', () => {
   })
   test('hybrid Edge web surface follows view conventions', ({ assert }) => {
     const hybrid = { ...profile('hybrid'), inertia: null }
-    const result = buildAddFeature(
-      { feature: 'bookings', surface: 'web' },
-      hybrid,
-      capabilities,
-      false
-    ).messages[0].text
+    const result = buildAddFeature({ feature: 'bookings', surface: 'web' }, hybrid, capabilities)
+      .messages[0].text
     assert.include(result, '`get_views`')
     assert.include(result, '`render_view`')
     assert.notInclude(result, '`get_inertia_pages`')
   })
   test('debug method validates known methods and normalizes case', ({ assert }) => {
-    const prompt = debugRequestPrompt(async () => profile('api'), '/tmp/fixture')
+    const prompt = debugRequestPrompt(async () => profile('api'))
     if (!prompt.argsSchema) throw new Error('Debug request schema is required')
     for (const method of ['get', 'Head', 'post', 'put', 'patch', 'delete', 'options']) {
       const args = prompt.argsSchema.parse({ path: '/', method })
-      const result = buildDebugRequest(args, profile('api'), capabilities, false).messages[0].text
+      const result = buildDebugRequest(args, profile('api'), capabilities).messages[0].text
       assert.include(result, `"method":"${method.toUpperCase()}"`)
     }
     assert.isFalse(prompt.argsSchema.safeParse({ path: '/', method: 'TRACE' }).success)
-    const result = buildDebugRequest(
-      { path: '/', guard: 'api' },
-      profile('api'),
-      capabilities,
-      false
-    ).messages[0].text
+    const result = buildDebugRequest({ path: '/', guard: 'api' }, profile('api'), capabilities)
+      .messages[0].text
     assert.include(result, 'guard is ignored without userId')
     assert.notInclude(result, '"as":')
   })
-  test('generated aliases and Flow are conditional', ({ assert }) => {
-    const absent = buildAddFeature({ feature: 'x' }, profile('inertia'), capabilities, false)
-      .messages[0].text
+  test('generated aliases are conditional', ({ assert }) => {
+    const absent = buildAddFeature({ feature: 'x' }, profile('inertia'), capabilities).messages[0]
+      .text
     assert.notInclude(absent, '#generated/controllers')
     assert.notInclude(absent, '@generated/data')
-    assert.notInclude(absent, '.flow/')
-    const present = buildAddFeature({ feature: 'x' }, profile('inertia', true), capabilities, true)
+    const present = buildAddFeature({ feature: 'x' }, profile('inertia', true), capabilities)
       .messages[0].text
     assert.include(present, '#generated/controllers')
     assert.include(present, '@generated/data')
-    assert.include(present, '.flow/')
   })
   test('unserved tools carry reasons without executable references', ({ assert }) => {
     const unavailable: WorkflowCapabilities = {
@@ -187,8 +167,8 @@ test.group('Workflow prompts', () => {
           : entry
       ),
     }
-    const result = buildDebugRequest({ path: '/fail' }, profile('api'), unavailable, false)
-      .messages[0].text
+    const result = buildDebugRequest({ path: '/fail' }, profile('api'), unavailable).messages[0]
+      .text
     assert.notInclude(result, '`get_logs`')
     assert.include(result, 'Not available: get_logs — capture not instrumented')
     assert.include(result, '`get_last_exceptions`')
@@ -196,8 +176,8 @@ test.group('Workflow prompts', () => {
     assert.notInclude(result, 'available project evidence')
   })
   test('debugging identity and tenant only come from arguments', ({ assert }) => {
-    const absent = buildDebugRequest({ path: '/fail' }, profile('api'), capabilities, false)
-      .messages[0].text
+    const absent = buildDebugRequest({ path: '/fail' }, profile('api'), capabilities).messages[0]
+      .text
     assert.notInclude(absent, '"as":')
     assert.notInclude(absent, '"tenant":')
     assert.include(absent, '"method":"GET"')
@@ -218,8 +198,7 @@ test.group('Workflow prompts', () => {
     const present = buildDebugRequest(
       { path: '/fail', method: 'POST', userId: '4', guard: 'api', tenant: 'team' },
       profile('api'),
-      capabilities,
-      false
+      capabilities
     ).messages[0].text
     assert.include(present, '"as":{"userId":"4","guard":"api"}')
     assert.include(present, '"tenant":"team"')

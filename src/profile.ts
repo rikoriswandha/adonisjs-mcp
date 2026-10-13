@@ -99,7 +99,6 @@ const PACKAGES: Record<PackageKey, { name: string; signal?: Signal }> = {
   tuyau: { name: '@tuyau/core' },
   transmit: { name: '@adonisjs/transmit' },
   tenant: { name: '@rikology/adonisjs-tenant', signal: binding('tenant.service') },
-  permissions: { name: '@adonisplus/permissions' },
   bouncer: { name: '@adonisjs/bouncer' },
   queue: { name: '@adonisjs/queue', signal: binding('queue.manager') },
 }
