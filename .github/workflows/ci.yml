@@ -81,7 +81,11 @@ jobs:
         run: *select-artifact
       - run: npm run test:integration
   security:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -89,7 +93,15 @@ jobs:
         with:
           node-version: '24'
           cache: npm
-      - run: sudo apt-get update && sudo apt-get install -y postgresql
+      - name: Install owned-cluster binaries
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            sudo apt-get update && sudo apt-get install -y postgresql
+          else
+            brew install postgresql@18
+            echo "ADONISJS_MCP_PG_BIN=$(brew --prefix postgresql@18)/bin" >> "$GITHUB_ENV"
+          fi
       - run: npm ci
       - uses: actions/download-artifact@v4
         if: inputs.artifact != ''

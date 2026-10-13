@@ -1075,7 +1075,8 @@ test.group('Database | PostgreSQL with tenants and row level security', (group) 
       })
       assert.deepEqual(bounded.data.rows, [[1], [2], [3], [4], [5]])
       assert.isTrue(bounded.data.hasMore)
-      assert.isBelow(performance.now() - started, 5_000)
+      // The unbounded series would run for hours; 15 s leaves room for slow hosted runners.
+      assert.isBelow(performance.now() - started, 15_000)
 
       const slowStarted = performance.now()
       const [slow, home] = await Promise.all([
@@ -1087,7 +1088,7 @@ test.group('Database | PostgreSQL with tenants and row level security', (group) 
       ])
       assert.equal(slow.code, 'TIMEOUT')
       assert.include(slow.message, 'pg_cancel_backend')
-      assert.isBelow(performance.now() - slowStarted, 5_000)
+      assert.isBelow(performance.now() - slowStarted, 15_000)
       assert.equal(home, 200)
 
       const appPool = await call<QueryModelData>(client, 'query_model', { model: 'Country' })

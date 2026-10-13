@@ -110,10 +110,14 @@ function convert(
       }
     }
     if (object instanceof Map) {
+      const names = new Set<string>()
       return Object.fromEntries(
         [...object.entries()].flatMap(([key, item]) => {
           const converted = convert(item, depth + 1, ancestors, redactor)
-          const name = redactor ? redactor.knownSecrets(String(key)) : String(key)
+          const name = uniqueName(
+            redactor ? redactor.knownSecrets(String(key)) : String(key),
+            names
+          )
           return converted === undefined ? [] : [[name, converted]]
         })
       )
@@ -121,17 +125,26 @@ function convert(
     if (object instanceof Set || Array.isArray(object)) {
       return [...object].map((item) => convert(item, depth + 1, ancestors, redactor) ?? null)
     }
+    const names = new Set<string>()
     return Object.fromEntries(
       Object.entries(object).flatMap(([key, item]) => {
         const converted = convert(item, depth + 1, ancestors, redactor)
         return converted === undefined
           ? []
-          : [[redactor ? redactor.knownSecrets(key) : key, converted]]
+          : [[uniqueName(redactor ? redactor.knownSecrets(key) : key, names), converted]]
       })
     )
   } finally {
     ancestors.delete(object)
   }
+}
+
+function uniqueName(name: string, names: Set<string>): string {
+  let unique = name
+  let suffix = 2
+  while (names.has(unique)) unique = `${name}#${suffix++}`
+  names.add(unique)
+  return unique
 }
 
 /**

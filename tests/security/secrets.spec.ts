@@ -196,6 +196,18 @@ router.get('/__security/error', () => { throw new Error('securityprobe ${SENTINE
             )
           assert.notInclude(JSON.stringify(success), SENTINEL, `${era} ${tool.name} success`)
         }
+        // SQLite includes the row-derived invalid JSON path in its error.
+        const sqlFailure = await client.callTool({
+          name: 'execute_sql_query',
+          arguments: { query: "SELECT json_extract('{}', neutral) FROM security_rows" },
+        })
+        assert.isTrue(sqlFailure.isError, `${era} row-derived SQL failure`)
+        assert.include(
+          JSON.stringify(sqlFailure),
+          '[REDACTED]',
+          `${era} error actually carried the row secret`
+        )
+        assert.notInclude(JSON.stringify(sqlFailure), SENTINEL, `${era} SQL failure`)
         const listedResources = await client.listResources()
         assert.lengthOf(listedResources.resources, 4)
         for (const resource of listedResources.resources) {
@@ -245,6 +257,23 @@ router.get('/__security/error', () => { throw new Error('securityprobe ${SENTINE
         for (const entry of escaped.data.console.entries) {
           assert.include(entry.text, '[REDACTED]')
           assert.notInclude(entry.text, 'MIIE-security')
+        }
+        for (const expression of [
+          '({ reason: err })',
+          '[err]',
+          'await Promise.allSettled([Promise.reject(err)])',
+          "new Error('x', { cause: err })",
+          "new AggregateError([err], 'aggregate')",
+        ]) {
+          const nested = await client.callTool({
+            name: 'project_eval',
+            arguments: {
+              code: `const err = new Error(process.env.SECURITY_PRIVATE_KEY); const value = ${expression}; console.log(value); return value`,
+            },
+          })
+          assert.notOk(nested.isError)
+          assert.notInclude(JSON.stringify(nested), 'MIIE-security')
+          assert.include(JSON.stringify(nested), '[REDACTED]')
         }
         const captured = await client.callTool({
           name: 'get_logs',

@@ -1,4 +1,5 @@
 import { test } from '@japa/runner'
+import { inspect } from 'node:util'
 import { HTTP_SENSITIVE_WORDS, isSensitiveKey, project, Redactor } from '../../src/redaction.js'
 import { toJsonValue } from '../../src/result.js'
 
@@ -116,4 +117,42 @@ test('Redaction | success scrub distinguishes low entropy from strong registered
     'postgres': 'postgres',
     '[REDACTED]': '[REDACTED]',
   })
+})
+
+test('Redaction | nested Error stacks mask multiline secrets without mutating errors', ({
+  assert,
+}) => {
+  const pem = '-----BEGIN PRIVATE KEY-----\nMIIEsecretbody42\n-----END PRIVATE KEY-----'
+  const scrubber = new Redactor([pem])
+  const error = new Error(pem)
+  const values = [
+    { reason: error },
+    [error],
+    [{ status: 'rejected', reason: error }],
+    new Error('x', { cause: error }),
+    new AggregateError([error], 'aggregate'),
+  ]
+  for (const value of values) {
+    const display = scrubber.inspectedText(inspect(value, { breakLength: Infinity }))
+    assert.notInclude(display, 'MIIEsecretbody42')
+    assert.include(display, '[REDACTED]')
+  }
+  assert.equal(error.message, pem)
+})
+
+test('Redaction | colliding scrubbed object and Map keys retain every entry', ({ assert }) => {
+  const other = 'AnotherStrongSecret-123'
+  const scrubber = redactor.withSecrets([other])
+  const entries: Array<[string, number]> = [
+    [SECRET, 1],
+    [other, 2],
+    ['[REDACTED]', 3],
+  ]
+  for (const value of [Object.fromEntries(entries), new Map(entries)]) {
+    assert.deepEqual(toJsonValue(value, scrubber), {
+      '[REDACTED]': 1,
+      '[REDACTED]#2': 2,
+      '[REDACTED]#3': 3,
+    })
+  }
 })

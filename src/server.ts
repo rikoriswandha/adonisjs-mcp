@@ -312,7 +312,22 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
           })),
         }
       } catch (error) {
-        throw new Error(redactor.text(error instanceof Error ? error.message : String(error)))
+        const code =
+          error !== null &&
+          typeof error === 'object' &&
+          'code' in error &&
+          Number.isInteger(error.code)
+            ? Number(error.code)
+            : ProtocolErrorCode.InternalError
+        const data =
+          error !== null && typeof error === 'object' && 'data' in error
+            ? redactor.value(error.data)
+            : undefined
+        throw new ProtocolError(
+          code,
+          redactor.text(error instanceof Error ? error.message : String(error)),
+          data
+        )
       }
     }
     const metadata = {

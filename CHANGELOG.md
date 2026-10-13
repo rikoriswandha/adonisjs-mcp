@@ -25,7 +25,7 @@
 ### M9 security and release gates
 
 - Security regression suite covering network, SQL, HTTP, capture and serialization boundaries; lifecycle, OS/Node matrix and capacity smokes.
-- CI and release gates reuse one SHA-512-verified tarball across all verification jobs before publishing; post-publish smoke compares registry bytes with that exact artifact.
+- Release verification reuses one SHA-512-verified tarball across every CI job before publishing; post-publish smoke compares registry bytes with that exact artifact.
 - Success-output secret scrubbing without key-name masking of requested database/model fields; low-entropy registered values remain unchanged in success data.
 - Configure handles single-line `handle` wiring; eval reports `displayTruncated` explicitly.
 - Permissions are Bouncer-only; removed Adonis Plus and Flow coupling.

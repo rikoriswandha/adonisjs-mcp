@@ -66,6 +66,8 @@ export class Redactor {
   readonly #secrets: readonly string[]
   readonly #strongSecrets: readonly string[]
   readonly #inspectedSecrets: readonly string[]
+  readonly #multilineSecrets: readonly RegExp[]
+  readonly longestEscapedSecretLength: number
 
   constructor(secrets: Iterable<string>) {
     this.#secrets = [...new Set(secrets)]
@@ -86,6 +88,24 @@ export class Redactor {
         return [rendered, escaped, escaped.replaceAll('\\"', '"').replaceAll("'", "\\'")]
       })
       .sort((left, right) => right.length - left.length)
+    this.longestEscapedSecretLength = Math.max(
+      0,
+      ...this.#inspectedSecrets.map((secret) => secret.length)
+    )
+    // inspect indents raw Error stacks inside containers. Allow only the
+    // whitespace it inserts after newlines; the original object is untouched.
+    this.#multilineSecrets = this.#secrets
+      .filter((secret) => secret.includes('\n'))
+      .map(
+        (secret) =>
+          new RegExp(
+            secret
+              .split('\n')
+              .map((line) => line.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+              .join('\\n[ \\t]*'),
+            'g'
+          )
+      )
   }
 
   /**
@@ -134,11 +154,14 @@ export class Redactor {
   }
 
   /**
-   * Scrubs inspect/JSON escapes before display truncation. Rendering must
-   * disable line splitting and string truncation so complete secrets match.
+   * Scrubs inspect/JSON escapes and indented Error stacks before truncation.
+   * Rendering must keep each secret within its per-string inspection cap.
    */
   inspectedText(input: string): string {
     let output = input
+    for (const pattern of this.#multilineSecrets) {
+      output = output.replace(pattern, REDACTED)
+    }
     for (const secret of this.#inspectedSecrets) {
       output = output.split(secret).join(REDACTED)
     }

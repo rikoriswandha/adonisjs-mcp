@@ -6,6 +6,7 @@ import { resolveConfig } from '../../src/define_config.js'
 import { Redactor } from '../../src/redaction.js'
 import { defineTool } from '../../src/define_tool.js'
 import { z } from 'zod'
+import { ProtocolError, ProtocolErrorCode } from '@modelcontextprotocol/server'
 
 test('Server | app tool and prompt failures are redacted at the protocol boundary', async ({
   assert,
@@ -33,7 +34,9 @@ test('Server | app tool and prompt failures are redacted at the protocol boundar
           name: 'app_failure',
           description: 'App prompt',
           get() {
-            throw new Error(`app-derived ${secret}`)
+            throw new ProtocolError(ProtocolErrorCode.InvalidParams, `app-derived ${secret}`, {
+              nested: { neutral: secret },
+            })
           },
         },
       ],
@@ -54,10 +57,15 @@ test('Server | app tool and prompt failures are redacted at the protocol boundar
     assert.isTrue(failure.isError)
     assert.include(JSON.stringify(failure), '[REDACTED]')
     assert.notInclude(JSON.stringify(failure), secret)
-    await assert.rejects(
-      () => client.getPrompt({ name: 'app_failure' }),
-      /app-derived \[REDACTED\]/
-    )
+    try {
+      await client.getPrompt({ name: 'app_failure' })
+      assert.fail('prompt must fail')
+    } catch (error) {
+      if (!(error instanceof Error) || !('code' in error) || !('data' in error)) throw error
+      assert.include(error.message, 'app-derived [REDACTED]')
+      assert.equal(error.code, -32602)
+      assert.deepEqual(error.data, { nested: { neutral: '[REDACTED]' } })
+    }
   } finally {
     await client.close()
     await server.close()

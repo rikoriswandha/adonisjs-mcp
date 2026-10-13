@@ -36,7 +36,6 @@ const INSPECT_OPTIONS = {
   depth: 4,
   colors: false,
   maxArrayLength: 100,
-  maxStringLength: null,
   breakLength: Infinity,
 } as const
 
@@ -52,7 +51,8 @@ class ConsoleCapture {
   readonly #timers = new Map<string, number>()
   readonly console: Record<string, (...args: unknown[]) => void>
 
-  constructor(redactor: Redactor, maxBytes: number) {
+  constructor(redactor: Redactor, maxBytes: number, maxStringLength: number) {
+    const options = { ...INSPECT_OPTIONS, maxStringLength }
     const push = (level: string, args: unknown[]) => {
       // Checked before formatting: a full capture costs nothing per call.
       if (this.entries.length >= MAX_CONSOLE_ENTRIES || this.#bytes >= maxBytes) {
@@ -60,7 +60,7 @@ class ConsoleCapture {
         return
       }
       const text = bounded(
-        redactor.inspectedText(formatWithOptions(INSPECT_OPTIONS, ...args)),
+        redactor.inspectedText(formatWithOptions(options, ...args)),
         Math.min(16_384, maxBytes)
       )
       const bytes = Buffer.byteLength(text)
@@ -83,8 +83,8 @@ class ConsoleCapture {
           (...args: unknown[]) => push(level, args),
         ])
       ),
-      dir: (value: unknown) => push('dir', [inspect(value, INSPECT_OPTIONS)]),
-      table: (value: unknown) => push('table', [inspect(value, INSPECT_OPTIONS)]),
+      dir: (value: unknown) => push('dir', [inspect(value, options)]),
+      table: (value: unknown) => push('table', [inspect(value, options)]),
       assert: (condition: unknown, ...args: unknown[]) => {
         if (!condition) push('error', ['Assertion failed', ...args])
       },
@@ -137,10 +137,16 @@ export class ProjectEvaluator {
     context: ToolContext
   ): Promise<ToolOutput> {
     const started = performance.now()
+    const options = {
+      ...INSPECT_OPTIONS,
+      maxStringLength:
+        context.config.limits.maxResultBytes / 2 + this.redactor.longestEscapedSecretLength,
+    }
     const signal = AbortSignal.any([context.signal, AbortSignal.timeout(timeout)])
     const capture = new ConsoleCapture(
       this.redactor,
-      Math.min(65_536, context.config.limits.maxResultBytes / 4)
+      Math.min(65_536, context.config.limits.maxResultBytes / 4),
+      options.maxStringLength
     )
     const logger = await this.app.container.make('logger')
     const excerpt = this.redactor.text(code.replace(/\s+/g, ' ')).slice(0, 200)
@@ -203,7 +209,7 @@ export class ProjectEvaluator {
     )
     try {
       const value = await Promise.race([interrupted.promise, observed])
-      const inspected = this.redactor.inspectedText(inspect(value, INSPECT_OPTIONS))
+      const inspected = this.redactor.inspectedText(inspect(value, options))
       const display = bounded(inspected, context.config.limits.maxResultBytes / 2)
       return {
         data: {
@@ -231,7 +237,7 @@ export class ProjectEvaluator {
       const failure =
         error instanceof Error
           ? error
-          : new Error(this.redactor.inspectedText(formatWithOptions(INSPECT_OPTIONS, error)))
+          : new Error(this.redactor.inspectedText(formatWithOptions(options, error)))
       throw new ToolError('EXECUTION_FAILED', bounded(this.redactor.text(failure.message), 4096), {
         details: {
           name: this.redactor.text(failure.name),
