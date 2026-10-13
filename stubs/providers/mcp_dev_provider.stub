@@ -1,0 +1,13 @@
+{{{
+  exports({ to: app.providersPath('mcp_dev_provider.ts') })
+}}}
+import app from '@adonisjs/core/services/app'
+
+/**
+ * Loads @rikology/adonisjs-mcp only in development. The package is a
+ * development dependency, so production never imports it; the empty
+ * class keeps the provider list valid there.
+ */
+export default app.inDev
+  ? (await import('@rikology/adonisjs-mcp/providers/mcp_provider')).default
+  : class McpDisabledProvider {}

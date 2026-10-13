@@ -79,7 +79,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | ID | Kewajiban | Sumber | Gate | WP | Verifikasi | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | API-01 | Config input parsial typed (`McpConfig`) → config resolved tervalidasi oleh provider; `config/mcp.ts` memakai `import type` + `satisfies`, bukan runtime `defineConfig` (D21); `projectEval: false` dan `tools.disabled` berlaku | Plan §4.3, D21; Design config | SP-B | WP-03 | unit config merge, E10 | TERBUKA |
-| API-02 | `defineTool`: schema object Zod v4, nama snake_case, inferred input tanpa `any` publik | Plan §4.3 | SP-A | WP-03 | typecheck consumer tarball | TERBUKA |
+| API-02 | `defineTool`: schema object Zod v4, nama snake_case, inferred input tanpa `any` publik | Plan §4.3 | SP-A | WP-03 | typecheck consumer tarball (M1: `verify:exports`, `tests/unit/define_tool.spec.ts`) | SELESAI |
 | API-03 | `ToolContext`: app, config/profile, log/exception services, `callId`, signal, tenant per call; tanpa credential singleton | Plan §4.3 | SP-C, SP-H | WP-03, WP-05 | E07 | TERBUKA |
 | API-04 | `available(ctx)` membedakan dependency absen vs integrasi rusak (diagnostic) | Plan §4.3 | SP-K | WP-09 | PF-01, PF-07 | TERBUKA |
 | API-05 | `registry.tool/resource/prompt`: tabrakan gagal sebelum serving; `disable` deny-set independen urutan | Plan §4.3; Design plugin | — | WP-05 | E07 | TERBUKA |
@@ -232,7 +232,7 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 
 | ID | Kewajiban | WP | Status |
 | --- | --- | --- | --- |
-| PK-01 | Manifest ESM, engines Node ≥24, MIT, tsdown + declarations, lint/format, Japa, `package-lock.json` | WP-01 | TERBUKA |
+| PK-01 | Manifest ESM, engines Node ≥24, MIT, tsdown + declarations, lint/format, Japa, `package-lock.json` | WP-01 | SELESAI (M1; matriks Node minimum tetap PK-07) |
 | PK-02 | Script CI: `lint`, `typecheck`, `test`, `test:integration`, `test:security`, `build`, `verify:exports`, `smoke:pack`, `smoke:clients` | WP-01, WP-38 | TERBUKA |
 | PK-03 | Configure idempotent: provider tidak ganda, config/skill tidak ditimpa, `.claude` tidak dibuat tanpa alasan, port/path tercermin | WP-33 | TERBUKA |
 | PK-04 | Satu sumber English `SKILL.md` (npm + repo), conventions per profile, tanpa klaim hard timeout/sandbox | WP-34 | TERBUKA |
@@ -251,8 +251,8 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-02 | Byte limit endpoint 1 MiB ditegakkan eksplisit; limit SDK tidak berlaku untuk parsed body dan limit bodyparser app bisa lebih besar | S-A | WP-08 | TERBUKA |
 | OB-03 | Malformed JSON ditolak bodyparser Adonis sebelum SDK (400, debug raw body); normalisasi + redaction endpoint ditetapkan, tidak diklaim milik SDK | S-A | WP-07, WP-08 | TERBUKA |
 | OB-04 | Pertahankan Shield `exceptRoutes` exact, `relayHeaders()` sebelum bridge, `await` bridge, tanpa payload return; contract test `isPending`/`headersSent`/finalizer per versi http-server | S-A | WP-07, WP-38 | TERBUKA |
-| OB-05 | Rc entry `{ file: () => import('#providers/mcp_dev_provider'), environment: ['web'] }` via `rcFile.addProvider`; wrapper app-local meng-import package hanya bila `app.inDev`; provider package tetap punya guard | S-B | WP-06, WP-33 | TERBUKA |
-| OB-06 | Stub config `import type { McpConfig }` + `satisfies McpConfig`; provider melakukan default/validation; tidak ada runtime import dev package dari config | S-B | WP-03, WP-33 | TERBUKA |
+| OB-05 | Rc entry `{ file: () => import('#providers/mcp_dev_provider'), environment: ['web'] }` via `rcFile.addProvider`; wrapper app-local meng-import package hanya bila `app.inDev`; provider package tetap punya guard | S-B | WP-06, WP-33 | SELESAI (M1: `configure.ts`, `tests/integration/package_install.spec.ts`) |
+| OB-06 | Stub config `import type { McpConfig }` + `satisfies McpConfig`; provider melakukan default/validation; tidak ada runtime import dev package dari config | S-B | WP-03, WP-33 | SELESAI (M1: `stubs/config/mcp.stub`, provider `register()`, `package_install.spec.ts`) |
 | OB-07 | Release gate: tarball → `npm ci --omit=dev` → deployment standalone di luar ancestor `node_modules` → `/` 200, MCP 404, tanpa binding/listener/marker, `ace list` dan `migration:status` exit 0 | S-B | WP-38 | TERBUKA |
 | OB-08 | Capture log lewat `hooks.streamWrite` logger config dan observer sekali di `HttpExceptionHandler.handle`, melalui gateway app-local dev-guarded yang dibuat configure; compose hook yang ada, output app tidak berubah | S-C | WP-10, WP-33 | TERBUKA |
 | OB-09 | Capture wajib redaction pre-storage, batas bytes/count, fail-safe, detach saat shutdown/HMR, coverage named logger/existing hooks/worker transport/ignored exceptions/report-throw | S-C | WP-10, WP-36 | TERBUKA |
@@ -294,7 +294,7 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-45 | Permission: `@adonisplus/permissions` (plural) dari modul aplikasi `#start/permissions`; CI memerlukan akses Plus berlisensi; tanpa redistribusi; Bouncer adapter eksplisit, bukan pengganti diam-diam | S-K | WP-27, WP-38 | TERBUKA |
 | OB-46 | Queue: pin `@adonisjs/queue@0.6.2` + `@boringnode/queue@0.6.0`; listing mengikuti semantik loader (glob relatif `process.cwd()`, URL `file://` mentah, nama `options.name` atau fallback `class.name`) + verifikasi identitas `Locator.get`; manual registration unknown; status non-pending lewat adapter versi-terikat | S-K | WP-27 | TERBUKA |
 | OB-47 | Tenant memakai `TenantService.run(context, cb)` atau export standalone `runWithTenant`; method `TenantService.runWithTenant` tidak ada | S-K | WP-18 | TERBUKA |
-| OB-48 | `extraTools` dan definisi tool app tidak boleh di-import saat runtime production (zod/package absen); bentuk lazy dibuktikan di WP-03 (turunan S-B, belum diuji) | Integrasi M0 | WP-03, WP-33 | TERBUKA |
+| OB-48 | `extraTools` dan definisi tool app tidak boleh di-import saat runtime production (zod/package absen); bentuk lazy dibuktikan di WP-03 | Integrasi M0 | WP-03, WP-33 | SELESAI (M1: `ExtraToolLoader` + `loadExtraTools`; production prune dengan `() => import('#start/mcp_tools')` yang meng-import zod + package) |
 | OB-49 | Configure menawarkan penambahan `--experimental-vm-modules` ke proses dev (mis. `NODE_OPTIONS` pada script `dev`) dengan konfirmasi, idempotent, tanpa mengubah diam-diam; README/skill menjelaskan flag, ExperimentalWarning, dan perilaku tanpa flag | B-01 | WP-28, WP-33, WP-34, WP-35 | TERBUKA |
 
 ## 11. Blocker dan keputusan terbuka
@@ -314,3 +314,22 @@ Belum ada pengurangan cakupan. M0 tidak menghapus tool, resource, atau prompt. K
 - `execute_sql_query` hanya menerima subset SELECT/WITH terbatas pada executor milik MCP; PostgreSQL membutuhkan reader role terkonfigurasi, SQLite in-memory tidak didukung (D28).
 - Impersonation cookie session memberi replay window terbatas, bukan revocation instan (D27).
 - Package permission adalah `@adonisplus/permissions` (privat, berlisensi), bukan `@adonisplus/permission`; queue memakai `@adonisjs/queue`, bukan `@rikology/adonisjs-queue` yang tidak terbit (D32).
+
+## 13. Progres M1 (13 Oktober 2026)
+
+M1 (WP-01–WP-04) diimplementasikan; bukti dijalankan pada macOS arm64, Node 24.21.0, npm 11.19.0: `npm run lint`, `npm run typecheck`, `npm test` (30 unit), `npm run test:integration` (11 integration, fixture nyata), `npm run verify:exports` (consumer strict dari tarball). Baris yang berpindah ke `SELESAI`: API-02, PK-01, OB-05, OB-06, OB-48.
+
+Bukti parsial; baris tetap `TERBUKA` sampai WP konsumennya selesai:
+
+| ID | Sudah terbukti di M1 | Sisa |
+| --- | --- | --- |
+| API-01 | Input parsial typed, default, merge array-replace, `projectEval: false`, validasi strict dengan path issue; provider memvalidasi di dev, test/production tidak memuat package | Efek `tools.disabled` pada registry (WP-05); E10 penuh (WP-33) |
+| API-03 | Tipe `ToolContext` (`app`, `config`, `callId`, `signal`) | Profile/log/exception/tenant per call (WP-05, WP-09, WP-10, WP-18) |
+| API-10 | Tipe `ToolErrorCode` sembilan kode + `ToolError` | Normalisasi ke result `isError` (WP-05, WP-07) |
+| API-11 | Empat export resolve dari tarball untuk `tsc` strict (`skipLibCheck: false`) dan Node | `smoke:pack` (WP-38) |
+| API-12 | Public entry tidak meng-import paket opsional; production prune boot tanpa package/zod | PF-01 dan adapter opsional (WP-09+) |
+| DC-02 | Zod v4 + tuple SDK v2 terkunci di lockfile; tanpa shim v1 | Pemakaian SDK di transport (WP-07) |
+| DC-21 / DC-22 | Configure membuat wrapper, config type-only, rc entry `['web']`; production standalone `/` 200, MCP 404, Ace `list`/`migration:status` exit 0 | Instrumentasi logger/exception production-safe (WP-33); gate CI (WP-38) |
+| OB-07 | Skenario release gate dijalankan di integration test | Asersi binding/listener setelah ada (M2–M3); CI (WP-38) |
+| OB-15 / OB-40 | Fixture factory mendukung runner `hmr` (`node ace serve --hmr`) dengan stop process group | Regression HMR (WP-37); koreksi ignore Vite `**/tmp/**` saat fixture kit Vite ditambahkan |
+| PK-02 | Script `lint`, `typecheck`, `test`, `test:integration`, `build`, `verify:exports` | `test:security`, `smoke:pack`, `smoke:clients` (WP-38) |

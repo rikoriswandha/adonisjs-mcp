@@ -1,0 +1,471 @@
+/*
+|--------------------------------------------------------------------------
+| Public types
+|--------------------------------------------------------------------------
+|
+| Type-only contracts shared by the provider, builtin tools, extension
+| packages and the application's `config/mcp.ts`. This module has no
+| runtime imports, so consumers can depend on it with `import type`.
+|
+*/
+
+import type { ApplicationService } from '@adonisjs/core/types'
+import type { z } from 'zod'
+
+/**
+ * Request surfaces an application can expose. A `web` surface is rendered
+ * by Inertia or Edge; an `api` surface answers JSON.
+ */
+export type SurfaceName = 'web' | 'api'
+
+/**
+ * Correction for an auto-detected surface. Only fill the fields that the
+ * detection gets wrong.
+ */
+export interface SurfaceConfig {
+  /**
+   * URL path prefix owned by the surface, e.g. `/api`.
+   */
+  prefix?: string
+
+  /**
+   * Auth guard used when impersonating a user on this surface.
+   */
+  guard?: string
+}
+
+export interface ProjectEvalConfig {
+  /**
+   * Default and maximum cooperative timeout for `project_eval`, in
+   * milliseconds. A call may ask for less, never for more. The timeout
+   * stops waiting; it does not preempt synchronous code or undo side
+   * effects that already happened.
+   */
+  timeout?: number
+}
+
+export interface SqlToolConfig {
+  /**
+   * Run raw SQL with database-enforced read-only boundaries.
+   */
+  readOnly?: boolean
+
+  /**
+   * Maximum rows returned by `execute_sql_query` and `query_model`.
+   */
+  maxRows?: number
+
+  /**
+   * Allow tenant-scoped tools to read across tenants. Every result
+   * produced this way is labelled as cross-tenant.
+   */
+  allowCrossTenant?: boolean
+}
+
+export interface LogsToolConfig {
+  /**
+   * Number of log entries kept in the ring buffer.
+   */
+  bufferSize?: number
+
+  /**
+   * Number of handled exceptions kept in the ring buffer.
+   */
+  exceptionBufferSize?: number
+}
+
+export interface DocsToolConfig {
+  /**
+   * Installed packages indexed by `search_package_docs`. Accepts exact
+   * package names and `@scope/*` patterns.
+   */
+  include?: readonly string[]
+}
+
+export interface DeadlineToolConfig {
+  /**
+   * Deadline in milliseconds.
+   */
+  timeout?: number
+}
+
+export interface McpLimitsConfig {
+  /**
+   * Maximum accepted MCP request body, in bytes.
+   */
+  maxRequestBytes?: number
+
+  /**
+   * Maximum serialized tool/resource result, in bytes. Larger results
+   * are truncated to valid JSON and flagged as truncated.
+   */
+  maxResultBytes?: number
+}
+
+/**
+ * Module shape accepted by `extraTools` loaders. The default export is a
+ * single tool definition or a list of them.
+ */
+export interface ExtraToolsModule {
+  default: AnyToolDefinition | readonly AnyToolDefinition[]
+}
+
+/**
+ * Lazy loader for application-owned tools, e.g.
+ * `() => import('#start/mcp_tools')`.
+ *
+ * Tools are always referenced lazily because `config/mcp.ts` is loaded
+ * in production, where this package and `zod` are not installed. The
+ * loader only runs in development.
+ */
+export type ExtraToolLoader = () => Promise<ExtraToolsModule>
+
+/**
+ * Input accepted by `config/mcp.ts`. Every key is optional; the provider
+ * applies defaults and validates the result in development.
+ *
+ * Keep `config/mcp.ts` free of runtime imports from this package:
+ * `import type { McpConfig } from '@rikology/adonisjs-mcp'` together
+ * with `satisfies McpConfig`.
+ */
+export interface McpConfig {
+  /**
+   * Kill switch. When `false`, no endpoint is registered.
+   *
+   * @default true
+   */
+  enabled?: boolean
+
+  /**
+   * Exact URL path of the MCP endpoint.
+   *
+   * @default '/__adonis/mcp'
+   */
+  path?: string
+
+  /**
+   * Accept peers outside the loopback interface. Host and Origin checks
+   * still apply. Only enable behind a trusted network boundary.
+   *
+   * @default false
+   */
+  allowRemoteAccess?: boolean
+
+  /**
+   * Extra exact `Host` header values (`hostname` or `hostname:port`)
+   * accepted besides loopback names on the listening port. Wildcards
+   * are not supported.
+   *
+   * @default []
+   */
+  allowedHosts?: readonly string[]
+
+  /**
+   * Extra exact browser origins (`scheme://host[:port]`) accepted besides
+   * loopback origins. Requests without an `Origin` header are accepted;
+   * `null` is never accepted.
+   *
+   * @default []
+   */
+  allowedOrigins?: readonly string[]
+
+  limits?: McpLimitsConfig
+
+  profile?: {
+    /**
+     * Corrections for auto-detected surfaces. Leave empty to rely on
+     * detection.
+     */
+    surfaces?: {
+      web?: SurfaceConfig
+      api?: SurfaceConfig
+      default?: SurfaceName
+    }
+  }
+
+  tools?: {
+    /**
+     * Names of tools that must never be served, including tools
+     * registered by other packages.
+     *
+     * @default []
+     */
+    disabled?: readonly string[]
+
+    /**
+     * `false` disables `project_eval`.
+     */
+    projectEval?: false | ProjectEvalConfig
+
+    sql?: SqlToolConfig
+    logs?: LogsToolConfig
+    docs?: DocsToolConfig
+    http?: DeadlineToolConfig
+    ace?: DeadlineToolConfig
+  }
+
+  /**
+   * Lazy loaders for application-owned tools.
+   *
+   * @default []
+   */
+  extraTools?: readonly ExtraToolLoader[]
+}
+
+/**
+ * Config after defaults and validation. Frozen at runtime.
+ */
+export interface ResolvedMcpConfig {
+  readonly enabled: boolean
+  readonly path: string
+  readonly allowRemoteAccess: boolean
+  readonly allowedHosts: readonly string[]
+  readonly allowedOrigins: readonly string[]
+  readonly limits: {
+    readonly maxRequestBytes: number
+    readonly maxResultBytes: number
+  }
+  readonly profile: {
+    readonly surfaces: {
+      readonly web?: Readonly<SurfaceConfig>
+      readonly api?: Readonly<SurfaceConfig>
+      readonly default?: SurfaceName
+    }
+  }
+  readonly tools: {
+    readonly disabled: readonly string[]
+    readonly projectEval: false | { readonly timeout: number }
+    readonly sql: {
+      readonly readOnly: boolean
+      readonly maxRows: number
+      readonly allowCrossTenant: boolean
+    }
+    readonly logs: {
+      readonly bufferSize: number
+      readonly exceptionBufferSize: number
+    }
+    readonly docs: {
+      readonly include: readonly string[]
+    }
+    readonly http: { readonly timeout: number }
+    readonly ace: { readonly timeout: number }
+  }
+  readonly extraTools: readonly ExtraToolLoader[]
+}
+
+/**
+ * Stable error codes returned by failing tool calls.
+ */
+export type ToolErrorCode =
+  | 'DEPENDENCY_UNAVAILABLE'
+  | 'CAPABILITY_UNSUPPORTED'
+  | 'INPUT_INVALID'
+  | 'NOT_FOUND'
+  | 'READ_ONLY_VIOLATION'
+  | 'TENANT_SCOPE_REQUIRED'
+  | 'TIMEOUT'
+  | 'CANCELLED'
+  | 'EXECUTION_FAILED'
+
+/**
+ * Why a definition is not served.
+ *
+ * - `DEPENDENCY_UNAVAILABLE`: the optional package is not installed.
+ * - `CAPABILITY_UNSUPPORTED`: installed, but this setup is not supported.
+ * - `INTEGRATION_FAILED`: installed and expected to work, but broken.
+ */
+export type UnavailableCode =
+  'DEPENDENCY_UNAVAILABLE' | 'CAPABILITY_UNSUPPORTED' | 'INTEGRATION_FAILED'
+
+export type Availability =
+  { available: true } | { available: false; code: UnavailableCode; reason: string }
+
+/**
+ * Where the information in a result comes from.
+ *
+ * - `runtime`: observed from the running application.
+ * - `generated`: read from generated artifacts (e.g. `.adonisjs/`).
+ * - `source`: derived from source files without executing them.
+ */
+export type EvidenceKind = 'runtime' | 'generated' | 'source'
+
+/**
+ * Context available when deciding whether a definition is served.
+ */
+export interface AvailabilityContext {
+  app: ApplicationService
+  config: ResolvedMcpConfig
+}
+
+/**
+ * Per-call context handed to tool handlers. Nothing in it outlives the
+ * call.
+ */
+export interface ToolContext extends AvailabilityContext {
+  /**
+   * Unique identifier of this call, used to correlate logs.
+   */
+  callId: string
+
+  /**
+   * Aborted when the client cancels the call or its deadline expires.
+   */
+  signal: AbortSignal
+}
+
+/**
+ * Successful tool/resource payload. Serialized as JSON text content by
+ * the server, together with `durationMs` and `truncated` metadata.
+ */
+export interface ToolOutput {
+  data: unknown
+  evidence?: readonly EvidenceKind[]
+  limitations?: readonly string[]
+}
+
+/**
+ * MCP tool annotations. Hints describe actual behavior; they are not
+ * enforcement.
+ */
+export interface ToolAnnotations {
+  title?: string
+  readOnlyHint?: boolean
+  destructiveHint?: boolean
+  idempotentHint?: boolean
+  openWorldHint?: boolean
+}
+
+/**
+ * Zod v4 object schema describing a tool input.
+ */
+export type ToolInputSchema = z.ZodObject
+
+export interface ToolDefinition<Schema extends ToolInputSchema = ToolInputSchema> {
+  /**
+   * snake_case name, unique across the registry. Prefix it with your
+   * package domain, e.g. `audit_list_entries`.
+   */
+  name: string
+  title?: string
+
+  /**
+   * What the tool does via the running AdonisJS application, and any
+   * side effects it can have.
+   */
+  description: string
+  inputSchema: Schema
+  annotations?: ToolAnnotations
+  available?(context: AvailabilityContext): Availability | Promise<Availability>
+  handler(input: z.output<Schema>, context: ToolContext): ToolOutput | Promise<ToolOutput>
+}
+
+/**
+ * Tool definition with any input schema. Used for heterogeneous lists.
+ */
+export type AnyToolDefinition = ToolDefinition<ToolInputSchema>
+
+/**
+ * A tool call flowing through `registry.extend()` wrappers.
+ */
+export interface ToolCall {
+  readonly name: string
+  readonly input: unknown
+  readonly context: ToolContext
+}
+
+/**
+ * Wraps every tool handler. `next` runs the remaining wrappers and the
+ * handler, and can be called at most once.
+ */
+export type ToolCallWrapper = (
+  call: ToolCall,
+  next: () => Promise<ToolOutput>
+) => Promise<ToolOutput>
+
+export interface ResourceReadRequest {
+  uri: URL
+
+  /**
+   * Values of URI template variables, e.g. `{ key: 'database' }` for
+   * `adonis://config/{key}`. Empty for static URIs.
+   */
+  variables: Readonly<Record<string, string | readonly string[]>>
+}
+
+export interface ResourceDefinition {
+  /**
+   * Registry identity, unique across resources.
+   */
+  name: string
+
+  /**
+   * Static URI (`adonis://profile`) or RFC 6570 URI template
+   * (`adonis://config/{key}`).
+   */
+  uri: string
+  title?: string
+  description?: string
+  available?(context: AvailabilityContext): Availability | Promise<Availability>
+  read(request: ResourceReadRequest, context: ToolContext): ToolOutput | Promise<ToolOutput>
+}
+
+export interface PromptMessage {
+  role: 'user' | 'assistant'
+  text: string
+}
+
+export interface PromptOutput {
+  description?: string
+  messages: readonly PromptMessage[]
+}
+
+export interface PromptDefinition<Schema extends ToolInputSchema = ToolInputSchema> {
+  name: string
+  title?: string
+  description: string
+  argsSchema?: Schema
+
+  available?(context: AvailabilityContext): Availability | Promise<Availability>
+
+  /**
+   * Builds messages only. Must not run queries, HTTP requests or eval.
+   */
+  get(args: z.output<Schema>, context: AvailabilityContext): PromptOutput | Promise<PromptOutput>
+}
+
+/**
+ * Registry bound to the container as `mcp.registry` in development.
+ * Other packages register definitions from their provider `boot()`:
+ *
+ * ```ts
+ * if (this.app.inDev && this.app.container.hasBinding('mcp.registry')) {
+ *   const registry = await this.app.container.make('mcp.registry')
+ *   registry.tool(...)
+ * }
+ * ```
+ */
+export interface McpRegistry {
+  /**
+   * Registers a tool. Duplicate names fail before the endpoint serves.
+   */
+  tool<Schema extends ToolInputSchema>(definition: ToolDefinition<Schema>): void
+  resource(definition: ResourceDefinition): void
+  prompt<Schema extends ToolInputSchema>(definition: PromptDefinition<Schema>): void
+
+  /**
+   * Adds a wrapper around every tool handler. Wrappers run in
+   * registration order, outermost first.
+   */
+  extend(wrapper: ToolCallWrapper): void
+
+  /**
+   * Never serve the named tool, regardless of registration order.
+   */
+  disable(name: string): void
+}
+
+declare module '@adonisjs/core/types' {
+  interface ContainerBindings {
+    'mcp.registry': McpRegistry
+  }
+}

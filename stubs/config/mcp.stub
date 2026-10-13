@@ -1,0 +1,28 @@
+{{{
+  exports({ to: app.configPath('mcp.ts') })
+}}}
+import type { McpConfig } from '@rikology/adonisjs-mcp'
+
+/**
+ * Development-only MCP endpoint for coding agents.
+ *
+ * This file is loaded in production too, where @rikology/adonisjs-mcp is
+ * not installed. Keep runtime imports of the package and zod out of it,
+ * and reference application tools lazily, for example:
+ *
+ *   extraTools: [() => import('#start/mcp_tools')]
+ */
+const mcpConfig = {
+  enabled: true,
+  path: '/__adonis/mcp',
+  allowRemoteAccess: false,
+  tools: {
+    disabled: [],
+    docs: {
+      include: ['@adonisjs/*', '@rikology/*'],
+    },
+  },
+  extraTools: [],
+} satisfies McpConfig
+
+export default mcpConfig

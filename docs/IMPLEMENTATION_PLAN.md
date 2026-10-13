@@ -1,7 +1,7 @@
 # Implementation Plan — @rikology/adonisjs-mcp
 
 Tanggal: 13 Oktober 2026  
-Status: M0 (spike dan obligation ledger) selesai; belum ada implementasi runtime package  
+Status: M0 (spike dan obligation ledger) dan M1 (fondasi package dan fixture, §6.1) selesai; M2 belum dimulai  
 Sumber kebutuhan: [DESIGN.md](./DESIGN.md)  
 Obligation ledger: [OBLIGATION_LEDGER.md](./OBLIGATION_LEDGER.md); bukti spike: [spikes/](./spikes/)  
 Target deliverable: package npm `@rikology/adonisjs-mcp@0.1.0`, MIT, untuk aplikasi AdonisJS v7 dalam development.
@@ -267,6 +267,28 @@ Prasyarat: keputusan dependency serta S-A/S-B memiliki jalur solusi yang terveri
 
 **Exit gate M1:** tarball awal bisa diimpor fixture; production config/provider strategy sudah diprove; belum mengklaim tools lengkap.
 
+#### 6.1 Hasil M1 (13 Oktober 2026)
+
+Exit gate M1 terpenuhi pada macOS arm64, Node 24.21.0, npm 11.19.0: tarball hasil `npm pack` terpasang sebagai devDependency di fixture API, `node ace configure` dua kali idempotent, development memuat provider package (config invalid menggagalkan boot dengan pesan berpath), proses `test` dan deployment production standalone hasil `npm ci --omit=dev` boot tanpa package maupun `zod` (`/` 200, endpoint MCP 404, `ace list`/`migration:status` exit 0). Belum ada route MCP, registry, atau tool; itu M2.
+
+| WP | Artefak | Bukti |
+| --- | --- | --- |
+| WP-01 | `package.json` (ESM, `node >=24`, MIT, deps `@modelcontextprotocol/server` ^2.3.1, `@modelcontextprotocol/node` ^2.1.1, `zod` ^4.6.7; peer `@adonisjs/core` ^7, optional `@adonisjs/assembler` ^8), `package-lock.json`, `tsconfig*.json`, tsdown (JS + copy stubs) + `tsc` declarations, ESLint/Prettier AdonisJS, Japa (`bin/test.ts`, suite `unit`/`integration`), `LICENSE.md` | `npm run lint`, `npm run typecheck`, `npm run build` |
+| WP-02 | Exports `.`, `./configure`, `./types`, `./providers/mcp_provider`; `stubs/main.ts`, `stubs/config/mcp.stub`, `stubs/providers/mcp_dev_provider.stub`; `files: ["build"]` | `npm run verify:exports`: isi tarball hanya build output + stubs; consumer `tsc` strict `skipLibCheck: false` dan import Node seluruh export |
+| WP-03 | `src/types.ts` (config input/resolved, `ToolDefinition`, `ToolContext`, `ToolOutput`, `Availability`, `ToolErrorCode`, resource/prompt/registry types, augmentasi `ContainerBindings['mcp.registry']`), `src/define_config.ts`, `src/define_tool.ts` (`defineTool`, `loadExtraTools`), `src/errors.ts`, `providers/mcp_provider.ts`, `configure.ts` | `tests/unit/define_config.spec.ts`, `tests/unit/define_tool.spec.ts` (30 test); inferensi dan augmentasi diperiksa consumer `verify:exports` |
+| WP-04 | `tests/fixtures/apps/api` (kit API create-adonisjs 3.4.0 + koneksi `pg` via `DB_CONNECTION` + route probe `/__fixture/environment`), `tests/helpers/` (fixture factory, log capture, owned PostgreSQL, MCP client, pack) | `tests/integration/fixture_app.spec.ts`, `tests/integration/package_install.spec.ts` (11 test) |
+
+Keputusan implementasi M1 (keputusan rencana, belum persetujuan pengguna):
+
+- Kontrak config dibekukan untuk key di §4.4 dan desain: `enabled`, `path`, `allowRemoteAccess`, `allowedHosts`, `allowedOrigins`, `limits.{maxRequestBytes,maxResultBytes}`, `profile.surfaces.{web,api,default}`, `tools.{disabled,projectEval,sql,logs,docs,http,ace}`, `extraTools`. Key tidak dikenal ditolak (strict) dengan path; array mengganti default; `projectEval.timeout` adalah default sekaligus batas atas. Byte budget log ditambahkan aditif di WP-10.
+- `extraTools` hanya menerima loader lazy `() => import('…')` (D22); definisi eager tidak didukung karena config dimuat di production.
+- `defineConfig` tetap export publik untuk konteks yang package-nya terpasang, tetapi stub memakai `satisfies McpConfig`; provider memanggil resolver yang sama di `register()` hanya saat `app.inDev`.
+- `available()` mengembalikan `{ available: true }` atau `{ available: false, code, reason }` dengan code `DEPENDENCY_UNAVAILABLE`, `CAPABILITY_UNSUPPORTED`, atau `INTEGRATION_FAILED` (integrasi rusak, API-04).
+- Configure M1 hanya menulis surface D21 (config, wrapper, rc entry) dan gagal jelas bila alias `#providers/*` tidak ada. Shield/Accept exemption, instrumentasi log, flag eval, skill, dan next steps tetap WP-33.
+- Fixture berada di luar repository (`$TMPDIR/adonisjs-mcp-fixtures` atau `ADONISJS_MCP_FIXTURE_ROOT`) karena ancestor `node_modules` menutupi package absen (S-B). Dependency template di-cache per hash lockfile lalu di-clone copy-on-write. Proses fixture hanya mewarisi environment allowlist (tanpa `DATABASE_URL`, `PG*`, `NODE_OPTIONS`, `npm_config_*`) dan selalu memakai `NODE_ENV` eksplisit.
+- PostgreSQL test selalu cluster milik test (`initdb` + `pg_ctl` di direktori sementara, 127.0.0.1, port bebas, dihapus setelahnya); binary dicari lewat `ADONISJS_MCP_PG_BIN`, `pg_config`, lalu lokasi umum. Tanpa binary, test gagal dengan pesan, tidak pernah fallback ke server yang sudah ada.
+- Fixture saat ini hanya kit API. Kit Inertia/Edge/hybrid/tenant ditambahkan bersama WP konsumennya; kit Vite wajib mengoreksi ignore `**/tmp/**` (OB-40).
+
 ### M2 — Registry, provider, transport, security boundary
 
 Prasyarat: M1, S-A, S-B.
@@ -510,7 +532,7 @@ Svelte/Solid tercantum pada tipe desain tetapi dukungan actual Inertia adapter h
 
 ### 9.4 Command contract CI yang direncanakan
 
-Script berikut **belum tersedia** dan menjadi deliverable WP-01/WP-38:
+Command contract CI (WP-01/WP-38). Sejak M1 tersedia `lint`, `typecheck`, `test` (suite unit), `test:integration` (build + suite integration dengan fixture nyata), `build`, dan `verify:exports`; `test:security`, `smoke:pack`, dan `smoke:clients` masih deliverable WP-38:
 
 ```sh
 npm ci
@@ -653,7 +675,7 @@ Bila post-publish smoke gagal, hentikan promosi dan terbitkan perbaikan versi ba
 5. ~~Jalankan spike log/auth/SQL/tenant/eval/introspection yang tersisa~~ — selesai di M0; B-01 diputuskan (opsi a).
 6. Eksekusi M3–M8 sesuai dependensi, tutup dengan M9. Jangan memindahkan risiko keamanan ke akhir hanya karena tool sudah tampak bekerja.
 
-Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Belum ada tests atau smoke package karena source package belum ada.
+Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Sejak M1, tests dan smoke package mencakup fondasi saja (§6.1); belum ada endpoint MCP maupun tool.
 
 ## 14. Referensi
 

@@ -1,0 +1,8 @@
+build
+coverage
+node_modules
+package-lock.json
+tests/fixtures/apps
+spikes
+docs
+*.stub

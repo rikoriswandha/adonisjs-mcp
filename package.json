@@ -1,0 +1,124 @@
+{
+  "name": "@rikology/adonisjs-mcp",
+  "description": "Development-only MCP endpoint embedded in a running AdonisJS v7 application",
+  "version": "0.0.0",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "build"
+  ],
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./build/index.d.ts",
+      "default": "./build/index.js"
+    },
+    "./configure": {
+      "types": "./build/configure.d.ts",
+      "default": "./build/configure.js"
+    },
+    "./types": {
+      "types": "./build/src/types.d.ts",
+      "default": "./build/src/types.js"
+    },
+    "./providers/mcp_provider": {
+      "types": "./build/providers/mcp_provider.d.ts",
+      "default": "./build/providers/mcp_provider.js"
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import=@poppinss/ts-exec --enable-source-maps bin/test.ts unit",
+    "test:integration": "npm run build && node --import=@poppinss/ts-exec --enable-source-maps bin/test.ts integration",
+    "clean": "node -e \"require('node:fs').rmSync('build', { recursive: true, force: true })\"",
+    "compile": "npm run clean && tsdown && tsc -p tsconfig.build.json",
+    "build": "npm run compile",
+    "verify:exports": "npm run build && node scripts/verify_exports.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "adonisjs",
+    "mcp",
+    "model-context-protocol",
+    "coding-agent",
+    "development"
+  ],
+  "author": "Riko Riswandha Fahmi Prasetyo <rikorisw@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rikoriswandha/adonisjs-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rikoriswandha/adonisjs-mcp/issues"
+  },
+  "homepage": "https://github.com/rikoriswandha/adonisjs-mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/node": "^2.1.1",
+    "@modelcontextprotocol/server": "^2.3.1",
+    "zod": "^4.6.7"
+  },
+  "peerDependencies": {
+    "@adonisjs/assembler": "^8.0.0",
+    "@adonisjs/core": "^7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@adonisjs/assembler": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^8.5.2",
+    "@adonisjs/core": "^7.6.0",
+    "@adonisjs/eslint-config": "^3.1.0",
+    "@adonisjs/prettier-config": "^1.5.0",
+    "@adonisjs/tsconfig": "^2.0.0",
+    "@japa/assert": "^4.2.0",
+    "@japa/expect-type": "^2.0.4",
+    "@japa/runner": "^5.4.0",
+    "@modelcontextprotocol/client": "^2.3.1",
+    "@poppinss/ts-exec": "^1.5.0",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.12.0",
+    "prettier": "^3.9.10",
+    "tsdown": "^0.23.1",
+    "typescript": "~6.0.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "tsdown": {
+    "entry": {
+      "index": "./index.ts",
+      "configure": "./configure.ts",
+      "src/types": "./src/types.ts",
+      "providers/mcp_provider": "./providers/mcp_provider.ts",
+      "stubs/main": "./stubs/main.ts"
+    },
+    "outDir": "./build",
+    "clean": false,
+    "format": "esm",
+    "minify": "dce-only",
+    "fixedExtension": false,
+    "dts": false,
+    "treeshake": false,
+    "sourcemap": false,
+    "target": "esnext",
+    "platform": "node",
+    "copy": [
+      {
+        "from": "stubs/**/*.stub",
+        "to": "build/stubs",
+        "flatten": false
+      }
+    ]
+  },
+  "prettier": "@adonisjs/prettier-config"
+}
