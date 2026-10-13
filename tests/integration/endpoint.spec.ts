@@ -795,13 +795,17 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
       get_queue_jobs: 'DEPENDENCY_UNAVAILABLE',
       get_routes: 'served',
       get_shared_props: 'DEPENDENCY_UNAVAILABLE',
+      get_source_location: 'served',
       get_transformers: 'served',
       get_tuyau_schema: 'DEPENDENCY_UNAVAILABLE',
       get_validators: 'DEPENDENCY_UNAVAILABLE',
       get_views: 'DEPENDENCY_UNAVAILABLE',
       http_request: 'served',
+      project_eval: 'CAPABILITY_UNSUPPORTED',
       query_model: 'DEPENDENCY_UNAVAILABLE',
       render_view: 'DEPENDENCY_UNAVAILABLE',
+      run_ace_command: 'served',
+      search_package_docs: 'served',
     })
     const models = profile.data.capabilities.resources.find((entry) => entry.name === 'models')
     assert.deepInclude(models, { status: 'unavailable', code: 'DEPENDENCY_UNAVAILABLE' })

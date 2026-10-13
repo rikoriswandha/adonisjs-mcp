@@ -107,6 +107,7 @@
       "src/types": "./src/types.ts",
       "providers/mcp_provider": "./providers/mcp_provider.ts",
       "src/database/sqlite_reader": "./src/database/sqlite_reader.ts",
+      "src/ace/ace_watchdog": "./src/ace/ace_watchdog.ts",
       "stubs/main": "./stubs/main.ts"
     },
     "outDir": "./build",

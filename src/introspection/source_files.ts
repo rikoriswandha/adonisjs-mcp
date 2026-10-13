@@ -20,6 +20,7 @@ import { readdir, readFile, realpath, stat } from 'node:fs/promises'
 import { extname, isAbsolute, join, relative, sep } from 'node:path'
 import type * as TypeScript from 'typescript'
 import type { TypeScriptApi } from './typescript.js'
+import { resolveMapping } from './package_maps.js'
 
 /**
  * Largest source file read for introspection.
@@ -346,36 +347,7 @@ export async function resolveAppSpecifier(
     } catch {
       return null
     }
-    for (const [pattern, mapping] of Object.entries(imports)) {
-      const value =
-        typeof mapping === 'string'
-          ? mapping
-          : typeof mapping === 'object' && mapping !== null
-            ? (mapping as Record<string, unknown>).default
-            : undefined
-      if (typeof value !== 'string') {
-        continue
-      }
-      if (pattern === specifier) {
-        target = value
-        break
-      }
-      const star = pattern.indexOf('*')
-      if (star === -1) {
-        continue
-      }
-      const prefix = pattern.slice(0, star)
-      const suffix = pattern.slice(star + 1)
-      if (
-        specifier.startsWith(prefix) &&
-        specifier.endsWith(suffix) &&
-        specifier.length >= prefix.length + suffix.length
-      ) {
-        const captured = specifier.slice(prefix.length, specifier.length - suffix.length)
-        target = value.split('*').join(captured)
-        break
-      }
-    }
+    target = resolveMapping(imports, specifier)
     if (target === null) {
       return null
     }

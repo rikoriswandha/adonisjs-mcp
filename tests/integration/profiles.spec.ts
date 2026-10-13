@@ -1,12 +1,14 @@
 /*
 |--------------------------------------------------------------------------
-| Profile fixtures and their tool sets (M6 exit gate)
+| Profile fixtures and their tool sets (M6 and M7 exit gates)
 |--------------------------------------------------------------------------
 |
 | Each starter kit, configured with the tarball and nothing else, serves
 | exactly the framework tools its integrations support; every other tool
 | is reported unavailable with the reason a dependency or capability is
-| missing. The API kit without Lucid/auth/views is covered by
+| missing. The profile-independent M7 tools are served on every kit, except
+| project_eval, which needs --experimental-vm-modules (the kits start
+| without it). The API kit without Lucid/auth/views is covered by
 | endpoint.spec.ts.
 |
 */
@@ -40,6 +42,17 @@ const FRAMEWORK_TOOLS = [
   'get_permissions',
   'get_queue_jobs',
 ] as const
+
+/**
+ * Profile-independent tools and their status on every kit started without
+ * --experimental-vm-modules.
+ */
+const CORE_M7_TOOLS: Record<string, Status> = {
+  project_eval: 'CAPABILITY_UNSUPPORTED',
+  run_ace_command: 'served',
+  get_source_location: 'served',
+  search_package_docs: 'served',
+}
 
 type Status = 'served' | 'DEPENDENCY_UNAVAILABLE' | 'CAPABILITY_UNSUPPORTED'
 
@@ -155,6 +168,12 @@ test.group('Profiles | starter kits serve their framework tools', () => {
             .map((entry) => [entry.name, entry.code ?? entry.status])
         )
         assert.deepEqual(statuses, expected.tools)
+        const core = Object.fromEntries(
+          profile.data.capabilities.tools
+            .filter((entry) => entry.name in CORE_M7_TOOLS)
+            .map((entry) => [entry.name, entry.code ?? entry.status])
+        )
+        assert.deepEqual(core, CORE_M7_TOOLS)
         for (const entry of profile.data.capabilities.tools) {
           if (entry.status === 'unavailable') {
             assert.isString(entry.reason, entry.name)

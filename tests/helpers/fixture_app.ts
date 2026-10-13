@@ -359,6 +359,7 @@ export class FixtureApp {
     nodeEnv: Exclude<NodeEnvironment, 'production'>
     runner?: DevRunner
     host?: string
+    nodeOptions?: string
   }): Promise<RunningApp> {
     const port = await freePort()
     const args =
@@ -367,7 +368,10 @@ export class FixtureApp {
         : ['--import=@poppinss/ts-exec', 'bin/server.ts']
     const app = await RunningApp.launch(process.execPath, args, {
       cwd: this.root,
-      env: this.environment(options.nodeEnv, port, options.host),
+      env: {
+        ...this.environment(options.nodeEnv, port, options.host),
+        ...(options.nodeOptions === undefined ? {} : { NODE_OPTIONS: options.nodeOptions }),
+      },
       port,
     })
     this.track(app)

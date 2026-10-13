@@ -44,6 +44,7 @@ const REQUIRED_FILES = [
   'build/providers/mcp_provider.js',
   'build/providers/mcp_provider.d.ts',
   'build/src/database/sqlite_reader.js',
+  'build/src/ace/ace_watchdog.js',
   'build/stubs/main.js',
   'build/stubs/config/mcp.stub',
   'build/stubs/providers/mcp_dev_provider.stub',
