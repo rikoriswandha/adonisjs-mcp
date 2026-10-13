@@ -199,12 +199,12 @@ export class ProjectEvaluator {
     )
     try {
       const value = await Promise.race([interrupted.promise, observed])
+      const inspected = this.redactor.text(inspect(value, INSPECT_OPTIONS))
+      const display = bounded(inspected, context.config.limits.maxResultBytes / 2)
       return {
         data: {
-          display: bounded(
-            this.redactor.text(inspect(value, INSPECT_OPTIONS)),
-            context.config.limits.maxResultBytes / 2
-          ),
+          display,
+          displayTruncated: display !== inspected,
           type: bounded(
             this.redactor.text(
               value === null

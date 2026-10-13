@@ -366,7 +366,7 @@ The skill derives conventions from the profile instead of imposing Inertia on AP
 | App owns the MCP path                             | Choose a different exact `config.path`, restart and update the client URL. The provider logs the conflict and releases the path to the app route instead of shadowing it. |
 | Client offers **Authenticate**                    | MCP has no OAuth. Check connection/guards first; authentication UI is not required. See the Zed caveat above.                                                             |
 | Tool absent from `tools/list`                     | Read profile capabilities for disabled/dependency/unsupported/broken-integration reasons; do not infer it from installed packages alone.                                  |
-| Model/provider changes appear stale               | Restart where required; provider/extraTools registrations are not rebuilt by HMR and imported models may retain the old identity.                                         |
+| Model/provider changes appear stale               | Read `changedSinceProcessStart` on model metadata. Restart to refresh imported model identity. Route/provider/extraTools edits need a full HTTP-process restart, not a controller hot replacement. |
 | Edge render fails on request globals or Vite      | Use `http_request` for request-bound behavior and run the app's Vite dev server when needed.                                                                              |
 
 ## Limitations
@@ -377,7 +377,13 @@ Static introspection cannot infer arbitrary dynamic controller/page/shared-prop/
 
 Raw SQL supports the tested SQLite file/PostgreSQL subset, not MySQL/MSSQL/Oracle, SQLite in-memory/URI or schema/database-per-tenant strategies. Tenant HTTP header resolution is integration-tested; subdomain/path resolver support is not equivalent evidence. Impersonation excludes non-Lucid user providers, custom/basic guards and stateful session stores. Legacy protocol cancellation does not reach evaluation's signal.
 
-Source lookup uses verified source-map evidence, not guesses from arbitrary bundles. Docs search is bounded and lexical, not semantic; its package cache keys include manifest realpath/version/mtime, so editing docs without changing `package.json` does not invalidate it. Linux and a full HMR restart matrix remain release gates; the evidence so far is a direct HTTP-process SIGKILL test and one observed dev-server restart during `migration:run`.
+Source lookup uses verified source-map evidence, not guesses from arbitrary bundles. Docs search is bounded and lexical, not semantic; its package cache keys include manifest realpath/version/mtime, so editing docs without changing `package.json` does not invalidate it.
+
+The registry is finalized once per HTTP process, then published to the endpoint as one immutable snapshot. Controller hot replacement does not rebuild providers or tools. A full assembler restart builds a new registry before serving MCP; requests during initialization receive 503 rather than a partially built registry. In-flight requests on the old process may lose transport when the assembler kills that process; they are not migrated or retried. Model inventory rescans source generations but never cache-busts ESM imports: changed files are explicitly labeled `changedSinceProcessStart`. Page inventory reads source files on each call.
+
+In the tested `ace serve --hmr` fixture boundaries, controller edits keep the HTTP PID; edits to an imported model, routes, providers and `start/mcp_tools.ts` replace it. Adding/deleting source files can be observed by the next inventory scan without a restart. A deleted page can remain in generated page declarations, but is reported with `existsOnDisk: false`, never as existing source. Hot-hook boundaries and application watchers are application configuration, not package-owned watchers.
+
+`npm run smoke:capacity` reports cold/warm latency, event-loop delay, memory, active resources, capture subscribers and emitter listeners for a fixed 216-call workload and one controller swap. Latency is informational, not a pass/fail budget; resource/listener growth and heap growth have explicit objective thresholds in the JSON report. Eval display byte truncation is labeled `data.displayTruncated`; envelope `truncated` separately describes result-encoder truncation.
 
 ## License
 
