@@ -1,0 +1,141 @@
+VERSIONS
+api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-d-api
+├── @adonisjs/assembler@8.5.2
+├─┬ @adonisjs/auth@10.1.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ ├── @adonisjs/core@7.6.0 deduped
+│ └─┬ @adonisjs/presets@3.0.0
+│   ├── @adonisjs/assembler@8.5.2 deduped
+│   └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/core@7.6.0
+│ ├─┬ @adonisjs/application@9.1.0
+│ │ ├── @adonisjs/assembler@8.5.2 deduped
+│ │ └── @adonisjs/fold@11.1.0 deduped
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ ├─┬ @adonisjs/bodyparser@11.0.4
+│ │ └── @adonisjs/http-server@9.3.1 deduped
+│ ├─┬ @adonisjs/events@10.2.0
+│ │ └── @adonisjs/fold@11.1.0 deduped
+│ ├── @adonisjs/fold@11.1.0
+│ ├─┬ @adonisjs/http-server@9.3.1
+│ │ ├── @adonisjs/events@10.2.0 deduped
+│ │ └── @adonisjs/fold@11.1.0 deduped
+│ └─┬ @adonisjs/http-transformers@2.3.1
+│   └── @adonisjs/fold@11.1.0 deduped
+├─┬ @adonisjs/cors@3.0.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/lucid@22.4.2
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/session@8.1.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/shield@9.0.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @japa/plugin-adonisjs@5.2.0
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @tuyau/core@1.2.2
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+└── hot-hook@1.0.0
+
+
+INITIAL {"pid":91847,"lifecycle":[{"phase":"register","pid":91847},{"phase":"boot","pid":91847,"commited":false,"routes":0},{"phase":"start","pid":91847,"commited":false,"routes":0},{"phase":"ready","pid":91847,"commited":true,"routes":7}],"constructions":0,"modelVersion":1,"commited":true,"listenerCount":7,"routes":[{"domain":"root","name":"sd.boot","pattern":"/sd/boot","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"()=>({\n                phase: 'boot'\n            })"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}}]},{"domain":"root","name":"sd.start","pattern":"/sd/start","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"()=>({\n                phase: 'start'\n            })"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}}]},{"domain":"root","name":"sd.controller","pattern":"/sd/controller","methods":["GET","HEAD"],"handler":{"method":"index","reference":[null,"index"],"importExpression":"()=>import('../app/controllers/probe_controller.ts')","name":""},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}}]},{"domain":"root","name":"sd.group.ordered","pattern":"/sd/group/ordered","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"(ctx)=>({\n            order: ctx.sdOrder\n        })"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}},{"name":"probe","args":{"tag":"group"},"reference":{"kind":"function","name":"probe","source":"()=>import('../app/middleware/probe_middleware.ts')"}},{"name":"probe","args":{"tag":"route"},"reference":{"kind":"function","name":"probe","source":"()=>import('../app/middleware/probe_middleware.ts')"}}]},{"domain":"root","name":"sd.group.protected","pattern":"/sd/group/protected","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"()=>'protected'"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}},{"name":"probe","args":{"tag":"group"},"reference":{"kind":"function","name":"probe","source":"()=>import('../app/middleware/probe_middleware.ts')"}},{"name":"auth","args":{"guards":["api"]},"reference":{"kind":"function","name":"auth","source":"()=>import('#middleware/auth_middleware')"}}]},{"domain":"root","name":"sd.snapshot","pattern":"/sd/snapshot","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"async ()=>({\n        pid: process.pid,\n        lifecycle: globalThis.sdState.lifecycle,\n        constructions: globalThis.sdState.constructions,\n        modelVersion: (await import('../app/models/probe_model.ts')).default.version,\n        commited: router.commited,\n        listenerCount: emitter.listenerCount(),\n        routes: Object.entries(router.toJSON()).flatMap(([domain, routes])=>routes.map((r)=>({\n                    domain,\n                    name: r.name,\n                    pattern: r.pattern,\n                    methods: r.methods,\n                    handler: ref(r.handler),\n                    middleware: Array.from(r.middleware.all()).map((m)=>({\n                            name: m.name || null,\n                            args: m.args ?? null,\n                            reference: ref(m.reference)\n                        }))\n                }))),\n        server: server.getMiddlewareList().map((m)=>ref(m.reference)),\n        events: Array.from(emitter.eventsListeners, ([event, listeners])=>({\n                event: typeof event === 'function' ? event.name : String(event),\n                listeners: Array.from(listeners.keys(), ref),\n                count: listeners.size\n            })),\n        container: {\n            ownKeys: Reflect.ownKeys(app.container).map(String),\n            known: [\n                'sd:binding',\n                'sd:singleton',\n                'sd:alias'\n            ].map((key)=>({\n                    key,\n                    exists: app.container.hasBinding(key)\n                })),\n            prototype: Object.getOwnPropertyNames(Object.getPrototypeOf(app.container))\n        },\n        handles: process._getActiveHandles().map((h)=>h.constructor.name)\n    })"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}}]},{"domain":"sd.localhost","name":"sd.domain","pattern":"/sd/domain","methods":["GET","HEAD"],"handler":{"kind":"function","name":null,"source":"()=>'domain'"},"middleware":[{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/core/bodyparser_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/session/session_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/shield/shield_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('@adonisjs/auth/initialize_auth_middleware')"}},{"name":null,"args":null,"reference":{"kind":"function","name":null,"source":"()=>import('#middleware/silent_auth_middleware')"}}]}],"server":[{"kind":"function","name":null,"source":"()=>import('#middleware/force_json_response_middleware')"},{"kind":"function","name":null,"source":"()=>import('#middleware/container_bindings_middleware')"},{"kind":"function","name":null,"source":"()=>import('@adonisjs/cors/cors_middleware')"}],"events":[{"event":"sd:inline","listeners":[{"kind":"function","name":null,"source":"()=>{}"}],"count":1},{"event":"sd:class","listeners":[[{"kind":"function","name":"ProbeListener","source":"class ProbeListener {\n    handle() {\n        throw new Error('must not emit');\n    }\n}"},"handle"]],"count":1},{"event":"sd:lazy","listeners":[[{"kind":"function","name":null,"source":"()=>import('../app/listeners/probe_listener.ts')"},"handle"]],"count":1},{"event":"ProbeEvent","listeners":[[{"kind":"function","name":"ProbeListener","source":"class ProbeListener {\n    handle() {\n        throw new Error('must not emit');\n    }\n}"},"handle"],[{"kind":"function","name":null,"source":"()=>import('../app/listeners/probe_listener.ts')"},"handle"]],"count":2}],"container":{"ownKeys":[],"known":[{"key":"sd:binding","exists":true},{"key":"sd:singleton","exists":true},{"key":"sd:alias","exists":true}],"prototype":["constructor","useEmitter","createResolver","hasBinding","hasAllBindings","make","call","alias","bind","bindValue","singleton","swap","restore","restoreAll","resolving","when","if","contextualBinding","conditionalBinding"]},"handles":["Socket","Socket","Server","Socket"]}
+LIVE_BOOT {"phase":"boot"}
+LIVE_START {"phase":"start"}
+LIVE_ORDER {"order":["group","route"]}
+LIVE_DOMAIN {"status":200,"body":"domain"}
+LIVE_AUTH_STATUS 401
+HMR {"kind":"controller","beforePid":91847,"afterPid":91847,"lifecycle":[{"phase":"register","pid":91847},{"phase":"boot","pid":91847,"commited":false,"routes":0},{"phase":"start","pid":91847,"commited":false,"routes":0},{"phase":"ready","pid":91847,"commited":true,"routes":7}],"modelVersion":1,"added":false,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"controller":{"version":2,"pid":91847}}
+HMR {"kind":"routes","beforePid":91847,"afterPid":92804,"lifecycle":[{"phase":"register","pid":92804},{"phase":"boot","pid":92804,"commited":false,"routes":0},{"phase":"start","pid":92804,"commited":false,"routes":0},{"phase":"ready","pid":92804,"commited":true,"routes":8}],"modelVersion":1,"added":true,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"controller":{"version":2,"pid":92804}}
+HMR {"kind":"model","beforePid":92804,"afterPid":92889,"lifecycle":[{"phase":"register","pid":92889},{"phase":"boot","pid":92889,"commited":false,"routes":0},{"phase":"start","pid":92889,"commited":false,"routes":0},{"phase":"ready","pid":92889,"commited":true,"routes":8}],"modelVersion":2,"added":true,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"controller":{"version":2,"pid":92889}}
+HMR {"kind":"provider","beforePid":92889,"afterPid":93048,"lifecycle":[{"phase":"register","pid":93048},{"phase":"boot","pid":93048,"commited":false,"routes":0},{"phase":"start","pid":93048,"commited":false,"routes":0},{"phase":"ready","pid":93048,"commited":true,"routes":8}],"modelVersion":2,"added":true,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"controller":{"version":2,"pid":93048}}
+RELOAD {"iteration":0,"pid":93173,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"lifecycle":[{"phase":"register","pid":93173},{"phase":"boot","pid":93173,"commited":false,"routes":0},{"phase":"start","pid":93173,"commited":false,"routes":0},{"phase":"ready","pid":93173,"commited":true,"routes":8}]}
+RELOAD {"iteration":1,"pid":93246,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"lifecycle":[{"phase":"register","pid":93246},{"phase":"boot","pid":93246,"commited":false,"routes":0},{"phase":"start","pid":93246,"commited":false,"routes":0},{"phase":"ready","pid":93246,"commited":true,"routes":8}]}
+RELOAD {"iteration":2,"pid":93322,"events":[{"event":"sd:inline","count":1},{"event":"sd:class","count":1},{"event":"sd:lazy","count":1},{"event":"ProbeEvent","count":2}],"handles":["Socket","Socket","Server","Socket"],"lifecycle":[{"phase":"register","pid":93322},{"phase":"boot","pid":93322,"commited":false,"routes":0},{"phase":"start","pid":93322,"commited":false,"routes":0},{"phase":"ready","pid":93322,"commited":true,"routes":8}]}
+SERVER_LOG
+[ info ] starting server in hmr mode...
+[ info ] loading hooks...
+[ info ] generating indexes...
+[ info ] codegen: created 5 file(s)
+[ info ] starting HTTP server...
+{"level":30,"time":1791855584067,"pid":91847,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 1.62 s                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+[ info ] watching file system for changes...
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (26 ms)
+update start/routes.ts
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 576 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+{"level":30,"time":1791855590191,"pid":92804,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (756 μs)
+update app/models/probe_model.ts
+{"level":30,"time":1791855594133,"pid":92889,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 493 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (727 μs)
+update providers/probe_provider.ts
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 676 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+{"level":30,"time":1791855598549,"pid":93048,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (1.31 ms)
+update start/routes.ts
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 524 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+{"level":30,"time":1791855602270,"pid":93173,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (711 μs)
+update start/routes.ts
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 423 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+{"level":30,"time":1791855605638,"pid":93246,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (790 μs)
+update start/routes.ts
+╭──────────────────────────────────────────────────╮
+│                                                  │
+│    Server address: http://127.0.0.1:41060        │
+│    Mode: hmr                                     │
+│    Ready in: 461 ms                              │
+│    Press h to show help                          │
+│                                                  │
+╰──────────────────────────────────────────────────╯
+{"level":30,"time":1791855609211,"pid":93322,"hostname":"MacBook-Pro-3.local","msg":"started HTTP server on 127.0.0.1:41060"}
+[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (510 μs)
+

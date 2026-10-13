@@ -1,0 +1,1 @@
+{"name":"@rikology/adonisjs-mcp","version":"0.0.0-spike-sc","type":"module","exports":{"./hooks":{"types":"./hooks.d.ts","default":"./hooks.js"}},"files":["hooks.js","hooks.d.ts"]}

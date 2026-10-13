@@ -1,0 +1,574 @@
+{
+  "records": [
+    {
+      "time": 1791857111943,
+      "phase": "ready",
+      "root": "/tmp/adonisjs-mcp-m0/s-j-hmr-api-1791857107116",
+      "supervisorPid": 20666,
+      "pid": 20715
+    },
+    {
+      "time": 1791857111951,
+      "phase": "baseline-codegen",
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857111099.067,
+          "hash": "fcc1440bc7f7ae2144dffb291209d33ad8205ac5a4e6bc5c61199beceb8f2663",
+          "hasHmrController": false,
+          "hasHeldController": false
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857111855.5364,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      }
+    },
+    {
+      "time": 1791857111953,
+      "phase": "http-pid",
+      "pid": 20715
+    },
+    {
+      "time": 1791857111957,
+      "phase": "request-start",
+      "argv": [
+        "make:controller",
+        "spike_hmr_probe"
+      ],
+      "ping": {
+        "pid": 20715,
+        "time": 1791857111956
+      }
+    },
+    {
+      "time": 1791857112235,
+      "phase": "request-result",
+      "argv": [
+        "make:controller",
+        "spike_hmr_probe"
+      ],
+      "durationMs": 284,
+      "result": {
+        "stdout": "DONE:    create app/controllers/spike_hmr_probes_controller.ts\n",
+        "stderr": "",
+        "exitCode": 0,
+        "signal": null,
+        "httpPid": 20715,
+        "childPid": 20777
+      }
+    },
+    {
+      "time": 1791857113737,
+      "phase": "after-scenario",
+      "argv": [
+        "make:controller",
+        "spike_hmr_probe"
+      ],
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857112240.1968,
+          "hash": "a302479bb81ea42b0549747c03ddcc0732435604c40a2fa1fb1b78c473c91eda",
+          "hasHmrController": true,
+          "hasHeldController": false
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857111855.5364,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      },
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": true
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        }
+      ]
+    },
+    {
+      "time": 1791857113741,
+      "phase": "request-start",
+      "argv": [
+        "make:model",
+        "spike_hmr_model"
+      ],
+      "ping": {
+        "pid": 20715,
+        "time": 1791857113740
+      }
+    },
+    {
+      "time": 1791857114034,
+      "phase": "request-result",
+      "argv": [
+        "make:model",
+        "spike_hmr_model"
+      ],
+      "durationMs": 297,
+      "result": {
+        "stdout": "DONE:    create app/models/spike_hmr.ts\n",
+        "stderr": "",
+        "exitCode": 0,
+        "signal": null,
+        "httpPid": 20715,
+        "childPid": 20845
+      }
+    },
+    {
+      "time": 1791857115539,
+      "phase": "after-scenario",
+      "argv": [
+        "make:model",
+        "spike_hmr_model"
+      ],
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857112240.1968,
+          "hash": "a302479bb81ea42b0549747c03ddcc0732435604c40a2fa1fb1b78c473c91eda",
+          "hasHmrController": true,
+          "hasHeldController": false
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857111855.5364,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      },
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": true
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        },
+        {
+          "pid": 20845,
+          "alive": false
+        }
+      ]
+    },
+    {
+      "time": 1791857115556,
+      "phase": "request-start",
+      "argv": [
+        "make:validator",
+        "spike_hmr_validator"
+      ],
+      "ping": {
+        "pid": 20715,
+        "time": 1791857115554
+      }
+    },
+    {
+      "time": 1791857115841,
+      "phase": "request-result",
+      "argv": [
+        "make:validator",
+        "spike_hmr_validator"
+      ],
+      "durationMs": 302,
+      "result": {
+        "stdout": "DONE:    create app/validators/spike_hmr.ts\n",
+        "stderr": "",
+        "exitCode": 0,
+        "signal": null,
+        "httpPid": 20715,
+        "childPid": 20912
+      }
+    },
+    {
+      "time": 1791857117349,
+      "phase": "after-scenario",
+      "argv": [
+        "make:validator",
+        "spike_hmr_validator"
+      ],
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857112240.1968,
+          "hash": "a302479bb81ea42b0549747c03ddcc0732435604c40a2fa1fb1b78c473c91eda",
+          "hasHmrController": true,
+          "hasHeldController": false
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857111855.5364,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      },
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": true
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        },
+        {
+          "pid": 20845,
+          "alive": false
+        },
+        {
+          "pid": 20912,
+          "alive": false
+        }
+      ]
+    },
+    {
+      "time": 1791857117372,
+      "phase": "request-start",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_held"
+      ],
+      "ping": {
+        "pid": 20715,
+        "time": 1791857117371
+      }
+    },
+    {
+      "time": 1791857129672,
+      "phase": "request-result",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_held"
+      ],
+      "durationMs": 12323,
+      "result": {
+        "stdout": "{\"phase\":\"before-generator\",\"pid\":20996,\"time\":1791857117631}\nDONE:    create app/controllers/spike_hmr_helds_controller.ts\n{\"phase\":\"after-generator\",\"pid\":20996,\"time\":1791857117649}\n{\"phase\":\"after-delay\",\"pid\":20996,\"time\":1791857129651}\n",
+        "stderr": "",
+        "exitCode": 0,
+        "signal": null,
+        "httpPid": 20715,
+        "childPid": 20995
+      }
+    },
+    {
+      "time": 1791857131173,
+      "phase": "after-scenario",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_held"
+      ],
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857117695.3254,
+          "hash": "dfbeacbab0367b8b1642d6d647078d786b616565c5c92df9888596ce2f2b0296",
+          "hasHmrController": true,
+          "hasHeldController": true
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857111855.5364,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      },
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": true
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        },
+        {
+          "pid": 20845,
+          "alive": false
+        },
+        {
+          "pid": 20912,
+          "alive": false
+        },
+        {
+          "pid": 20995,
+          "alive": false
+        }
+      ]
+    },
+    {
+      "time": 1791857131177,
+      "phase": "request-start",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_restart"
+      ],
+      "ping": {
+        "pid": 20715,
+        "time": 1791857131176
+      }
+    },
+    {
+      "time": 1791857131778,
+      "phase": "forcing-rc-restart"
+    },
+    {
+      "time": 1791857131813,
+      "phase": "request-lost",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_restart"
+      ],
+      "durationMs": 640,
+      "message": "fetch failed",
+      "cause": "SocketError: other side closed"
+    },
+    {
+      "time": 1791857131835,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857131937,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132038,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132140,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132241,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132343,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132445,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132547,
+      "phase": "ping-error",
+      "message": "fetch failed"
+    },
+    {
+      "time": 1791857132665,
+      "phase": "http-pid",
+      "pid": 21199
+    },
+    {
+      "time": 1791857133315,
+      "phase": "after-scenario",
+      "argv": [
+        "spike:hmr",
+        "spike_hmr_restart"
+      ],
+      "generated": {
+        ".adonisjs/server/controllers.ts": {
+          "mtime": 1791857131597.204,
+          "hash": "1556bb1b8a027cbcc4feaac906ef8e067d78a6611bbcdcc6188a934ae5142ee2",
+          "hasHmrController": true,
+          "hasHeldController": true
+        },
+        ".adonisjs/server/routes.json": {
+          "unavailable": "ENOENT"
+        },
+        ".adonisjs/client/registry/schema.d.ts": {
+          "mtime": 1791857132589.0532,
+          "hash": "5f06af794cb8ecb7c3b2958ce7cbec991edb0c15d220498174d580f3512ab343",
+          "hasHmrController": false,
+          "hasHeldController": false
+        }
+      },
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": true
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        },
+        {
+          "pid": 20845,
+          "alive": false
+        },
+        {
+          "pid": 20912,
+          "alive": false
+        },
+        {
+          "pid": 20995,
+          "alive": false
+        },
+        {
+          "pid": 21138,
+          "alive": false
+        }
+      ]
+    },
+    {
+      "time": 1791857146319,
+      "phase": "final-ping",
+      "pid": 21199
+    },
+    {
+      "time": 1791857147183,
+      "phase": "cleanup",
+      "processes": [
+        {
+          "pid": 20666,
+          "alive": false
+        },
+        {
+          "pid": 20777,
+          "alive": false
+        },
+        {
+          "pid": 20845,
+          "alive": false
+        },
+        {
+          "pid": 20912,
+          "alive": false
+        },
+        {
+          "pid": 20995,
+          "alive": false
+        },
+        {
+          "pid": 21138,
+          "alive": false
+        }
+      ]
+    }
+  ],
+  "serverLogs": [
+    {
+      "time": 1791857111080,
+      "stream": "stdout",
+      "text": "\u001bc"
+    },
+    {
+      "time": 1791857111081,
+      "stream": "stdout",
+      "text": "[ info ] starting server in hmr mode...\n"
+    },
+    {
+      "time": 1791857111093,
+      "stream": "stdout",
+      "text": "[ info ] loading hooks...\n"
+    },
+    {
+      "time": 1791857111094,
+      "stream": "stdout",
+      "text": "[ info ] generating indexes...\n"
+    },
+    {
+      "time": 1791857111101,
+      "stream": "stdout",
+      "text": "[ info ] codegen: created 5 file(s)\n"
+    },
+    {
+      "time": 1791857111101,
+      "stream": "stdout",
+      "text": "[ info ] starting HTTP server...\n"
+    },
+    {
+      "time": 1791857111835,
+      "stream": "stdout",
+      "text": "{\"level\":30,\"time\":1791857111835,\"pid\":20715,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41180\"}\n"
+    },
+    {
+      "time": 1791857111836,
+      "stream": "stdout",
+      "text": "╭──────────────────────────────────────────────────╮\n│                                                  │\n│    Server address: http://127.0.0.1:41180        │\n│    Mode: hmr                                     │\n│    Ready in: 547 ms                              │\n│    Press h to show help                          │\n│                                                  │\n╰──────────────────────────────────────────────────╯\n"
+    },
+    {
+      "time": 1791857111852,
+      "stream": "stdout",
+      "text": "[ info ] watching file system for changes...\n"
+    },
+    {
+      "time": 1791857111855,
+      "stream": "stdout",
+      "text": "[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (1.17 ms)\n"
+    },
+    {
+      "time": 1791857112240,
+      "stream": "stdout",
+      "text": "[ info ] created .adonisjs/server/controllers.ts (788 μs)\n"
+    },
+    {
+      "time": 1791857117695,
+      "stream": "stdout",
+      "text": "[ info ] created .adonisjs/server/controllers.ts (535 μs)\n"
+    },
+    {
+      "time": 1791857131597,
+      "stream": "stdout",
+      "text": "[ info ] created .adonisjs/server/controllers.ts (906 μs)\n"
+    },
+    {
+      "time": 1791857131796,
+      "stream": "stdout",
+      "text": "\u001bc"
+    },
+    {
+      "time": 1791857131796,
+      "stream": "stdout",
+      "text": "update adonisrc.ts\n"
+    },
+    {
+      "time": 1791857132582,
+      "stream": "stdout",
+      "text": "╭──────────────────────────────────────────────────╮\n│                                                  │\n│    Server address: http://127.0.0.1:41180        │\n│    Mode: hmr                                     │\n│    Ready in: 560 ms                              │\n│    Press h to show help                          │\n│                                                  │\n╰──────────────────────────────────────────────────╯\n"
+    },
+    {
+      "time": 1791857132582,
+      "stream": "stdout",
+      "text": "{\"level\":30,\"time\":1791857132582,\"pid\":21199,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41180\"}\n"
+    },
+    {
+      "time": 1791857132590,
+      "stream": "stdout",
+      "text": "[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (1.38 ms)\n"
+    },
+    {
+      "time": 1791857146513,
+      "stream": "stdout",
+      "text": "[ info ] Underlying HTTP server closed. Still watching for changes\n"
+    }
+  ],
+  "routeTrace": "{\"time\":1791857111965,\"httpPid\":20715,\"phase\":\"spawn\",\"childPid\":20777,\"argv\":[\"make:controller\",\"spike_hmr_probe\"]}\n{\"time\":1791857112227,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20777,\"text\":\"DONE:    create app/controllers/spike_hmr_probes_controller.ts\\n\"}\n{\"time\":1791857112234,\"httpPid\":20715,\"phase\":\"close\",\"childPid\":20777,\"exitCode\":0,\"signal\":null}\n{\"time\":1791857113748,\"httpPid\":20715,\"phase\":\"spawn\",\"childPid\":20845,\"argv\":[\"make:model\",\"spike_hmr_model\"]}\n{\"time\":1791857114024,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20845,\"text\":\"DONE:    create app/models/spike_hmr.ts\\n\"}\n{\"time\":1791857114033,\"httpPid\":20715,\"phase\":\"close\",\"childPid\":20845,\"exitCode\":0,\"signal\":null}\n{\"time\":1791857115563,\"httpPid\":20715,\"phase\":\"spawn\",\"childPid\":20912,\"argv\":[\"make:validator\",\"spike_hmr_validator\"]}\n{\"time\":1791857115832,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20912,\"text\":\"DONE:    create app/validators/spike_hmr.ts\\n\"}\n{\"time\":1791857115840,\"httpPid\":20715,\"phase\":\"close\",\"childPid\":20912,\"exitCode\":0,\"signal\":null}\n{\"time\":1791857117376,\"httpPid\":20715,\"phase\":\"spawn\",\"childPid\":20995,\"argv\":[\"spike:hmr\",\"spike_hmr_held\"]}\n{\"time\":1791857117632,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20995,\"text\":\"{\\\"phase\\\":\\\"before-generator\\\",\\\"pid\\\":20996,\\\"time\\\":1791857117631}\\n\"}\n{\"time\":1791857117649,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20995,\"text\":\"DONE:    create app/controllers/spike_hmr_helds_controller.ts\\n\"}\n{\"time\":1791857117649,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20995,\"text\":\"{\\\"phase\\\":\\\"after-generator\\\",\\\"pid\\\":20996,\\\"time\\\":1791857117649}\\n\"}\n{\"time\":1791857129651,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":20995,\"text\":\"{\\\"phase\\\":\\\"after-delay\\\",\\\"pid\\\":20996,\\\"time\\\":1791857129651}\\n\"}\n{\"time\":1791857129671,\"httpPid\":20715,\"phase\":\"close\",\"childPid\":20995,\"exitCode\":0,\"signal\":null}\n{\"time\":1791857131180,\"httpPid\":20715,\"phase\":\"spawn\",\"childPid\":21138,\"argv\":[\"spike:hmr\",\"spike_hmr_restart\"]}\n{\"time\":1791857131531,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":21138,\"text\":\"{\\\"phase\\\":\\\"before-generator\\\",\\\"pid\\\":21139,\\\"time\\\":1791857131531}\\n\"}\n{\"time\":1791857131543,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":21138,\"text\":\"DONE:    create app/controllers/spike_hmr_restarts_controller.ts\\n\"}\n{\"time\":1791857131543,\"httpPid\":20715,\"phase\":\"stdout\",\"childPid\":21138,\"text\":\"{\\\"phase\\\":\\\"after-generator\\\",\\\"pid\\\":21139,\\\"time\\\":1791857131543}\\n\"}\n",
+  "guardTrace": "{\"time\":1791857112016,\"phase\":\"start\",\"parentPid\":20715,\"guardianPid\":20777,\"acePid\":20778}\n{\"time\":1791857112232,\"phase\":\"normal-close\",\"parentPid\":20715,\"guardianPid\":20777,\"acePid\":20778}\n{\"time\":1791857113805,\"phase\":\"start\",\"parentPid\":20715,\"guardianPid\":20845,\"acePid\":20846}\n{\"time\":1791857114030,\"phase\":\"normal-close\",\"parentPid\":20715,\"guardianPid\":20845,\"acePid\":20846}\n{\"time\":1791857115612,\"phase\":\"start\",\"parentPid\":20715,\"guardianPid\":20912,\"acePid\":20913}\n{\"time\":1791857115838,\"phase\":\"normal-close\",\"parentPid\":20715,\"guardianPid\":20912,\"acePid\":20913}\n{\"time\":1791857117415,\"phase\":\"start\",\"parentPid\":20715,\"guardianPid\":20995,\"acePid\":20996}\n{\"time\":1791857129665,\"phase\":\"normal-close\",\"parentPid\":20715,\"guardianPid\":20995,\"acePid\":20996}\n{\"time\":1791857131222,\"phase\":\"start\",\"parentPid\":20715,\"guardianPid\":21138,\"acePid\":21139}\n{\"time\":1791857131827,\"phase\":\"parent-gone-stop\",\"parentPid\":20715,\"guardianPid\":21138,\"acePid\":21139}\n{\"time\":1791857132028,\"phase\":\"swept\",\"parentPid\":20715,\"guardianPid\":21138,\"acePid\":21139}\n"
+}

@@ -1,0 +1,110 @@
+{
+  "kit": "api",
+  "expectedId": 2,
+  "observations": [
+    {
+      "anonymous": {
+        "status": 401,
+        "location": null,
+        "body": {
+          "errors": [
+            {
+              "message": "Unauthorized access"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "guard": "unsupported",
+      "error": "CAPABILITY_UNSUPPORTED"
+    },
+    {
+      "guard": "api",
+      "error": "NOT_FOUND"
+    },
+    {
+      "guard": "api",
+      "mode": "success",
+      "result": {
+        "status": 200,
+        "location": null,
+        "body": {
+          "middleware": "auth-passed",
+          "id": 2,
+          "requestId": "869eb6fd-e44b-4549-9e6e-c9b96b53542a",
+          "mode": "success"
+        }
+      },
+      "before": 0,
+      "after": 0,
+      "tokenRemoved": true
+    },
+    {
+      "guard": "api",
+      "mode": "error",
+      "result": {
+        "status": 500,
+        "location": null,
+        "body": {
+          "message": "S-F deliberate application failure",
+          "name": "Error",
+          "frames": "[REDACTED: development frames may include source/context]",
+          "stack": "Error: S-F deliberate application failure\n    at Object.handler (file:///private/tmp/adonisjs-mcp-m0/s-f-api/start/sf_probe.js:36:42)\n    at httpRouteHandler.tracePromise.httpRouteHandler.hasSubscribers.route.route (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@adonisjs/http-server/build/helpers-D-ryK4qq.js:130:113)\n    at TracingChannel.tracePromise (node:diagnostics_channel:362:14)\n    at Runner.<anonymous> (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@adonisjs/http-server/build/helpers-D-ryK4qq.js:130:68)\n    at #invokeWithErrorManagement (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@poppinss/middleware/build/index.js:32:45)\n    at next (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@poppinss/middleware/build/index.js:8:10)\n    at AuthMiddleware.handle (/private/tmp/adonisjs-mcp-m0/s-f-api/app/middleware/auth_middleware.ts:18:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async ShieldMiddleware.handle (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@adonisjs/shield/build/src/shield_middleware.js:17:3)\n    at async SessionMiddleware.handle (file:///private/tmp/adonisjs-mcp-m0/s-f-api/node_modules/@adonisjs/session/build/src/session_middleware.js:110:20)",
+          "raw": {
+            "status": 500
+          }
+        }
+      },
+      "before": 0,
+      "after": 0,
+      "tokenRemoved": true
+    },
+    {
+      "guard": "api",
+      "mode": "timeout",
+      "result": {
+        "error": "TimeoutError"
+      },
+      "before": 0,
+      "after": 0,
+      "tokenRemoved": true
+    },
+    {
+      "guard": "api",
+      "mode": "abort",
+      "result": {
+        "error": "AbortError"
+      },
+      "before": 0,
+      "after": 0,
+      "tokenRemoved": true
+    }
+  ],
+  "middlewareEvents": [
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "869eb6fd-e44b-4549-9e6e-c9b96b53542a",
+      "mode": "success"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "77fc35e8-dba8-4046-abdf-3624ae5b0545",
+      "mode": "error"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "5468e3c3-4d95-48e1-8c14-4ae610d23238",
+      "mode": "slow"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "d344ce20-84e1-4485-9ab9-e801c1852f3e",
+      "mode": "slow"
+    }
+  ]
+}

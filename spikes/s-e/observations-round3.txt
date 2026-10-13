@@ -1,0 +1,122 @@
+CLONE /tmp/adonisjs-mcp-m0/s-e-api-1791857010559
+api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559
+├── @adonisjs/assembler@8.5.2
+├─┬ @adonisjs/auth@10.1.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ ├── @adonisjs/core@7.6.0 deduped
+│ ├── @adonisjs/lucid@22.4.2 deduped
+│ └─┬ @adonisjs/presets@3.0.0
+│   ├── @adonisjs/assembler@8.5.2 deduped
+│   └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/core@7.6.0
+│ ├─┬ @adonisjs/application@9.1.0
+│ │ └── @adonisjs/assembler@8.5.2 deduped
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ ├─┬ @adonisjs/events@10.2.0
+│ │ └── @adonisjs/application@9.1.0 deduped
+│ ├─┬ @adonisjs/http-server@9.3.1
+│ │ └── @adonisjs/application@9.1.0 deduped
+│ └── @adonisjs/repl@5.0.0
+├─┬ @adonisjs/cors@3.0.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/lucid@22.4.2
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/session@8.1.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ ├── @adonisjs/core@7.6.0 deduped
+│ └── @adonisjs/lucid@22.4.2 deduped
+├─┬ @adonisjs/shield@9.0.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @japa/plugin-adonisjs@5.2.0
+│ └── @adonisjs/core@7.6.0 deduped
+├── @poppinss/ts-exec@1.5.0
+├─┬ @tuyau/core@1.2.2
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/core@7.6.0 deduped
+└── hot-hook@1.0.0
+
+
+NODE v24.21.0 OS ProductName:		macOS
+ProductVersion:		27.0
+BuildVersion:		26A428
+WITHOUT_VM_FLAG
+{"candidate":"async-function","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/evaluator.mjs"},"logs":[],"callId":"call","pid":19049}
+{"candidate":"compile-none","ok":false,"error":{"code":"ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING","message":"A dynamic import callback was not specified."},"logs":[],"callId":"call","pid":19049}
+{"candidate":"compile-default","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/eval-call.mjs"},"logs":[],"callId":"call","pid":19049}
+{"candidate":"compile-root-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19049}
+{"candidate":"compile-app","ok":false,"error":{"code":"ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG","message":"A dynamic import callback was invoked without --experimental-vm-modules"},"logs":[],"callId":"call","pid":19049}
+{"candidate":"script-default","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/eval-call.mjs"},"logs":[],"callId":"call","pid":19049}
+{"candidate":"script-root-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19049}
+{"candidate":"script-app","ok":false,"error":{"code":"ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING_FLAG","message":"A dynamic import callback was invoked without --experimental-vm-modules"},"logs":[],"callId":"call","pid":19049}
+{"candidate":"source-app","ok":false,"error":{"message":"vm.SourceTextModule is not a constructor"},"logs":[],"callId":"call","pid":19049}
+WITH_VM_FLAG
+{"candidate":"async-function","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/evaluator.mjs"},"logs":[],"callId":"call","pid":19224}
+{"candidate":"compile-none","ok":false,"error":{"code":"ERR_VM_DYNAMIC_IMPORT_CALLBACK_MISSING","message":"A dynamic import callback was not specified."},"logs":[],"callId":"call","pid":19224}
+{"candidate":"compile-default","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/eval-call.mjs"},"logs":[],"callId":"call","pid":19224}
+{"candidate":"compile-root-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19224}
+{"candidate":"compile-app","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19224}
+{"candidate":"script-default","ok":false,"error":{"code":"ERR_PACKAGE_IMPORT_NOT_DEFINED","message":"Package import specifier \"#models/user\" is not defined in package /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/package.json imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/node_modules/@spike/eval/eval-call.mjs"},"logs":[],"callId":"call","pid":19224}
+{"candidate":"script-root-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19224}
+{"candidate":"script-app","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19224}
+{"candidate":"source-app","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"call","pid":19224}
+FRAMEWORK_CALLBACK_CONTROLLER_WITH_FLAG
+CALLBACK_CONTROLLER_BEFORE {"marker":"controller-before","url":"file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=0","pid":19224}
+{"candidate":"compile-app","ok":true,"display":"{\n  marker: 'controller-before',\n  url: 'file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=0',\n  sameAsRouter: true\n}","logs":[],"callId":"call","pid":19224}
+CALLBACK_CONTROLLER_AFTER {"marker":"controller-after","url":"file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=1","pid":19224,"samePid":true}
+{"candidate":"compile-app","ok":true,"display":"{\n  marker: 'controller-after',\n  url: 'file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=1',\n  sameAsRouter: true\n}","logs":[],"callId":"call","pid":19224}
+{"candidate":"script-app","ok":true,"display":"{\n  marker: 'controller-after',\n  url: 'file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=1',\n  sameAsRouter: true\n}","logs":[],"callId":"call","pid":19224}
+{"candidate":"source-app","ok":true,"display":"{\n  marker: 'controller-after',\n  url: 'file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=1',\n  sameAsRouter: true\n}","logs":[],"callId":"call","pid":19224}
+SELECTED_ROOT_LOADER_WITHOUT_FLAG
+CONTROLLER_BEFORE {"marker":"controller-before","url":"file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=0","pid":19410}
+{"candidate":"compile-root-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.mjs"},"logs":[],"callId":"call","pid":19410}
+TS_REFERRER_MATRIX before-hot-swap
+{"candidate":"compile-root-ts-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"before-hot-swap-model","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"before-hot-swap-controller","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/services/spike_eval_service.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"before-hot-swap-service","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"before-hot-swap-relative","pid":19410}
+{"candidate":"compile-root-ts-default","ok":true,"display":"{ package: 'luxon', year: 2026 }","logs":[],"callId":"before-hot-swap-package","pid":19410}
+{"candidate":"compile-start-ts-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"before-hot-swap-model","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"before-hot-swap-controller","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/services/spike_eval_service.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"before-hot-swap-service","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"before-hot-swap-relative","pid":19410}
+{"candidate":"compile-start-ts-default","ok":true,"display":"{ package: 'luxon', year: 2026 }","logs":[],"callId":"before-hot-swap-package","pid":19410}
+CONTROLLER_AFTER {"marker":"controller-after","url":"file:///private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.ts?hot-hook=1","pid":19410,"samePid":true}
+{"candidate":"compile-root-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.mjs"},"logs":[],"callId":"call","pid":19410}
+{"candidate":"script-root-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.mjs"},"logs":[],"callId":"call","pid":19410}
+TS_REFERRER_MATRIX after-hot-swap
+{"candidate":"compile-root-ts-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"after-hot-swap-model","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"after-hot-swap-controller","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/services/spike_eval_service.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"after-hot-swap-service","pid":19410}
+{"candidate":"compile-root-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/eval-call.ts"},"logs":[],"callId":"after-hot-swap-relative","pid":19410}
+{"candidate":"compile-root-ts-default","ok":true,"display":"{ package: 'luxon', year: 2026 }","logs":[],"callId":"after-hot-swap-package","pid":19410}
+{"candidate":"compile-start-ts-default","ok":true,"display":"{ same: true, marker: 'before' }","logs":[],"callId":"after-hot-swap-model","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"after-hot-swap-controller","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/services/spike_eval_service.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"after-hot-swap-service","pid":19410}
+{"candidate":"compile-start-ts-default","ok":false,"error":{"code":"ERR_MODULE_NOT_FOUND","message":"Cannot find module '/private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/app/controllers/spike_eval_controller.js' imported from /private/tmp/adonisjs-mcp-m0/s-e-api-1791857010559/start/__mcp_eval__.ts"},"logs":[],"callId":"after-hot-swap-relative","pid":19410}
+{"candidate":"compile-start-ts-default","ok":true,"display":"{ package: 'luxon', year: 2026 }","logs":[],"callId":"after-hot-swap-package","pid":19410}
+{"candidate":"compile-root-default","ok":true,"display":"{\n  router: 'Router',\n  bigint: 42n,\n  map: Map(1) { 'answer' => 42n },\n  model: User {\n    modelOptions: undefined,\n    modelTrx: undefined,\n    transactionListener: [Function: bound listener],\n    fillInvoked: false,\n    cachedGetters: {},\n    forceUpdate: false,\n    '$columns': [ 'createdAt', 'email', 'fullName', 'id', 'password', 'updatedAt' ],\n    '$attributes': { email: 'probe@example.invalid' },\n    '$original': {},\n    '$preloaded': {},\n    '$extras': {},\n    '$sideloaded': {},\n    '$isPersisted': false,\n    '$isDeleted': false,\n    '$isLocal': true,\n    email: 'probe@example.invalid'\n  }\n}","logs":[],"callId":"call","pid":19410}
+{"candidate":"compile-root-default","ok":true,"display":"'B'","logs":[{"level":"log","text":"B start"},{"level":"error","text":"B end"}],"callId":"B","pid":19410}
+{"candidate":"compile-root-default","ok":true,"display":"'A'","logs":[{"level":"log","text":"A start"},{"level":"warn","text":"A end"}],"callId":"A","pid":19410}
+{"candidate":"compile-root-default","ok":false,"error":{"code":"TIMEOUT","message":"Cooperative wait expired; execution NOT stopped"},"logs":[],"callId":"late","pid":19410}
+POST_TIMEOUT {"completions":[{"callId":"late","aborted":true}],"marker":"before","pid":19410}
+{"candidate":"compile-root-default","ok":false,"error":{"code":"TIMEOUT","message":"Cooperative wait expired; execution NOT stopped"},"logs":[],"callId":"cooperating","pid":19410}
+COOPERATED {"completions":[{"callId":"late","aborted":true},{"callId":"cooperating","cooperated":true}],"marker":"before","pid":19410}
+HMR {"before":{"completions":[{"callId":"late","aborted":true},{"callId":"cooperating","cooperated":true}],"marker":"before","pid":19410},"after":{"completions":[],"marker":"after","pid":19584},"restarted":true}
+{"candidate":"compile-root-default","ok":true,"display":"{ same: true, marker: 'after' }","logs":[],"callId":"call","pid":19584}
+ACE_REPL
+
+[33m[3mType ".ls" to a view list of available context methods/properties[39m[23m
+> (js) > (js) [90mundefined[39m
+> (js) REPL_NATURAL User after true
+[90mundefined[39m
+> (js) 
+REPL_EXIT 0
+BLOCKING_CHILD_PRE {"completions":[],"marker":"after","pid":19837}
+BLOCKING_HTTP_FROZEN TimeoutError
+EXTERNAL_WATCHDOG_KILLED_CHILD
+BLOCK_EVAL_EXTERNAL_DEADLINE TypeError
+
+EXIT 0

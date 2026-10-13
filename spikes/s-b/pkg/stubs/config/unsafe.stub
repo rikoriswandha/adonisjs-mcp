@@ -1,0 +1,3 @@
+{{{ exports({ to: app.configPath('mcp.ts') }) }}}
+import { defineConfig } from '@rikology/adonisjs-mcp'
+export default defineConfig({ enabled: true, path: '/__adonis/mcp', allowRemoteAccess: false })

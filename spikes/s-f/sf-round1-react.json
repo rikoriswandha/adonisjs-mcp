@@ -1,0 +1,177 @@
+{
+  "kit": "react",
+  "expectedId": 2,
+  "observations": [
+    {
+      "anonymous": {
+        "status": 401,
+        "location": null,
+        "body": {
+          "errors": [
+            {
+              "message": "Unauthorized access"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "guard": "unsupported",
+      "error": "CAPABILITY_UNSUPPORTED"
+    },
+    {
+      "guard": "web",
+      "error": "NOT_FOUND"
+    },
+    {
+      "csrfMissing": {
+        "status": 302,
+        "location": "/",
+        "body": "Redirecting to /"
+      }
+    },
+    {
+      "csrfValid": {
+        "status": 200,
+        "location": null,
+        "body": {
+          "id": 2
+        }
+      }
+    },
+    {
+      "xsrfValid": {
+        "status": 200,
+        "location": null,
+        "body": {
+          "id": 2
+        }
+      }
+    },
+    {
+      "invalid": {
+        "status": 302,
+        "location": "http://127.0.0.1:41101/sf/page"
+      },
+      "validation": {
+        "status": 200,
+        "errors": {
+          "title": "The title field must be defined"
+        },
+        "flashErrors": {
+          "title": [
+            "The title field must be defined"
+          ]
+        }
+      }
+    },
+    {
+      "guard": "web",
+      "mode": "success",
+      "result": {
+        "status": 200,
+        "location": null,
+        "body": {
+          "middleware": "auth-passed",
+          "id": 2,
+          "requestId": "8bc73036-63fd-4925-ab2d-d6df7cbc5a35",
+          "mode": "success"
+        }
+      },
+      "jarSizeAfter": 0,
+      "serverStore": "cookie: no server-side record"
+    },
+    {
+      "cookieReplayAfterDiscard": {
+        "status": 200,
+        "location": null,
+        "body": {
+          "middleware": "auth-passed",
+          "id": 2,
+          "requestId": "c42a9b20-b229-467c-8cce-7d7e32a0ded9",
+          "mode": "replay"
+        }
+      }
+    },
+    {
+      "guard": "web",
+      "mode": "error",
+      "result": {
+        "status": 500,
+        "location": null,
+        "body": {
+          "message": "S-F deliberate application failure",
+          "name": "Error",
+          "frames": "[REDACTED: development frames may include source/context]",
+          "stack": "Error: S-F deliberate application failure\n    at Object.handler (file:///private/tmp/adonisjs-mcp-m0/s-f-react/start/sf_probe.js:36:42)\n    at httpRouteHandler.tracePromise.httpRouteHandler.hasSubscribers.route.route (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@adonisjs/http-server/build/helpers-D-ryK4qq.js:130:113)\n    at TracingChannel.tracePromise (node:diagnostics_channel:362:14)\n    at Runner.<anonymous> (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@adonisjs/http-server/build/helpers-D-ryK4qq.js:130:68)\n    at #invokeWithErrorManagement (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@poppinss/middleware/build/index.js:32:45)\n    at next (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@poppinss/middleware/build/index.js:8:10)\n    at AuthMiddleware.handle (/private/tmp/adonisjs-mcp-m0/s-f-react/app/middleware/auth_middleware.ts:23:12)\n    at async ShieldMiddleware.handle (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@adonisjs/shield/build/src/shield_middleware.js:17:3)\n    at async SessionMiddleware.handle (file:///private/tmp/adonisjs-mcp-m0/s-f-react/node_modules/@adonisjs/session/build/src/session_middleware.js:110:20)\n    at async InertiaMiddleware.handle (/private/tmp/adonisjs-mcp-m0/s-f-react/app/middleware/inertia_middleware.ts:52:20)",
+          "raw": {
+            "status": 500
+          }
+        }
+      },
+      "jarSizeAfter": 0,
+      "serverStore": "cookie: no server-side record"
+    },
+    {
+      "guard": "web",
+      "mode": "timeout",
+      "result": {
+        "error": "TimeoutError"
+      },
+      "jarSizeAfter": 0,
+      "serverStore": "cookie: no server-side record"
+    },
+    {
+      "guard": "web",
+      "mode": "abort",
+      "result": {
+        "error": "AbortError"
+      },
+      "jarSizeAfter": 0,
+      "serverStore": "cookie: no server-side record"
+    },
+    {
+      "store": "memory",
+      "existed": true,
+      "after": null
+    },
+    {
+      "store": "file",
+      "existed": true,
+      "after": null,
+      "filesAfter": []
+    }
+  ],
+  "middlewareEvents": [
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "8bc73036-63fd-4925-ab2d-d6df7cbc5a35",
+      "mode": "success"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "c42a9b20-b229-467c-8cce-7d7e32a0ded9",
+      "mode": "replay"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "3a17fbf2-46d0-422d-ac23-2c16539546eb",
+      "mode": "error"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "08cf71fd-f83d-4bac-b247-1cf800edbaaf",
+      "mode": "slow"
+    },
+    {
+      "middleware": "auth-passed",
+      "id": 2,
+      "requestId": "5218ca6a-51fe-4e06-94d6-d408e37137dc",
+      "mode": "slow"
+    }
+  ]
+}

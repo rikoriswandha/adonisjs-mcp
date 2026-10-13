@@ -1,0 +1,30 @@
+{
+  "redaction": "Credential-named fields/access token patterns; development error frames removed explicitly. Runtime rounds 2/3 additionally compared actual issued credentials against logs/results/headers with zero matches.",
+  "files": [
+    {
+      "source": "s-f-api/sf-observations.json",
+      "destination": "sf-round1-api.json",
+      "secretPatternMatchesAfterRedaction": 0
+    },
+    {
+      "source": "s-f-react/sf-observations.json",
+      "destination": "sf-round1-react.json",
+      "secretPatternMatchesAfterRedaction": 0
+    },
+    {
+      "source": "s-f-api/sf-round2-observations.json",
+      "destination": "sf-round2-api.json",
+      "secretPatternMatchesAfterRedaction": 0
+    },
+    {
+      "source": "s-f-react/sf-round2-observations.json",
+      "destination": "sf-round2-react.json",
+      "secretPatternMatchesAfterRedaction": 0
+    },
+    {
+      "source": "s-f3-api/sf-round3-observations.json",
+      "destination": "sf-round3-api.json",
+      "secretPatternMatchesAfterRedaction": 0
+    }
+  ]
+}

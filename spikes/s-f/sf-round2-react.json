@@ -1,0 +1,135 @@
+{
+  "status": 200,
+  "result": {
+    "inspection": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "idFound": true,
+        "valueType": "object",
+        "keys": [
+          "auth_web",
+          "csrf-secret"
+        ],
+        "sessionKeys": [
+          "auth_web",
+          "csrf-secret"
+        ]
+      }
+    },
+    "expectedId": 8,
+    "during": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 8,
+        "requestId": "68076394-6b9d-45ae-a7ad-930d94f89ce0",
+        "mode": "bounded-before"
+      }
+    },
+    "expiredOriginal": {
+      "status": 401,
+      "location": null,
+      "body": {
+        "errors": [
+          {
+            "message": "Unauthorized access"
+          }
+        ]
+      }
+    },
+    "refreshedReplay": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 8,
+        "requestId": "eeba8090-9ef7-4a0e-a550-a3a56026a3d2",
+        "mode": "refreshed-after"
+      }
+    },
+    "xsrfDuring": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "id": 8
+      }
+    },
+    "xsrfAfter": {
+      "status": 302,
+      "location": "/",
+      "body": "Redirecting to /"
+    },
+    "clampedBefore": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 8,
+        "requestId": "0d608be9-5eb7-469e-b8dc-5c82e344fd66",
+        "mode": "clamped-before"
+      }
+    },
+    "clampedAfter": {
+      "status": 401,
+      "location": null,
+      "body": {
+        "errors": [
+          {
+            "message": "Unauthorized access"
+          }
+        ]
+      }
+    },
+    "login": {
+      "status": 302,
+      "location": "/dashboard"
+    },
+    "loggedIn": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 8,
+        "requestId": "9e0cc04e-bce0-40f2-b937-1faf8019e1f3",
+        "mode": "real-login"
+      }
+    },
+    "logout": {
+      "status": 302,
+      "location": "/login"
+    },
+    "afterLogout": {
+      "status": 401,
+      "location": null,
+      "body": {
+        "errors": [
+          {
+            "message": "Unauthorized access"
+          }
+        ]
+      }
+    },
+    "logoutReplay": {
+      "status": 200,
+      "location": null,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 8,
+        "requestId": "d5aa5397-8086-4780-96d4-bf0fe66236f8",
+        "mode": "logout-replay"
+      }
+    },
+    "csrfReadSucceeded": true,
+    "returnedCredentialHeaders": false
+  },
+  "exposure": {
+    "logLevel": "info",
+    "candidates": 59,
+    "secretsInAppLogs": 0,
+    "secretsInResult": 0,
+    "secretsInOuterHeaders": 0,
+    "authRequestLogCount": 5
+  }
+}

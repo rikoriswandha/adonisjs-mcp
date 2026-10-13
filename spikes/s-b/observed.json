@@ -1,0 +1,616 @@
+[
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp/spikes/s-b/",
+    "command": "node --version",
+    "exit": 0,
+    "output": "v24.21.0\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp/spikes/s-b/",
+    "command": "npm --version",
+    "exit": 0,
+    "output": "11.19.0\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp/spikes/s-b/",
+    "command": "uname -a",
+    "exit": 0,
+    "output": "Darwin MacBook-Pro-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:22:49 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6000 arm64\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp/spikes/s-b/pkg",
+    "command": "npm pack --pack-destination /tmp/adonisjs-mcp-m0",
+    "exit": 0,
+    "output": "rikology-adonisjs-mcp-0.0.0-spike.tgz\nnpm notice\nnpm notice 📦  @rikology/adonisjs-mcp@0.0.0-spike\nnpm notice Tarball Contents\nnpm notice 729B configure.js\nnpm notice 160B index.d.ts\nnpm notice 90B index.js\nnpm notice 329B package.json\nnpm notice 182B providers/mcp_provider.d.ts\nnpm notice 617B providers/mcp_provider.js\nnpm notice 208B stubs/config/safe.stub\nnpm notice 200B stubs/config/unsafe.stub\nnpm notice 449B stubs/providers/observer.stub\nnpm notice 332B stubs/providers/wrapper.stub\nnpm notice Tarball Details\nnpm notice name: @rikology/adonisjs-mcp\nnpm notice version: 0.0.0-spike\nnpm notice filename: rikology-adonisjs-mcp-0.0.0-spike.tgz\nnpm notice package size: 1.5 kB\nnpm notice unpacked size: 3.3 kB\nnpm notice shasum: 90b3c097a9fe68cf2a9e6e013930a19ddc95c29e\nnpm notice integrity: sha512-+/5E4pvfZRqAQ[...]c/hAht7T+NKTg==\nnpm notice total files: 10\nnpm notice\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "bash spikes/clone-fixture.sh api s-b-unsafe-api-1791855651953",
+    "exit": 0,
+    "output": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953",
+    "command": "npm install --save-dev --save-exact /tmp/adonisjs-mcp-m0/rikology-adonisjs-mcp-0.0.0-spike.tgz",
+    "exit": 0,
+    "output": "\nadded 1 package in 649ms\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953",
+    "command": "npm ls @adonisjs/core @adonisjs/application @adonisjs/assembler @adonisjs/lucid @adonisjs/inertia @adonisjs/vite vite @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953\n├── @adonisjs/assembler@8.5.2\n├─┬ @adonisjs/auth@10.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ ├── @adonisjs/lucid@22.4.2 deduped\n│ └─┬ @adonisjs/presets@3.0.0\n│   ├── @adonisjs/assembler@8.5.2 deduped\n│   └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/core@7.6.0\n│ ├─┬ @adonisjs/application@9.1.0\n│ │ └── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├─┬ @adonisjs/events@10.2.0\n│ │ └── @adonisjs/application@9.1.0 deduped\n│ └─┬ @adonisjs/http-server@9.3.1\n│   └── @adonisjs/application@9.1.0 deduped\n├─┬ @adonisjs/cors@3.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/lucid@22.4.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/session@8.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/lucid@22.4.2 deduped\n├─┬ @adonisjs/shield@9.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @japa/plugin-adonisjs@5.2.0\n│ └── @adonisjs/core@7.6.0 deduped\n├── @rikology/adonisjs-mcp@0.0.0-spike\n└─┬ @tuyau/core@1.2.2\n  ├── @adonisjs/assembler@8.5.2 deduped\n  └── @adonisjs/core@7.6.0 deduped\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953",
+    "command": "node ace configure @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "DONE:    update adonisrc.ts file\nDONE:    create config/mcp.ts\nDONE:    create providers/sb_observer_provider.ts\nDONE:    update adonisrc.ts file\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953",
+    "command": "node ace build",
+    "exit": 0,
+    "output": "[ info ] loading hooks...\n[ info ] generating indexes...\n[ info ] codegen: created 5 file(s)\n[ info ] cleaning up output directory (build)\n[ info ] compiling typescript source (tsc)\n[ info ] created ace file (build/ace.js)\n[ info ] copying meta files to the output directory\n[ success ] build completed\n\n╭────────────────────────────────────────────────────────────────────────╮\n│    Run the following commands to start the server in production        │\n│────────────────────────────────────────────────────────────────────────│\n│                                                                        │\n│    ❯ cd build                                                          │\n│    ❯ npm ci --omit=\"dev\"                                               │\n│    ❯ node bin/server.js                                                │\n│                                                                        │\n╰────────────────────────────────────────────────────────────────────────╯\n"
+  },
+  {
+    "kit": "api",
+    "strategy": "unsafe",
+    "compiled": "adonisrc.js",
+    "output": "import { indexEntities } from '@adonisjs/core/generators';\nimport { defineConfig } from '@adonisjs/core/app';\nimport { generateRegistry } from '@tuyau/core/hooks';\nexport default defineConfig({\n    experimental: {},\n    commands: [\n        () => import('@adonisjs/core/commands'),\n        () => import('@adonisjs/lucid/commands'),\n        () => import('@adonisjs/session/commands'),\n    ],\n    providers: [\n        () => import('@adonisjs/core/providers/app_provider'),\n        () => import('@adonisjs/core/providers/hash_provider'),\n        {\n            file: () => import('@adonisjs/core/providers/repl_provider'),\n            environment: ['repl', 'test'],\n        },\n        () => import('@adonisjs/core/providers/vinejs_provider'),\n        () => import('@adonisjs/session/session_provider'),\n        () => import('@adonisjs/shield/shield_provider'),\n        () => import('@adonisjs/lucid/database_provider'),\n        () => import('@adonisjs/cors/cors_provider'),\n        () => import('@adonisjs/auth/auth_provider'),\n        () => import('#providers/api_provider'),\n        {\n            file: () => import('@rikology/adonisjs-mcp/providers/mcp_provider'),\n            environment: ['web'],\n        },\n        () => import('#providers/sb_observer_provider')\n    ],\n    preloads: [\n        () => import('#start/routes'),\n        () => import('#start/kernel'),\n        () => import('#start/validator'),\n    ],\n    tests: {\n        suites: [\n            {\n                files: ['tests/unit/**/*.spec.{ts,js}'],\n                name: 'unit',\n                timeout: 2000,\n            },\n            {\n                files: ['tests/functional/**/*.spec.{ts,js}'],\n                name: 'functional',\n                timeout: 30000,\n            },\n        ],\n        forceExit: false,\n    },\n    metaFiles: [],\n    hooks: {\n        init: [\n            indexEntities({\n                transformers: { enabled: true },\n            }),\n            generateRegistry(),\n        ],\n    },\n});\n//# sourceMappingURL=adonisrc.js.map"
+  },
+  {
+    "kit": "api",
+    "strategy": "unsafe",
+    "compiled": "config/mcp.js",
+    "output": "import { defineConfig } from '@rikology/adonisjs-mcp';\nexport default defineConfig({ enabled: true, path: '/__adonis/mcp', allowRemoteAccess: false });\n//# sourceMappingURL=mcp.js.map"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953/build",
+    "command": "npm ci --omit=dev",
+    "exit": 0,
+    "output": "\nadded 371 packages in 2s\n"
+  },
+  {
+    "kit": "api",
+    "strategy": "unsafe",
+    "packageAbsent": true
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "cp -cR /tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953/build /tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production",
+    "production": true,
+    "healthy": false,
+    "responses": [],
+    "exit": 1,
+    "output": "\n\u001b[31mℹ Error: Cannot find package '@rikology/adonisjs-mcp' imported from /private/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production/config/mcp.js\u001b[39m\n\n\u001b[2m ⁃ at \u001b[3mObject.getPackageJSONURL\u001b[23m (\u001b[3mnode:internal/modules/package_json_reader:331:9\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mpackageResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:784:25\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mmoduleResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:873:18\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mdefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:1006:11\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#cachedDefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:705:20\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolveAndMaybeBlockOnLoaderThread\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:725:38\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.resolveSync\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:763:56\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:687:17\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.getOrCreateModuleJob\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:607:35\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleJob.syncLink\u001b[23m (\u001b[3mnode:internal/modules/esm/module_job:276:33\u001b[23m)\u001b[22m\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production",
+    "command": "node ace list",
+    "exit": 0,
+    "commandCount": 42,
+    "commandNames": [
+      "add",
+      "build",
+      "codegen",
+      "configure",
+      "eject",
+      "list",
+      "repl",
+      "serve",
+      "test",
+      "db:seed",
+      "db:truncate",
+      "db:wipe",
+      "env:add",
+      "generate:key",
+      "inspect:rcfile",
+      "list:routes",
+      "make:command",
+      "make:controller",
+      "make:event",
+      "make:exception",
+      "make:factory",
+      "make:listener",
+      "make:middleware",
+      "make:migration",
+      "make:model",
+      "make:preload",
+      "make:provider",
+      "make:seeder",
+      "make:service",
+      "make:session-table",
+      "make:test",
+      "make:transformer",
+      "make:validator",
+      "make:view",
+      "migration:fresh",
+      "migration:refresh",
+      "migration:reset",
+      "migration:rollback",
+      "migration:run",
+      "migration:status",
+      "schema:dump",
+      "schema:generate"
+    ]
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production",
+    "command": "node ace migration:status",
+    "exit": 1,
+    "output": "\n\u001b[31mℹ Error: Cannot find package '@rikology/adonisjs-mcp' imported from /private/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855651953-production/config/mcp.js\u001b[39m\n\n\u001b[2m ⁃ at \u001b[3mObject.getPackageJSONURL\u001b[23m (\u001b[3mnode:internal/modules/package_json_reader:331:9\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mpackageResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:784:25\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mmoduleResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:873:18\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mdefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:1006:11\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#cachedDefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:705:20\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolveAndMaybeBlockOnLoaderThread\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:725:38\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.resolveSync\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:763:56\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:687:17\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.getOrCreateModuleJob\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:607:35\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleJob.syncLink\u001b[23m (\u001b[3mnode:internal/modules/esm/module_job:276:33\u001b[23m)\u001b[22m\n\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "bash spikes/clone-fixture.sh api s-b-safe-api-1791855664477",
+    "exit": 0,
+    "output": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "npm install --save-dev --save-exact /tmp/adonisjs-mcp-m0/rikology-adonisjs-mcp-0.0.0-spike.tgz",
+    "exit": 0,
+    "output": "\nadded 1 package in 614ms\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "npm ls @adonisjs/core @adonisjs/application @adonisjs/assembler @adonisjs/lucid @adonisjs/inertia @adonisjs/vite vite @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477\n├── @adonisjs/assembler@8.5.2\n├─┬ @adonisjs/auth@10.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ ├── @adonisjs/lucid@22.4.2 deduped\n│ └─┬ @adonisjs/presets@3.0.0\n│   ├── @adonisjs/assembler@8.5.2 deduped\n│   └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/core@7.6.0\n│ ├─┬ @adonisjs/application@9.1.0\n│ │ └── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├─┬ @adonisjs/events@10.2.0\n│ │ └── @adonisjs/application@9.1.0 deduped\n│ └─┬ @adonisjs/http-server@9.3.1\n│   └── @adonisjs/application@9.1.0 deduped\n├─┬ @adonisjs/cors@3.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/lucid@22.4.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/session@8.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/lucid@22.4.2 deduped\n├─┬ @adonisjs/shield@9.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @japa/plugin-adonisjs@5.2.0\n│ └── @adonisjs/core@7.6.0 deduped\n├── @rikology/adonisjs-mcp@0.0.0-spike\n└─┬ @tuyau/core@1.2.2\n  ├── @adonisjs/assembler@8.5.2 deduped\n  └── @adonisjs/core@7.6.0 deduped\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "node ace configure @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "DONE:    update adonisrc.ts file\nDONE:    create config/mcp.ts\nDONE:    create providers/mcp_dev_provider.ts\nDONE:    create providers/sb_observer_provider.ts\nDONE:    update adonisrc.ts file\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "node --import=@poppinss/ts-exec environment-matrix.mjs",
+    "exit": 0,
+    "output": "SB_PACKAGE_MODULE_LOADED\nSB_PACKAGE_BOOT {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"web\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"console\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"repl\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"test\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "node --import=@poppinss/ts-exec environment-matrix.mjs",
+    "exit": 0,
+    "output": "SB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"web\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"console\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"repl\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"test\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "node --import=@poppinss/ts-exec environment-matrix.mjs",
+    "exit": 0,
+    "output": "SB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"web\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"console\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"repl\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"test\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "production": false,
+    "healthy": true,
+    "responses": [
+      {
+        "path": "/",
+        "status": 200,
+        "body": "{\"hello\":\"world\"}"
+      },
+      {
+        "path": "/__adonis/mcp",
+        "status": 200,
+        "body": "{\"spike\":\"S-B\",\"buffer\":true}"
+      }
+    ],
+    "exit": null,
+    "output": "SB_PACKAGE_MODULE_LOADED\nSB_PACKAGE_BOOT {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false}\n{\"level\":30,\"time\":1791855671199,\"pid\":95842,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41021\"}\nSB_OBSERVER {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false,\"buffer\":true}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477",
+    "command": "node ace build",
+    "exit": 0,
+    "output": "[ info ] loading hooks...\n[ info ] generating indexes...\n[ info ] codegen: created 5 file(s)\n[ info ] cleaning up output directory (build)\n[ info ] compiling typescript source (tsc)\n[ info ] created ace file (build/ace.js)\n[ info ] copying meta files to the output directory\n[ success ] build completed\n\n╭────────────────────────────────────────────────────────────────────────╮\n│    Run the following commands to start the server in production        │\n│────────────────────────────────────────────────────────────────────────│\n│                                                                        │\n│    ❯ cd build                                                          │\n│    ❯ npm ci --omit=\"dev\"                                               │\n│    ❯ node bin/server.js                                                │\n│                                                                        │\n╰────────────────────────────────────────────────────────────────────────╯\n"
+  },
+  {
+    "kit": "api",
+    "strategy": "safe",
+    "compiled": "adonisrc.js",
+    "output": "import { indexEntities } from '@adonisjs/core/generators';\nimport { defineConfig } from '@adonisjs/core/app';\nimport { generateRegistry } from '@tuyau/core/hooks';\nexport default defineConfig({\n    experimental: {},\n    commands: [\n        () => import('@adonisjs/core/commands'),\n        () => import('@adonisjs/lucid/commands'),\n        () => import('@adonisjs/session/commands'),\n    ],\n    providers: [\n        () => import('@adonisjs/core/providers/app_provider'),\n        () => import('@adonisjs/core/providers/hash_provider'),\n        {\n            file: () => import('@adonisjs/core/providers/repl_provider'),\n            environment: ['repl', 'test'],\n        },\n        () => import('@adonisjs/core/providers/vinejs_provider'),\n        () => import('@adonisjs/session/session_provider'),\n        () => import('@adonisjs/shield/shield_provider'),\n        () => import('@adonisjs/lucid/database_provider'),\n        () => import('@adonisjs/cors/cors_provider'),\n        () => import('@adonisjs/auth/auth_provider'),\n        () => import('#providers/api_provider'),\n        {\n            file: () => import('#providers/mcp_dev_provider'),\n            environment: ['web'],\n        },\n        () => import('#providers/sb_observer_provider')\n    ],\n    preloads: [\n        () => import('#start/routes'),\n        () => import('#start/kernel'),\n        () => import('#start/validator'),\n    ],\n    tests: {\n        suites: [\n            {\n                files: ['tests/unit/**/*.spec.{ts,js}'],\n                name: 'unit',\n                timeout: 2000,\n            },\n            {\n                files: ['tests/functional/**/*.spec.{ts,js}'],\n                name: 'functional',\n                timeout: 30000,\n            },\n        ],\n        forceExit: false,\n    },\n    metaFiles: [],\n    hooks: {\n        init: [\n            indexEntities({\n                transformers: { enabled: true },\n            }),\n            generateRegistry(),\n        ],\n    },\n});\n//# sourceMappingURL=adonisrc.js.map"
+  },
+  {
+    "kit": "api",
+    "strategy": "safe",
+    "compiled": "config/mcp.js",
+    "output": "export default { enabled: true, path: '/__adonis/mcp', allowRemoteAccess: false };\n//# sourceMappingURL=mcp.js.map"
+  },
+  {
+    "kit": "api",
+    "strategy": "safe",
+    "compiled": "providers/mcp_dev_provider.js",
+    "output": "import app from '@adonisjs/core/services/app';\nexport default app.inDev\n    ? (await import('@rikology/adonisjs-mcp/providers/mcp_provider')).default\n    : class McpDisabledProvider {\n    };\n//# sourceMappingURL=mcp_dev_provider.js.map"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477/build",
+    "command": "npm ci --omit=dev",
+    "exit": 0,
+    "output": "\nadded 371 packages in 2s\n"
+  },
+  {
+    "kit": "api",
+    "strategy": "safe",
+    "packageAbsent": true
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "cp -cR /tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477/build /tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477-production",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477-production",
+    "production": true,
+    "healthy": true,
+    "responses": [
+      {
+        "path": "/",
+        "status": 200,
+        "body": "{\"hello\":\"world\"}"
+      },
+      {
+        "path": "/__adonis/mcp",
+        "status": 404,
+        "body": "{\"message\":\"Cannot GET:/__adonis/mcp\"}"
+      }
+    ],
+    "exit": null,
+    "output": "SB_OBSERVER {\"environment\":\"web\",\"inDev\":false,\"inProduction\":true,\"buffer\":false}\n{\"level\":30,\"time\":1791855677343,\"pid\":96238,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41022\"}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477-production",
+    "command": "node ace list",
+    "exit": 0,
+    "commandCount": 42,
+    "commandNames": [
+      "add",
+      "build",
+      "codegen",
+      "configure",
+      "eject",
+      "list",
+      "repl",
+      "serve",
+      "test",
+      "db:seed",
+      "db:truncate",
+      "db:wipe",
+      "env:add",
+      "generate:key",
+      "inspect:rcfile",
+      "list:routes",
+      "make:command",
+      "make:controller",
+      "make:event",
+      "make:exception",
+      "make:factory",
+      "make:listener",
+      "make:middleware",
+      "make:migration",
+      "make:model",
+      "make:preload",
+      "make:provider",
+      "make:seeder",
+      "make:service",
+      "make:session-table",
+      "make:test",
+      "make:transformer",
+      "make:validator",
+      "make:view",
+      "migration:fresh",
+      "migration:refresh",
+      "migration:reset",
+      "migration:rollback",
+      "migration:run",
+      "migration:status",
+      "schema:dump",
+      "schema:generate"
+    ]
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-api-1791855664477-production",
+    "command": "node ace migration:status",
+    "exit": 0,
+    "output": "SB_OBSERVER {\"environment\":\"console\",\"inDev\":false,\"inProduction\":true,\"buffer\":false}\n┌────────────────────────────────────────────────────────────────┬─────────────┬─────────┬───────────┐\n│  Name                                                          │  Status     │  Batch  │  Message  │\n├────────────────────────────────────────────────────────────────┼─────────────┼─────────┼───────────┤\n│  database/migrations/1761885935168_create_users_table          │  completed  │  1      │           │\n├────────────────────────────────────────────────────────────────┼─────────────┼─────────┼───────────┤\n│  database/migrations/1768620764696_create_access_tokens_table  │  completed  │  1      │           │\n└────────────────────────────────────────────────────────────────┴─────────────┴─────────┴───────────┘\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "bash spikes/clone-fixture.sh react s-b-unsafe-react-1791855677973",
+    "exit": 0,
+    "output": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973",
+    "command": "npm install --save-dev --save-exact /tmp/adonisjs-mcp-m0/rikology-adonisjs-mcp-0.0.0-spike.tgz",
+    "exit": 0,
+    "output": "\nadded 2 packages in 1s\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973",
+    "command": "npm ls @adonisjs/core @adonisjs/application @adonisjs/assembler @adonisjs/lucid @adonisjs/inertia @adonisjs/vite vite @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "react@0.0.0 /private/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973\n├── @adonisjs/assembler@8.5.2\n├─┬ @adonisjs/auth@10.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ ├── @adonisjs/lucid@22.4.2 deduped\n│ └─┬ @adonisjs/presets@3.0.0\n│   ├── @adonisjs/assembler@8.5.2 deduped\n│   └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/core@7.6.0\n│ ├─┬ @adonisjs/application@9.1.0\n│ │ └── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├─┬ @adonisjs/events@10.2.0\n│ │ └── @adonisjs/application@9.1.0 deduped\n│ └─┬ @adonisjs/http-server@9.3.1\n│   └── @adonisjs/application@9.1.0 deduped\n├─┬ @adonisjs/cors@3.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/inertia@5.0.1\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/vite@6.0.3 deduped\n├─┬ @adonisjs/lucid@22.4.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/session@8.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/lucid@22.4.2 deduped\n├─┬ @adonisjs/shield@9.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/static@2.0.1\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/vite@6.0.3\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── vite@8.3.4 deduped\n├─┬ @japa/plugin-adonisjs@5.2.0\n│ └── @adonisjs/core@7.6.0 deduped\n├── @rikology/adonisjs-mcp@0.0.0-spike\n├─┬ @tuyau/core@1.2.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @vitejs/plugin-react@6.1.2\n│ └── vite@8.3.4 deduped\n└── vite@8.3.4\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973",
+    "command": "node ace configure @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "DONE:    update adonisrc.ts file\nDONE:    create config/mcp.ts\nDONE:    create providers/sb_observer_provider.ts\nDONE:    update adonisrc.ts file\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973",
+    "command": "node ace build",
+    "exit": 0,
+    "output": "[ info ] loading hooks...\n[ info ] generating indexes...\n[ info ] codegen: created 6 file(s)\n[ info ] cleaning up output directory (build)\n[ info ] building assets with vite\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 2496 modules transformed.\nrendering chunks...\ncomputing gzip size...\npublic/assets/.vite/manifest.json             2.92 kB │ gzip:   0.56 kB\npublic/assets/app-DtDlKd6L.css               13.67 kB │ gzip:   3.46 kB\npublic/assets/rolldown-runtime-CbXtAM7H.js    0.58 kB │ gzip:   0.36 kB\npublic/assets/not_found-BpMS6JI6.js           0.70 kB │ gzip:   0.37 kB\npublic/assets/server_error-DUjXL6vz.js        0.73 kB │ gzip:   0.39 kB\npublic/assets/marketing-BnXgJ-1Y.js           0.79 kB │ gzip:   0.36 kB\npublic/assets/auth-CLYkXZ2U.js                1.09 kB │ gzip:   0.51 kB\npublic/assets/login-CokbYNS1.js               1.55 kB │ gzip:   0.63 kB\npublic/assets/signup-DRwGOTGz.js              2.45 kB │ gzip:   0.74 kB\npublic/assets/dashboard-ik5dACb3.js           3.02 kB │ gzip:   1.25 kB\npublic/assets/home-BVcy-OOr.js                6.32 kB │ gzip:   2.39 kB\npublic/assets/app-D-kHpyJg.js                28.62 kB │ gzip:   9.99 kB\npublic/assets/theme_toggle-BG4wOz_H.js       39.78 kB │ gzip:  11.90 kB\npublic/assets/react-BvuaeocE.js             346.90 kB │ gzip: 107.88 kB\n\n✓ built in 390ms\n[ info ] compiling typescript source (tsc)\n[ info ] created ace file (build/ace.js)\n[ info ] copying meta files to the output directory\n[ success ] build completed\n\n╭────────────────────────────────────────────────────────────────────────╮\n│    Run the following commands to start the server in production        │\n│────────────────────────────────────────────────────────────────────────│\n│                                                                        │\n│    ❯ cd build                                                          │\n│    ❯ npm ci --omit=\"dev\"                                               │\n│    ❯ node bin/server.js                                                │\n│                                                                        │\n╰────────────────────────────────────────────────────────────────────────╯\n"
+  },
+  {
+    "kit": "react",
+    "strategy": "unsafe",
+    "compiled": "adonisrc.js",
+    "output": "import { indexPages } from '@adonisjs/inertia';\nimport { indexEntities } from '@adonisjs/core/generators';\nimport { defineConfig } from '@adonisjs/core/app';\nimport { generateRegistry } from '@tuyau/core/hooks';\nexport default defineConfig({\n    experimental: {},\n    commands: [\n        () => import('@adonisjs/core/commands'),\n        () => import('@adonisjs/lucid/commands'),\n        () => import('@adonisjs/session/commands'),\n        () => import('@adonisjs/inertia/commands'),\n    ],\n    providers: [\n        () => import('@adonisjs/core/providers/app_provider'),\n        () => import('@adonisjs/core/providers/hash_provider'),\n        {\n            file: () => import('@adonisjs/core/providers/repl_provider'),\n            environment: ['repl', 'test'],\n        },\n        () => import('@adonisjs/core/providers/vinejs_provider'),\n        () => import('@adonisjs/core/providers/edge_provider'),\n        () => import('@adonisjs/session/session_provider'),\n        () => import('@adonisjs/vite/vite_provider'),\n        () => import('@adonisjs/shield/shield_provider'),\n        () => import('@adonisjs/static/static_provider'),\n        () => import('@adonisjs/lucid/database_provider'),\n        () => import('@adonisjs/cors/cors_provider'),\n        () => import('@adonisjs/inertia/inertia_provider'),\n        () => import('@adonisjs/auth/auth_provider'),\n        () => import('#providers/api_provider'),\n        {\n            file: () => import('@rikology/adonisjs-mcp/providers/mcp_provider'),\n            environment: ['web'],\n        },\n        () => import('#providers/sb_observer_provider')\n    ],\n    preloads: [\n        () => import('#start/routes'),\n        () => import('#start/kernel'),\n        () => import('#start/validator'),\n    ],\n    tests: {\n        suites: [\n            {\n                files: ['tests/unit/**/*.spec.{ts,js}'],\n                name: 'unit',\n                timeout: 2000,\n            },\n            {\n                files: ['tests/functional/**/*.spec.{ts,js}'],\n                name: 'functional',\n                timeout: 30000,\n            },\n            {\n                files: ['tests/browser/**/*.spec.{ts,js}'],\n                name: 'browser',\n                timeout: 300000,\n            },\n        ],\n        forceExit: false,\n    },\n    metaFiles: [\n        {\n            pattern: 'resources/views/**/*.edge',\n            reloadServer: false,\n        },\n        {\n            pattern: 'public/**',\n            reloadServer: false,\n        },\n    ],\n    hooks: {\n        init: [\n            indexEntities({\n                transformers: { enabled: true, withSharedProps: true },\n            }),\n            indexPages({ framework: 'react' }),\n            generateRegistry(),\n        ],\n        buildStarting: [() => import('@adonisjs/vite/build_hook')],\n    },\n});\n//# sourceMappingURL=adonisrc.js.map"
+  },
+  {
+    "kit": "react",
+    "strategy": "unsafe",
+    "compiled": "config/mcp.js",
+    "output": "import { defineConfig } from '@rikology/adonisjs-mcp';\nexport default defineConfig({ enabled: true, path: '/__adonis/mcp', allowRemoteAccess: false });\n//# sourceMappingURL=mcp.js.map"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973/build",
+    "command": "npm ci --omit=dev",
+    "exit": 0,
+    "output": "\nadded 385 packages in 3s\n"
+  },
+  {
+    "kit": "react",
+    "strategy": "unsafe",
+    "packageAbsent": true
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "cp -cR /tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973/build /tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production",
+    "production": true,
+    "healthy": false,
+    "responses": [],
+    "exit": 1,
+    "output": "\n\u001b[31mℹ Error: Cannot find package '@rikology/adonisjs-mcp' imported from /private/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production/config/mcp.js\u001b[39m\n\n\u001b[2m ⁃ at \u001b[3mObject.getPackageJSONURL\u001b[23m (\u001b[3mnode:internal/modules/package_json_reader:331:9\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mpackageResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:784:25\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mmoduleResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:873:18\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mdefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:1006:11\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#cachedDefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:705:20\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolveAndMaybeBlockOnLoaderThread\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:725:38\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.resolveSync\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:763:56\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:687:17\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.getOrCreateModuleJob\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:607:35\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleJob.syncLink\u001b[23m (\u001b[3mnode:internal/modules/esm/module_job:276:33\u001b[23m)\u001b[22m\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production",
+    "command": "node ace list",
+    "exit": 0,
+    "commandCount": 43,
+    "commandNames": [
+      "add",
+      "build",
+      "codegen",
+      "configure",
+      "eject",
+      "list",
+      "repl",
+      "serve",
+      "test",
+      "db:seed",
+      "db:truncate",
+      "db:wipe",
+      "env:add",
+      "generate:key",
+      "inspect:rcfile",
+      "list:routes",
+      "make:command",
+      "make:controller",
+      "make:event",
+      "make:exception",
+      "make:factory",
+      "make:listener",
+      "make:middleware",
+      "make:migration",
+      "make:model",
+      "make:page",
+      "make:preload",
+      "make:provider",
+      "make:seeder",
+      "make:service",
+      "make:session-table",
+      "make:test",
+      "make:transformer",
+      "make:validator",
+      "make:view",
+      "migration:fresh",
+      "migration:refresh",
+      "migration:reset",
+      "migration:rollback",
+      "migration:run",
+      "migration:status",
+      "schema:dump",
+      "schema:generate"
+    ]
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production",
+    "command": "node ace migration:status",
+    "exit": 1,
+    "output": "\n\u001b[31mℹ Error: Cannot find package '@rikology/adonisjs-mcp' imported from /private/tmp/adonisjs-mcp-m0/s-b-unsafe-react-1791855677973-production/config/mcp.js\u001b[39m\n\n\u001b[2m ⁃ at \u001b[3mObject.getPackageJSONURL\u001b[23m (\u001b[3mnode:internal/modules/package_json_reader:331:9\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mpackageResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:784:25\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mmoduleResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:873:18\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mdefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/resolve:1006:11\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#cachedDefaultResolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:705:20\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolveAndMaybeBlockOnLoaderThread\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:725:38\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.resolveSync\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:763:56\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3m#resolve\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:687:17\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleLoader.getOrCreateModuleJob\u001b[23m (\u001b[3mnode:internal/modules/esm/loader:607:35\u001b[23m)\u001b[22m\n\u001b[2m ⁃ at \u001b[3mModuleJob.syncLink\u001b[23m (\u001b[3mnode:internal/modules/esm/module_job:276:33\u001b[23m)\u001b[22m\n\n"
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "bash spikes/clone-fixture.sh react s-b-safe-react-1791855697438",
+    "exit": 0,
+    "output": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "command": "npm install --save-dev --save-exact /tmp/adonisjs-mcp-m0/rikology-adonisjs-mcp-0.0.0-spike.tgz",
+    "exit": 0,
+    "output": "\nadded 2 packages in 873ms\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "command": "npm ls @adonisjs/core @adonisjs/application @adonisjs/assembler @adonisjs/lucid @adonisjs/inertia @adonisjs/vite vite @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "react@0.0.0 /private/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438\n├── @adonisjs/assembler@8.5.2\n├─┬ @adonisjs/auth@10.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ ├── @adonisjs/lucid@22.4.2 deduped\n│ └─┬ @adonisjs/presets@3.0.0\n│   ├── @adonisjs/assembler@8.5.2 deduped\n│   └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/core@7.6.0\n│ ├─┬ @adonisjs/application@9.1.0\n│ │ └── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├─┬ @adonisjs/events@10.2.0\n│ │ └── @adonisjs/application@9.1.0 deduped\n│ └─┬ @adonisjs/http-server@9.3.1\n│   └── @adonisjs/application@9.1.0 deduped\n├─┬ @adonisjs/cors@3.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/inertia@5.0.1\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/vite@6.0.3 deduped\n├─┬ @adonisjs/lucid@22.4.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/session@8.1.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── @adonisjs/lucid@22.4.2 deduped\n├─┬ @adonisjs/shield@9.0.0\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/static@2.0.1\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @adonisjs/vite@6.0.3\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ ├── @adonisjs/core@7.6.0 deduped\n│ └── vite@8.3.4 deduped\n├─┬ @japa/plugin-adonisjs@5.2.0\n│ └── @adonisjs/core@7.6.0 deduped\n├── @rikology/adonisjs-mcp@0.0.0-spike\n├─┬ @tuyau/core@1.2.2\n│ ├── @adonisjs/assembler@8.5.2 deduped\n│ └── @adonisjs/core@7.6.0 deduped\n├─┬ @vitejs/plugin-react@6.1.2\n│ └── vite@8.3.4 deduped\n└── vite@8.3.4\n\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "command": "node ace configure @rikology/adonisjs-mcp",
+    "exit": 0,
+    "output": "DONE:    update adonisrc.ts file\nDONE:    create config/mcp.ts\nDONE:    create providers/mcp_dev_provider.ts\nDONE:    create providers/sb_observer_provider.ts\nDONE:    update adonisrc.ts file\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "command": "npm exec vite build",
+    "exit": 0,
+    "output": "vite v8.3.4 building client environment for production...\ntransforming...\n✓ 2498 modules transformed.\nrendering chunks...\ncomputing gzip size...\npublic/assets/.vite/manifest.json             3.05 kB │ gzip:   0.57 kB\npublic/assets/app-DtDlKd6L.css               13.67 kB │ gzip:   3.46 kB\npublic/assets/rolldown-runtime-CbXtAM7H.js    0.58 kB │ gzip:   0.36 kB\npublic/assets/not_found-CdNcPQRL.js           1.35 kB │ gzip:   0.53 kB\npublic/assets/server_error-BjJcZYu5.js        1.38 kB │ gzip:   0.54 kB\npublic/assets/marketing-BQ8FvKFd.js           1.55 kB │ gzip:   0.54 kB\npublic/assets/auth-Cofhh4fR.js                2.09 kB │ gzip:   0.68 kB\npublic/assets/login-BEVCF7Vc.js               2.61 kB │ gzip:   0.84 kB\npublic/assets/signup-DfGuQGjJ.js              4.00 kB │ gzip:   0.98 kB\npublic/assets/dashboard-awpGrF8Q.js           5.26 kB │ gzip:   1.57 kB\npublic/assets/home-IDov0lOQ.js               10.19 kB │ gzip:   2.74 kB\npublic/assets/app-BDMJ-UkW.js                28.84 kB │ gzip:  10.10 kB\npublic/assets/theme_toggle-bm5hQvCr.js       40.61 kB │ gzip:  12.19 kB\npublic/assets/jsx-dev-runtime-B3BKApta.js   558.93 kB │ gzip: 171.01 kB\n\n✓ built in 404ms\n[plugin builtin:vite-reporter] \n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "production": false,
+    "healthy": true,
+    "responses": [
+      {
+        "path": "/",
+        "status": 200,
+        "body": "<!DOCTYPE html>\n<html data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <"
+      },
+      {
+        "path": "/__adonis/mcp",
+        "status": 200,
+        "body": "{\"spike\":\"S-B\",\"buffer\":true}"
+      }
+    ],
+    "exit": null,
+    "output": "SB_PACKAGE_MODULE_LOADED\nSB_PACKAGE_BOOT {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false}\n{\"level\":30,\"time\":1791855707847,\"pid\":97271,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41024\"}\nSB_OBSERVER {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false,\"buffer\":true}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438",
+    "command": "node ace build",
+    "exit": 0,
+    "output": "[ info ] loading hooks...\n[ info ] generating indexes...\n[ info ] codegen: created 6 file(s)\n[ info ] cleaning up output directory (build)\n[ info ] building assets with vite\nvite v8.3.4 building client environment for production...\ntransforming...\n✓ 2496 modules transformed.\nrendering chunks...\ncomputing gzip size...\npublic/assets/.vite/manifest.json             2.92 kB │ gzip:   0.56 kB\npublic/assets/app-DtDlKd6L.css               13.67 kB │ gzip:   3.46 kB\npublic/assets/rolldown-runtime-CbXtAM7H.js    0.58 kB │ gzip:   0.36 kB\npublic/assets/not_found-BpMS6JI6.js           0.70 kB │ gzip:   0.37 kB\npublic/assets/server_error-DUjXL6vz.js        0.73 kB │ gzip:   0.39 kB\npublic/assets/marketing-BnXgJ-1Y.js           0.79 kB │ gzip:   0.36 kB\npublic/assets/auth-CLYkXZ2U.js                1.09 kB │ gzip:   0.51 kB\npublic/assets/login-CokbYNS1.js               1.55 kB │ gzip:   0.63 kB\npublic/assets/signup-DRwGOTGz.js              2.45 kB │ gzip:   0.74 kB\npublic/assets/dashboard-ik5dACb3.js           3.02 kB │ gzip:   1.25 kB\npublic/assets/home-BVcy-OOr.js                6.32 kB │ gzip:   2.39 kB\npublic/assets/app-D-kHpyJg.js                28.62 kB │ gzip:   9.99 kB\npublic/assets/theme_toggle-BG4wOz_H.js       39.78 kB │ gzip:  11.90 kB\npublic/assets/react-BvuaeocE.js             346.90 kB │ gzip: 107.88 kB\n\n✓ built in 173ms\n[ info ] compiling typescript source (tsc)\n[ info ] created ace file (build/ace.js)\n[ info ] copying meta files to the output directory\n[ success ] build completed\n\n╭────────────────────────────────────────────────────────────────────────╮\n│    Run the following commands to start the server in production        │\n│────────────────────────────────────────────────────────────────────────│\n│                                                                        │\n│    ❯ cd build                                                          │\n│    ❯ npm ci --omit=\"dev\"                                               │\n│    ❯ node bin/server.js                                                │\n│                                                                        │\n╰────────────────────────────────────────────────────────────────────────╯\n"
+  },
+  {
+    "kit": "react",
+    "strategy": "safe",
+    "compiled": "adonisrc.js",
+    "output": "import { indexPages } from '@adonisjs/inertia';\nimport { indexEntities } from '@adonisjs/core/generators';\nimport { defineConfig } from '@adonisjs/core/app';\nimport { generateRegistry } from '@tuyau/core/hooks';\nexport default defineConfig({\n    experimental: {},\n    commands: [\n        () => import('@adonisjs/core/commands'),\n        () => import('@adonisjs/lucid/commands'),\n        () => import('@adonisjs/session/commands'),\n        () => import('@adonisjs/inertia/commands'),\n    ],\n    providers: [\n        () => import('@adonisjs/core/providers/app_provider'),\n        () => import('@adonisjs/core/providers/hash_provider'),\n        {\n            file: () => import('@adonisjs/core/providers/repl_provider'),\n            environment: ['repl', 'test'],\n        },\n        () => import('@adonisjs/core/providers/vinejs_provider'),\n        () => import('@adonisjs/core/providers/edge_provider'),\n        () => import('@adonisjs/session/session_provider'),\n        () => import('@adonisjs/vite/vite_provider'),\n        () => import('@adonisjs/shield/shield_provider'),\n        () => import('@adonisjs/static/static_provider'),\n        () => import('@adonisjs/lucid/database_provider'),\n        () => import('@adonisjs/cors/cors_provider'),\n        () => import('@adonisjs/inertia/inertia_provider'),\n        () => import('@adonisjs/auth/auth_provider'),\n        () => import('#providers/api_provider'),\n        {\n            file: () => import('#providers/mcp_dev_provider'),\n            environment: ['web'],\n        },\n        () => import('#providers/sb_observer_provider')\n    ],\n    preloads: [\n        () => import('#start/routes'),\n        () => import('#start/kernel'),\n        () => import('#start/validator'),\n    ],\n    tests: {\n        suites: [\n            {\n                files: ['tests/unit/**/*.spec.{ts,js}'],\n                name: 'unit',\n                timeout: 2000,\n            },\n            {\n                files: ['tests/functional/**/*.spec.{ts,js}'],\n                name: 'functional',\n                timeout: 30000,\n            },\n            {\n                files: ['tests/browser/**/*.spec.{ts,js}'],\n                name: 'browser',\n                timeout: 300000,\n            },\n        ],\n        forceExit: false,\n    },\n    metaFiles: [\n        {\n            pattern: 'resources/views/**/*.edge',\n            reloadServer: false,\n        },\n        {\n            pattern: 'public/**',\n            reloadServer: false,\n        },\n    ],\n    hooks: {\n        init: [\n            indexEntities({\n                transformers: { enabled: true, withSharedProps: true },\n            }),\n            indexPages({ framework: 'react' }),\n            generateRegistry(),\n        ],\n        buildStarting: [() => import('@adonisjs/vite/build_hook')],\n    },\n});\n//# sourceMappingURL=adonisrc.js.map"
+  },
+  {
+    "kit": "react",
+    "strategy": "safe",
+    "compiled": "config/mcp.js",
+    "output": "export default { enabled: true, path: '/__adonis/mcp', allowRemoteAccess: false };\n//# sourceMappingURL=mcp.js.map"
+  },
+  {
+    "kit": "react",
+    "strategy": "safe",
+    "compiled": "providers/mcp_dev_provider.js",
+    "output": "import app from '@adonisjs/core/services/app';\nexport default app.inDev\n    ? (await import('@rikology/adonisjs-mcp/providers/mcp_provider')).default\n    : class McpDisabledProvider {\n    };\n//# sourceMappingURL=mcp_dev_provider.js.map"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438/build",
+    "command": "npm ci --omit=dev",
+    "exit": 0,
+    "output": "\nadded 385 packages in 3s\n"
+  },
+  {
+    "kit": "react",
+    "strategy": "safe",
+    "packageAbsent": true
+  },
+  {
+    "cwd": "/Users/rikoriswandha/Developer/projects/opensource/adonisjs-mcp",
+    "command": "cp -cR /tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438/build /tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438-production",
+    "exit": 0,
+    "output": ""
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438-production",
+    "production": true,
+    "healthy": true,
+    "responses": [
+      {
+        "path": "/",
+        "status": 200,
+        "body": "<!DOCTYPE html>\n<html data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <"
+      },
+      {
+        "path": "/__adonis/mcp",
+        "status": 404,
+        "body": "<!DOCTYPE html>\n<html data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <"
+      }
+    ],
+    "exit": null,
+    "output": "SB_OBSERVER {\"environment\":\"web\",\"inDev\":false,\"inProduction\":true,\"buffer\":false}\n{\"level\":30,\"time\":1791855717118,\"pid\":97723,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41025\"}\n"
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438-production",
+    "command": "node ace list",
+    "exit": 0,
+    "commandCount": 43,
+    "commandNames": [
+      "add",
+      "build",
+      "codegen",
+      "configure",
+      "eject",
+      "list",
+      "repl",
+      "serve",
+      "test",
+      "db:seed",
+      "db:truncate",
+      "db:wipe",
+      "env:add",
+      "generate:key",
+      "inspect:rcfile",
+      "list:routes",
+      "make:command",
+      "make:controller",
+      "make:event",
+      "make:exception",
+      "make:factory",
+      "make:listener",
+      "make:middleware",
+      "make:migration",
+      "make:model",
+      "make:page",
+      "make:preload",
+      "make:provider",
+      "make:seeder",
+      "make:service",
+      "make:session-table",
+      "make:test",
+      "make:transformer",
+      "make:validator",
+      "make:view",
+      "migration:fresh",
+      "migration:refresh",
+      "migration:reset",
+      "migration:rollback",
+      "migration:run",
+      "migration:status",
+      "schema:dump",
+      "schema:generate"
+    ]
+  },
+  {
+    "cwd": "/tmp/adonisjs-mcp-m0/s-b-safe-react-1791855697438-production",
+    "command": "node ace migration:status",
+    "exit": 0,
+    "output": "SB_OBSERVER {\"environment\":\"console\",\"inDev\":false,\"inProduction\":true,\"buffer\":false}\n┌────────────────────────────────────────────────────────┬─────────────┬─────────┬───────────┐\n│  Name                                                  │  Status     │  Batch  │  Message  │\n├────────────────────────────────────────────────────────┼─────────────┼─────────┼───────────┤\n│  database/migrations/1761885935168_create_users_table  │  completed  │  1      │           │\n└────────────────────────────────────────────────────────┴─────────────┴─────────┴───────────┘\n"
+  }
+]

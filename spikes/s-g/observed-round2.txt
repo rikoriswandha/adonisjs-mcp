@@ -1,0 +1,238 @@
+
+up to date, audited 537 packages in 1s
+
+171 packages are looking for funding
+  run `npm fund` for details
+
+20 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+The files belonging to this database system will be owned by user "rikoriswandha".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+creating directory /tmp/adonisjs-mcp-m0/s-g-pg ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Asia/Jakarta
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    '/opt/homebrew/opt/postgresql@18/bin/pg_ctl' -D /tmp/adonisjs-mcp-m0/s-g-pg -l logfile start
+
+waiting for server to start.... done
+server started
+v24.21.0
+Darwin MacBook-Pro-3.local 27.0.0 Darwin Kernel Version 27.0.0: Tue Aug 11 21:22:49 PDT 2026; root:xnu-13432.1.9~1/RELEASE_ARM64_T6000 arm64
+api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-g-api
+├─┬ @adonisjs/auth@10.1.0
+│ ├── @adonisjs/core@7.6.0 deduped
+│ ├── @adonisjs/lucid@22.4.2 deduped
+│ └─┬ @adonisjs/presets@3.0.0
+│   └── @adonisjs/core@7.6.0 deduped
+├── @adonisjs/core@7.6.0
+├─┬ @adonisjs/cors@3.0.0
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @adonisjs/lucid@22.4.2
+│ ├── @adonisjs/core@7.6.0 deduped
+│ ├─┬ knex-dynamic-connection@5.1.1
+│ │ └── knex@3.3.0 deduped
+│ └── knex@3.3.0
+├─┬ @adonisjs/session@8.1.0
+│ ├── @adonisjs/core@7.6.0 deduped
+│ └── @adonisjs/lucid@22.4.2 deduped
+├─┬ @adonisjs/shield@9.0.0
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @japa/plugin-adonisjs@5.2.0
+│ └── @adonisjs/core@7.6.0 deduped
+├─┬ @tuyau/core@1.2.2
+│ └── @adonisjs/core@7.6.0 deduped
+├── better-sqlite3@13.0.3
+└─┬ pg@8.16.3
+  └─┬ pg-pool@3.14.0
+    └── pg@8.16.3 deduped
+
+                                                             version                                                             
+---------------------------------------------------------------------------------------------------------------------------------
+ PostgreSQL 18.4 (Homebrew) on aarch64-apple-darwin25.4.0, compiled by Apple clang version 21.0.0 (clang-2100.0.123.102), 64-bit
+(1 row)
+
+{"kind":"pg-corpus","name":"select","sql":"SELECT * FROM probe","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"comment-delete","sql":"/* SELECT /* nested */ */ DELETE FROM probe","rejected":true,"error":"/* SELECT /* nested */ */ DELETE FROM probe - cannot execute DELETE in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"multi-delete","sql":"SELECT 1; DELETE FROM probe","rejected":true,"error":"SELECT 1; DELETE FROM probe - cannot execute DELETE in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"mutating-cte","sql":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d","rejected":true,"error":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d - cannot execute SELECT in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"explain-analyze-delete","sql":"EXPLAIN ANALYZE DELETE FROM probe","rejected":true,"error":"EXPLAIN ANALYZE DELETE FROM probe - cannot execute DELETE in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"nextval","sql":"SELECT nextval('probe_seq')","rejected":true,"error":"SELECT nextval('probe_seq') - cannot execute nextval() in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"setval","sql":"SELECT setval('probe_seq', 99)","rejected":true,"error":"SELECT setval('probe_seq', 99) - cannot execute setval() in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"advisory-lock","sql":"SELECT pg_advisory_lock(71120)","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":1,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":1,"listening":[]},"independentLocks":{"advisory":1}}
+{"kind":"pg-corpus","name":"set-config-session","sql":"SELECT set_config('application_name', 'spike-leaked', false)","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"spike-leaked","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"disable-read-only","sql":"SELECT set_config('transaction_read_only', 'off', true)","rejected":true,"error":"SELECT set_config('transaction_read_only', 'off', true) - transaction read-write mode must be set before any query","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"disable-timeout","sql":"SELECT set_config('statement_timeout', '0', true)","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"0","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"do-delete","sql":"DO $$ BEGIN DELETE FROM probe; END $$","rejected":true,"error":"DO $$ BEGIN DELETE FROM probe; END $$ - cannot execute DELETE in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"call-delete","sql":"CALL probe_call()","rejected":true,"error":"CALL probe_call() - cannot execute DELETE in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"copy-program","sql":"COPY (SELECT 1) TO PROGRAM 'true'","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"copy-stdout","sql":"COPY (SELECT * FROM probe) TO STDOUT","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"listen","sql":"LISTEN spike_event","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"notify","sql":"NOTIFY spike_event, 'hello'","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"sameConnection":{"readonly":"on","timeout":"150ms","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"sleep","sql":"SELECT pg_sleep(1)","rejected":true,"error":"SELECT pg_sleep(1) - canceling statement due to statement timeout","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"insert-returning","sql":"INSERT INTO probe VALUES (2, 'bad') RETURNING *","rejected":true,"error":"INSERT INTO probe VALUES (2, 'bad') RETURNING * - cannot execute INSERT in a read-only transaction","before":{"rows":1,"sequence":"1"},"after":{"rows":1,"sequence":"1"},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"pg-corpus","name":"transaction-escape","sql":"COMMIT; DELETE FROM probe","rejected":false,"error":"","before":{"rows":1,"sequence":"1"},"after":{"rows":0,"sequence":"1"},"sameConnection":{"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"pooled":{"pid":878,"readonly":"off","timeout":"0","application":"","advisory":0,"listening":[]},"independentLocks":{"advisory":0}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"select","sql":"SELECT * FROM probe","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"comment-delete","sql":"/* SELECT */ DELETE FROM probe","rejected":true,"error":"/* SELECT */ DELETE FROM probe - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"nested-comment","sql":"/* SELECT /* nested */ */ DELETE FROM probe","rejected":true,"error":"/* SELECT /* nested */ */ DELETE FROM probe - near \"*\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"multi-delete","sql":"SELECT 1; DELETE FROM probe","rejected":true,"error":"SELECT 1; DELETE FROM probe - The supplied SQL string contains more than one statement","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"mutating-cte","sql":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d","rejected":true,"error":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d - near \"DELETE\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"explain-analyze-delete","sql":"EXPLAIN ANALYZE DELETE FROM probe","rejected":true,"error":"EXPLAIN ANALYZE DELETE FROM probe - near \"DELETE\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"user-version","sql":"PRAGMA user_version=5","rejected":true,"error":"PRAGMA user_version=5 - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"journal-mode","sql":"PRAGMA journal_mode=WAL","rejected":true,"error":"PRAGMA journal_mode=WAL - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"attach","sql":"ATTACH DATABASE '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/attached.sqlite3' AS other","rejected":true,"error":"ATTACH DATABASE '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/attached.sqlite3' AS other - unable to open database: /private/tmp/adonisjs-mcp-m0/s-g-api/tmp/attached.sqlite3","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"vacuum-into","sql":"VACUUM INTO '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/vacuum-copy.sqlite3'","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":true,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"load-extension","sql":"SELECT load_extension('/missing/spike-extension')","rejected":true,"error":"SELECT load_extension('/missing/spike-extension') - not authorized","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"insert-returning","sql":"INSERT INTO probe VALUES (2, 'bad') RETURNING *","rejected":true,"error":"INSERT INTO probe VALUES (2, 'bad') RETURNING * - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"readonly","name":"disable-query-only","sql":"PRAGMA query_only=OFF","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"select","sql":"SELECT * FROM probe","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"comment-delete","sql":"/* SELECT */ DELETE FROM probe","rejected":true,"error":"/* SELECT */ DELETE FROM probe - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"nested-comment","sql":"/* SELECT /* nested */ */ DELETE FROM probe","rejected":true,"error":"/* SELECT /* nested */ */ DELETE FROM probe - near \"*\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"multi-delete","sql":"SELECT 1; DELETE FROM probe","rejected":true,"error":"SELECT 1; DELETE FROM probe - The supplied SQL string contains more than one statement","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"mutating-cte","sql":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d","rejected":true,"error":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d - near \"DELETE\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"explain-analyze-delete","sql":"EXPLAIN ANALYZE DELETE FROM probe","rejected":true,"error":"EXPLAIN ANALYZE DELETE FROM probe - near \"DELETE\": syntax error","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"user-version","sql":"PRAGMA user_version=5","rejected":true,"error":"PRAGMA user_version=5 - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"delete","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"journal-mode","sql":"PRAGMA journal_mode=WAL","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"delete"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":false,"attachedFileExists":false},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"attach","sql":"ATTACH DATABASE '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/attached.sqlite3' AS other","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"wal"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":false,"attachedFileExists":true},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"},{"seq":2,"name":"other","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/attached.sqlite3"}]}}
+{"kind":"sqlite-attached-write","mode":"query_only","attachedWrite":"CREATE TABLE other.side_effect (id integer) - attempt to write a readonly database"}
+{"kind":"sqlite-corpus","mode":"query_only","name":"vacuum-into","sql":"VACUUM INTO '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/vacuum-copy.sqlite3'","rejected":true,"error":"VACUUM INTO '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/vacuum-copy.sqlite3' - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"wal"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":true,"attachedFileExists":true},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"load-extension","sql":"SELECT load_extension('/missing/spike-extension')","rejected":true,"error":"SELECT load_extension('/missing/spike-extension') - not authorized","before":{"rows":{"n":1},"version":0,"journal":"wal"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":false,"attachedFileExists":true},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"insert-returning","sql":"INSERT INTO probe VALUES (2, 'bad') RETURNING *","rejected":true,"error":"INSERT INTO probe VALUES (2, 'bad') RETURNING * - attempt to write a readonly database","before":{"rows":{"n":1},"version":0,"journal":"wal"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":false,"attachedFileExists":true},"connectionState":{"queryOnly":[{"query_only":1}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"sqlite-corpus","mode":"query_only","name":"disable-query-only","sql":"PRAGMA query_only=OFF","rejected":false,"error":"","before":{"rows":{"n":1},"version":0,"journal":"wal"},"after":{"rows":{"n":1},"version":0,"journal":"wal","outputExists":false,"attachedFileExists":true},"connectionState":{"queryOnly":[{"query_only":0}],"databases":[{"seq":0,"name":"main","file":"/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/db.sqlite3"}]}}
+{"kind":"session-leak","state":{"pid":878,"readonly":"on","timeout":"321ms"}}
+{"kind":"cancellation","mode":"statement_timeout","pid":878,"elapsedMs":505,"error":"SELECT pg_sleep(2) - canceling statement due to statement timeout","recovery":{"pid":878,"readonly":"off","timeout":"0","healthy":42},"activity":{"state":"idle","xact_start":null},"poolUsed":0,"poolFree":1}
+{"kind":"cancellation","mode":"knex_cancel","pid":878,"elapsedMs":107,"error":"Defined query timeout of 80ms exceeded when running query.","recovery":{"pid":878,"readonly":"off","timeout":"0","healthy":42},"activity":{"state":"idle","xact_start":null},"poolUsed":0,"poolFree":1}
+{"kind":"cancellation","mode":"abort","pid":878,"elapsedMs":91,"error":"SELECT pg_sleep(2) - canceling statement due to user request","recovery":{"pid":878,"readonly":"off","timeout":"0","healthy":42},"activity":{"state":"idle","xact_start":null},"poolUsed":0,"poolFree":1}
+{"kind":"read-only-role","sql":"SELECT * FROM probe","error":"","state":{"rows":0,"sequence":"1"}}
+{"kind":"read-only-role","sql":"SET default_transaction_read_only=off","error":"","state":{"rows":0,"sequence":"1"}}
+{"kind":"read-only-role","sql":"DELETE FROM probe","error":"DELETE FROM probe - permission denied for table probe","state":{"rows":0,"sequence":"1"}}
+{"kind":"read-only-role","sql":"SELECT pg_advisory_lock(71121)","error":"","state":{"rows":0,"sequence":"1"}}
+{"kind":"pg-protocol","sql":"SELECT 1; SELECT 2","bindings":[],"results":2,"error":""}
+{"kind":"pg-protocol","sql":"SELECT ?::int; SELECT 2","bindings":[1],"results":0,"error":"SELECT $1::int; SELECT 2 - cannot insert multiple commands into a prepared statement"}
+{"kind":"sqlite-cancel-support","error":"Query cancelling not supported for this dialect"}
+{"kind":"sqlite-timeout","elapsedMs":268,"error":"","abortedAtReturn":false,"abortedAfterYield":true,"recovery":[{"healthy":42}],"poolUsed":0,"poolFree":1}
+{"kind":"sqlite-session-leak","nextBorrower":[{"query_only":1}]}
+{"kind":"sqlite-query-only-bypass","independentRows":{"n":2}}
+waiting for server to shut down.... done
+server stopped
+
+up to date, audited 537 packages in 1s
+
+171 packages are looking for funding
+  run `npm fund` for details
+
+20 high severity vulnerabilities
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+The files belonging to this database system will be owned by user "rikoriswandha".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.UTF-8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are enabled.
+
+creating directory /tmp/adonisjs-mcp-m0/s-g-pg ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default "max_connections" ... 100
+selecting default "shared_buffers" ... 128MB
+selecting default time zone ... Asia/Jakarta
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+Success. You can now start the database server using:
+
+    '/opt/homebrew/opt/postgresql@18/bin/pg_ctl' -D /tmp/adonisjs-mcp-m0/s-g-pg -l logfile start
+
+waiting for server to start.... done
+server started
+api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-g-api
+├── pgsql-ast-parser@12.0.1
+└── sqlite-parser@1.0.1
+
+{"kind":"sg2-role","rows":[{"rolname":"sg2_reader","rolsuper":false,"rolcreaterole":false,"rolcreatedb":false,"signal":false,"files":false,"program":false}]}
+{"kind":"sg2-pg","name":"select","text":"SELECT * FROM sg2_probe","error":"","parser":["select"],"policy":"ALLOW","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"multi-escape","text":"COMMIT; DELETE FROM sg2_probe","error":"cannot insert multiple commands into a prepared statement","parser":["commit","delete"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"multi-delete","text":"SELECT 1; DELETE FROM sg2_probe","error":"cannot insert multiple commands into a prepared statement","parser":["select","delete"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"multi-comments","text":"SELECT 1; /* nested /* hidden */ */ DELETE FROM sg2_probe","error":"cannot insert multiple commands into a prepared statement","parser":["select","delete"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"filtered","text":"SELECT * FROM sg2_probe WHERE id=1","error":"","parser":["select"],"policy":"ALLOW","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"join","text":"SELECT a.id FROM sg2_probe a JOIN sg2_probe b ON a.id=b.id","error":"","parser":["select"],"policy":"ALLOW","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"read-cte","text":"WITH x AS (SELECT * FROM sg2_probe) SELECT * FROM x","error":"","parser":["with"],"policy":"ALLOW","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"commit","text":"COMMIT","error":"","parser":["commit"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"rollback","text":"ROLLBACK","error":"","parser":["rollback"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"set-read-write","text":"SET TRANSACTION READ WRITE","error":"","parser":"Syntax error at line 1 col 17:\n\n1  SET TRANSACTION READ WRITE\n                   ^\nUnexpected word token: \"read\". Instead, I was expecting to see one of the following:\n\n    - A \"op_eq\" token\n    - A \"kw_to\" token\n\n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"comment-delete","text":"/* SELECT /* nested */ */ DELETE FROM sg2_probe","error":"cannot execute DELETE in a read-only transaction","parser":["delete"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"cte","text":"WITH d AS (DELETE FROM sg2_probe RETURNING *) SELECT * FROM d","error":"cannot execute SELECT in a read-only transaction","parser":["with"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"explain","text":"EXPLAIN ANALYZE DELETE FROM sg2_probe","error":"cannot execute DELETE in a read-only transaction","parser":"Syntax error at line 1 col 9:\n\n1  EXPLAIN ANALYZE DELETE FROM sg2_probe\n           ^\nUnexpected kw_analyze token: \"analyze\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"nextval","text":"SELECT nextval('sg2_seq')","error":"permission denied for sequence sg2_seq","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"setval","text":"SELECT setval('sg2_seq',99)","error":"permission denied for sequence sg2_seq","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"lock","text":"SELECT pg_advisory_lock(71122)","error":"","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"config","text":"SELECT set_config('application_name','sg2-residue',false)","error":"","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"timeout-config","text":"SELECT set_config('statement_timeout','0',true)","error":"","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"copy-program","text":"COPY (SELECT 1) TO PROGRAM 'true'","error":"permission denied to COPY to or from an external program","parser":"Syntax error at line 1 col 6:\n\n1  COPY (SELECT 1) TO PROGRAM 'true'\n        ^\nUnexpected lparen token: \"(\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"copy-stdout","text":"COPY (SELECT * FROM sg2_probe) TO STDOUT","error":"","parser":"Syntax error at line 1 col 6:\n\n1  COPY (SELECT * FROM sg2_probe) TO STDOUT\n        ^\nUnexpected lparen token: \"(\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"dblink","text":"SELECT dblink_exec('host=127.0.0.1 port=55441 dbname=postgres user=postgres','DELETE FROM sg2_probe')","error":"password or GSSAPI delegated credentials required","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"terminate","text":"SELECT pg_terminate_backend(1004)","error":"permission denied to terminate process","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"lo-import","text":"SELECT lo_import('/tmp/sg2-missing')","error":"permission denied for function lo_import","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"lo-export","text":"SELECT lo_export(123,'/tmp/adonisjs-mcp-m0/sg2-export')","error":"permission denied for function lo_export","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"do","text":"DO $$ BEGIN DELETE FROM sg2_probe; END $$","error":"cannot execute DELETE in a read-only transaction","parser":["do"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"call","text":"CALL sg2_call()","error":"cannot execute DELETE in a read-only transaction","parser":"Syntax error at line 1 col 6:\n\n1  CALL sg2_call()\n        ^\nUnexpected word token: \"sg2_call\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"listen","text":"LISTEN sg2_event","error":"","parser":"Syntax error at line 1 col 8:\n\n1  LISTEN sg2_event\n          ^\nUnexpected word token: \"sg2_event\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"notify","text":"NOTIFY sg2_event,'x'","error":"","parser":"Syntax error at line 1 col 8:\n\n1  NOTIFY sg2_event,'x'\n          ^\nUnexpected word token: \"sg2_event\". I did not expect any more input. Here is the state of my parse table:\n\n    kw_truncate → %word ● \n    kw_delete → %word ● \n    kw_start → %word ● \n    kw_insert → %word ● \n    kw_begin → %word ● \n    kw_show → %word ● \n    kw_set → %word ● \n    kw_tablespace → %word ● \n    kw_rollback → %word ● \n    kw_commit → %word ● \n    kw_values → %word ● \n    kw_comment → %word ● \n    kw_raise → %word ● \n    kw_refresh → %word ● \n    kw_drop → %word ● \n    kw_alter → %word ● \n    kw_update → %word ● \n    kw_deallocate → %word ● \n    kw_prepare → %word ● \n","policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"sleep","text":"SELECT pg_sleep(1)","error":"canceling statement due to statement timeout","parser":["select"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-pg","name":"insert","text":"INSERT INTO sg2_probe VALUES(2) RETURNING *","error":"cannot execute INSERT in a read-only transaction","parser":["insert"],"policy":"DENY","independent":{"rows":1,"locks":0},"clean":{"application":"","timeout":"0","readonly":"off","listening":[]}}
+{"kind":"sg2-protocol","query":{"text":"SELECT 1; SELECT 2","values":[]},"error":"","results":2}
+{"kind":"sg2-protocol","query":{"text":"SELECT 1; SELECT 2","values":[],"queryMode":"extended"},"error":"cannot insert multiple commands into a prepared statement","results":0}
+{"kind":"sg2-hard-deadline","elapsedMs":102,"error":"canceling statement due to user request","activity":{"state":"idle","xact_start":null}}
+{"kind":"sg2-discard","before":{"locks":1},"after":{"locks":0},"settings":{"application":"","timeout":"0","listening":[]},"appBefore":{"pid":1004,"application":"","timeout":"0","readonly":"off"},"appAfter":{"pid":1004,"application":"","timeout":"0","readonly":"off"}}
+{"kind":"sg2-sqlite-classify","text":"SELECT * FROM probe","readonly":true,"statementKind":["select"],"policy":"ALLOW","error":""}
+{"kind":"sg2-sqlite-classify","text":"/* SELECT */ DELETE FROM probe","readonly":false,"statementKind":["delete"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"SELECT 1; DELETE FROM probe","policy":"DENY","error":"The supplied SQL string contains more than one statement"}
+{"kind":"sg2-sqlite-classify","text":"WITH d AS (DELETE FROM probe RETURNING *) SELECT * FROM d","policy":"DENY","error":"near \"DELETE\": syntax error"}
+{"kind":"sg2-sqlite-classify","text":"EXPLAIN ANALYZE DELETE FROM probe","policy":"DENY","error":"near \"DELETE\": syntax error"}
+{"kind":"sg2-sqlite-classify","text":"PRAGMA user_version=5","readonly":false,"statementKind":["pragma"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"PRAGMA journal_mode=WAL","readonly":false,"statementKind":["pragma"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"ATTACH DATABASE '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/sg2-attach.sqlite3' AS other","readonly":true,"statementKind":["attach"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"VACUUM INTO '/private/tmp/adonisjs-mcp-m0/s-g-api/tmp/sg2-vacuum.sqlite3'","readonly":false,"policy":"DENY","error":"Syntax error found near Identifier (VACUUM Statement)"}
+{"kind":"sg2-sqlite-classify","text":"SELECT load_extension('/missing/sg2')","readonly":true,"statementKind":["select"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"INSERT INTO probe VALUES (9,'bad') RETURNING *","readonly":false,"policy":"DENY","error":"Syntax error found near Single-quoted String Literal (VALUES Clause)"}
+{"kind":"sg2-sqlite-classify","text":"PRAGMA query_only=OFF","readonly":true,"statementKind":["pragma"],"policy":"DENY","error":""}
+{"kind":"sg2-sqlite-classify","text":"SELECT * FROM probe WHERE id=1","readonly":true,"statementKind":["select"],"policy":"ALLOW","error":""}
+{"kind":"sg2-sqlite-classify","text":"SELECT a.id FROM probe a JOIN probe b ON a.id=b.id","readonly":true,"statementKind":["select"],"policy":"ALLOW","error":""}
+{"kind":"sg2-sqlite-classify","text":"WITH x AS (SELECT * FROM probe) SELECT * FROM x","readonly":true,"statementKind":["select"],"policy":"ALLOW","error":""}
+{"kind":"sg2-extension","sqlDefault":"not authorized","jsExtensionError":"dlopen(/missing/sg2.dylib, 0x000A): tried: '/missing/sg2.dylib' (no such file), '/System/Volumes/Preboot/Cryptexes/OS/missing/sg2.dylib' (no such file), '/missing/sg2.dylib' (no such file)","jsLoadExtensionType":"function"}
+{"kind":"sg2-sqlite-files","attach":false,"vacuum":false}
+{"kind":"sg2-executor-message","mode":"worker","ready":true}
+{"kind":"sg2-executor-message","mode":"worker","pending":true,"elapsedMs":302}
+{"kind":"sg2-executor-exit","mode":"worker","code":null,"signal":"SIGKILL","elapsedAfterReadyMs":503,"heartbeat":52}
+{"kind":"sg2-executor-message","mode":"child","ready":true}
+{"kind":"sg2-executor-exit","mode":"child","code":null,"signal":"SIGKILL","elapsedAfterReadyMs":103,"heartbeat":13}
+{"kind":"sg2-final","readerHealth":[{"healthy":42}],"sqliteHealth":{"rows":2}}
+waiting for server to shut down.... done
+server stopped

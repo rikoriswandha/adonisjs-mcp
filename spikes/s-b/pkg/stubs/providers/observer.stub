@@ -1,0 +1,6 @@
+{{{ exports({ to: app.providersPath('sb_observer_provider.ts') }) }}}
+import type { ApplicationService } from '@adonisjs/core/types'
+export default class SbObserverProvider {
+  constructor(protected app: ApplicationService) {}
+  async ready() { console.log('SB_OBSERVER', JSON.stringify({ environment: this.app.getEnvironment(), inDev:this.app.inDev, inProduction:this.app.inProduction, buffer:this.app.container.hasBinding('sb.mcp.buffer') })) }
+}

@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-13",
+  "sourceClone": "/tmp/adonisjs-mcp-m0/s-c-api-17464",
+  "standalone": "/tmp/adonisjs-mcp-m0/s-c-api-17464-standalone",
+  "dev": {"concurrentRequests":24,"probeLogRecords":80,"exceptions":8,"custom":{"reports":8,"handles":8},"requestCorrelation":true,"diagnosticCount":8,"diagnosticKeys":[],"detachStopsCapture":true,"subscribersAfterDetach":[0,0],"diagnosticSubscribersAfterDetach":false,"bytes":26105,"dropped":0,"stdoutProbeLines":84,"providerShutdown":true,"processStopped":true},
+  "bounds": {"countLimit":128,"initialEvictions":72,"bytes":32272,"retained":16,"oversizedDropped":true},
+  "production": {"root200":true,"customError500":true,"logOnce":true,"packageAbsent":true,"captureRouteAbsent":true,"providerNotLoaded":true,"migrationExit":0,"processStopped":true},
+  "rawEvidenceScan": {"filesScanned":5,"secretSentinelMatches":0,"sensitiveStructuredKeys":0}
+}

@@ -1,0 +1,6 @@
+{
+  "cwd": "/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855520486-production",
+  "command": "node --input-type=module -e \"await import('@rikology/adonisjs-mcp/providers/mcp_provider')\"",
+  "exit": 1,
+  "output": "node:internal/modules/package_json_reader:331\n  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);\n        ^\n\nError [ERR_MODULE_NOT_FOUND]: Cannot find package '@rikology/adonisjs-mcp' imported from /private/tmp/adonisjs-mcp-m0/s-b-unsafe-api-1791855520486-production/[eval1]\n    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:331:9)\n    at packageResolve (node:internal/modules/esm/resolve:784:25)\n    at moduleResolve (node:internal/modules/esm/resolve:873:18)\n    at defaultResolve (node:internal/modules/esm/resolve:1006:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:705:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:725:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:763:56)\n    at #resolve (node:internal/modules/esm/loader:687:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:607:35)\n    at node:internal/modules/esm/loader:636:32 {\n  code: 'ERR_MODULE_NOT_FOUND'\n}\n\nNode.js v24.21.0\n"
+}

@@ -1,0 +1,1708 @@
+[
+  {
+    "resolver": "header",
+    "port": 41140,
+    "result": {
+      "binding": true,
+      "bindingMatchesExport": true,
+      "modelMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "outsideBefore": null,
+      "concurrent": [
+        {
+          "tenant": "a",
+          "model": [
+            "a"
+          ],
+          "evalIds": [
+            "a",
+            "a"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketDomain": null,
+          "after": "a"
+        },
+        {
+          "tenant": "b",
+          "model": [
+            "b"
+          ],
+          "evalIds": [
+            "b",
+            "b"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketDomain": null,
+          "after": "b"
+        }
+      ],
+      "outsideAfter": null,
+      "unknownProgrammatic": {
+        "active": "unknown",
+        "rows": []
+      },
+      "rls": [
+        {
+          "tenant": "a",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "a"
+            }
+          ]
+        },
+        {
+          "tenant": "b",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "b"
+            }
+          ]
+        }
+      ],
+      "rlsMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "rlsOutside": [],
+      "rlsPoolSetting": [
+        {
+          "setting": null
+        }
+      ],
+      "rlsError": {
+        "ok": false,
+        "code": "42P01",
+        "message": "SELECT * FROM nonexistent_sh_table - relation \"nonexistent_sh_table\" does not exist"
+      },
+      "rlsAfterError": [
+        "b"
+      ],
+      "rlsContextOverride": {
+        "alsTenant": "a",
+        "rows": [
+          "b"
+        ]
+      },
+      "outsideFinal": null
+    },
+    "round2": {
+      "evalResults": [
+        {
+          "filename": "/private/tmp/adonisjs-mcp-m0/s-h-api/eval-call.mjs",
+          "hostedModule": "file:///private/tmp/adonisjs-mcp-m0/s-h-api/node_modules/@sh/tenant-evaluator/index.mjs",
+          "value": {
+            "before": "a",
+            "after": "a",
+            "sameModel": true,
+            "tenants": [
+              "a"
+            ]
+          }
+        },
+        {
+          "filename": "/private/tmp/adonisjs-mcp-m0/s-h-api/eval-call.mjs",
+          "hostedModule": "file:///private/tmp/adonisjs-mcp-m0/s-h-api/node_modules/@sh/tenant-evaluator/index.mjs",
+          "value": {
+            "before": "b",
+            "after": "b",
+            "sameModel": true,
+            "tenants": [
+              "b"
+            ]
+          }
+        }
+      ],
+      "readers": [
+        {
+          "tenant": "a",
+          "readerPid": 16983,
+          "role": {
+            "rolname": "sh_reader",
+            "rolsuper": false,
+            "rolbypassrls": false
+          },
+          "observations": [
+            {
+              "name": "plain",
+              "text": "SELECT * FROM sh_posts ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "filtered",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "or-tautology",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "comment",
+              "text": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "union",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-config",
+              "text": "SELECT set_config('app.tenant_id', 'b', true)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-role",
+              "text": "SET ROLE postgres",
+              "values": [],
+              "decision": "DENY",
+              "reason": "Syntax error at line 1 col 10:",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "multi-statement",
+              "text": "SELECT * FROM sh_posts; SELECT set_config('app.tenant_id', 'b', true); SELECT * FROM sh_posts",
+              "values": [],
+              "decision": "DENY",
+              "reason": "exactly one statement required",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "other-function",
+              "text": "SELECT pg_sleep(30)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            }
+          ],
+          "trustedDeadlineInjection": {
+            "elapsedMs": 104,
+            "error": "canceling statement due to user request",
+            "activity": {
+              "state": "idle",
+              "xact_start": null
+            },
+            "healthy": [
+              {
+                "healthy": 42
+              }
+            ]
+          }
+        },
+        {
+          "tenant": "b",
+          "readerPid": 16984,
+          "role": {
+            "rolname": "sh_reader",
+            "rolsuper": false,
+            "rolbypassrls": false
+          },
+          "observations": [
+            {
+              "name": "plain",
+              "text": "SELECT * FROM sh_posts ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "filtered",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "or-tautology",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "comment",
+              "text": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "union",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-config",
+              "text": "SELECT set_config('app.tenant_id', 'b', true)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-role",
+              "text": "SET ROLE postgres",
+              "values": [],
+              "decision": "DENY",
+              "reason": "Syntax error at line 1 col 10:",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "multi-statement",
+              "text": "SELECT * FROM sh_posts; SELECT set_config('app.tenant_id', 'b', true); SELECT * FROM sh_posts",
+              "values": [],
+              "decision": "DENY",
+              "reason": "exactly one statement required",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "other-function",
+              "text": "SELECT pg_sleep(30)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            }
+          ],
+          "trustedDeadlineInjection": {
+            "elapsedMs": 103,
+            "error": "canceling statement due to user request",
+            "activity": {
+              "state": "idle",
+              "xact_start": null
+            },
+            "healthy": [
+              {
+                "healthy": 42
+              }
+            ]
+          }
+        }
+      ],
+      "appBefore": {
+        "pid": 16980,
+        "application": "",
+        "timeout": "0",
+        "readonly": "off",
+        "tenant": null
+      },
+      "appAfter": {
+        "pid": 16980,
+        "application": "",
+        "timeout": "0",
+        "readonly": "off",
+        "tenant": null
+      },
+      "outsideTenant": null,
+      "ownership": "new pg.Client per tenant; control connection separate; app Lucid pool only snapshotted",
+      "executorReuse": false
+    }
+  },
+  {
+    "resolver": "subdomain",
+    "port": 41141,
+    "result": {
+      "binding": true,
+      "bindingMatchesExport": true,
+      "modelMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "outsideBefore": null,
+      "concurrent": [
+        {
+          "tenant": "a",
+          "model": [
+            "a"
+          ],
+          "evalIds": [
+            "a",
+            "a"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketDomain": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "after": "a"
+        },
+        {
+          "tenant": "b",
+          "model": [
+            "b"
+          ],
+          "evalIds": [
+            "b",
+            "b"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketDomain": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "after": "b"
+        }
+      ],
+      "outsideAfter": null,
+      "unknownProgrammatic": {
+        "active": "unknown",
+        "rows": []
+      },
+      "rls": [
+        {
+          "tenant": "a",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "a"
+            }
+          ]
+        },
+        {
+          "tenant": "b",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "b"
+            }
+          ]
+        }
+      ],
+      "rlsMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "rlsOutside": [],
+      "rlsPoolSetting": [
+        {
+          "setting": null
+        }
+      ],
+      "rlsError": {
+        "ok": false,
+        "code": "42P01",
+        "message": "SELECT * FROM nonexistent_sh_table - relation \"nonexistent_sh_table\" does not exist"
+      },
+      "rlsAfterError": [
+        "b"
+      ],
+      "rlsContextOverride": {
+        "alsTenant": "a",
+        "rows": [
+          "b"
+        ]
+      },
+      "outsideFinal": null
+    },
+    "round2": {
+      "evalResults": [
+        {
+          "filename": "/private/tmp/adonisjs-mcp-m0/s-h-api/eval-call.mjs",
+          "hostedModule": "file:///private/tmp/adonisjs-mcp-m0/s-h-api/node_modules/@sh/tenant-evaluator/index.mjs",
+          "value": {
+            "before": "a",
+            "after": "a",
+            "sameModel": true,
+            "tenants": [
+              "a"
+            ]
+          }
+        },
+        {
+          "filename": "/private/tmp/adonisjs-mcp-m0/s-h-api/eval-call.mjs",
+          "hostedModule": "file:///private/tmp/adonisjs-mcp-m0/s-h-api/node_modules/@sh/tenant-evaluator/index.mjs",
+          "value": {
+            "before": "b",
+            "after": "b",
+            "sameModel": true,
+            "tenants": [
+              "b"
+            ]
+          }
+        }
+      ],
+      "readers": [
+        {
+          "tenant": "a",
+          "readerPid": 17044,
+          "role": {
+            "rolname": "sh_reader",
+            "rolsuper": false,
+            "rolbypassrls": false
+          },
+          "observations": [
+            {
+              "name": "plain",
+              "text": "SELECT * FROM sh_posts ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "filtered",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "or-tautology",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "comment",
+              "text": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "union",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id",
+              "values": [
+                "a"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 1,
+                  "tenant_id": "a",
+                  "title": "A private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-config",
+              "text": "SELECT set_config('app.tenant_id', 'b', true)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-role",
+              "text": "SET ROLE postgres",
+              "values": [],
+              "decision": "DENY",
+              "reason": "Syntax error at line 1 col 10:",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "multi-statement",
+              "text": "SELECT * FROM sh_posts; SELECT set_config('app.tenant_id', 'b', true); SELECT * FROM sh_posts",
+              "values": [],
+              "decision": "DENY",
+              "reason": "exactly one statement required",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "other-function",
+              "text": "SELECT pg_sleep(30)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "a"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            }
+          ],
+          "trustedDeadlineInjection": {
+            "elapsedMs": 103,
+            "error": "canceling statement due to user request",
+            "activity": {
+              "state": "idle",
+              "xact_start": null
+            },
+            "healthy": [
+              {
+                "healthy": 42
+              }
+            ]
+          }
+        },
+        {
+          "tenant": "b",
+          "readerPid": 17045,
+          "role": {
+            "rolname": "sh_reader",
+            "rolsuper": false,
+            "rolbypassrls": false
+          },
+          "observations": [
+            {
+              "name": "plain",
+              "text": "SELECT * FROM sh_posts ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "filtered",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "or-tautology",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 OR 1=1 ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "comment",
+              "text": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "values": [],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "union",
+              "text": "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id",
+              "values": [
+                "b"
+              ],
+              "decision": "ALLOW",
+              "reason": "single known read AST, no functions",
+              "submitted": [
+                "SELECT * FROM sh_posts WHERE tenant_id = $1 UNION SELECT * FROM sh_posts ORDER BY id"
+              ],
+              "rows": [
+                {
+                  "id": 2,
+                  "tenant_id": "b",
+                  "title": "B private",
+                  "overlap": 7
+                }
+              ],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-config",
+              "text": "SELECT set_config('app.tenant_id', 'b', true)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "set-role",
+              "text": "SET ROLE postgres",
+              "values": [],
+              "decision": "DENY",
+              "reason": "Syntax error at line 1 col 10:",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "multi-statement",
+              "text": "SELECT * FROM sh_posts; SELECT set_config('app.tenant_id', 'b', true); SELECT * FROM sh_posts",
+              "values": [],
+              "decision": "DENY",
+              "reason": "exactly one statement required",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            },
+            {
+              "name": "other-function",
+              "text": "SELECT pg_sleep(30)",
+              "values": [],
+              "decision": "DENY",
+              "reason": "unsupported AST node call",
+              "submitted": [],
+              "rows": [],
+              "error": null,
+              "txState": {
+                "readonly": "on",
+                "tenant": "b"
+              },
+              "clean": {
+                "readonly": "off",
+                "tenant": null,
+                "application": "",
+                "timeout": "0"
+              },
+              "queryMode": "extended"
+            }
+          ],
+          "trustedDeadlineInjection": {
+            "elapsedMs": 104,
+            "error": "canceling statement due to user request",
+            "activity": {
+              "state": "idle",
+              "xact_start": null
+            },
+            "healthy": [
+              {
+                "healthy": 42
+              }
+            ]
+          }
+        }
+      ],
+      "appBefore": {
+        "pid": 17041,
+        "application": "",
+        "timeout": "0",
+        "readonly": "off",
+        "tenant": null
+      },
+      "appAfter": {
+        "pid": 17041,
+        "application": "",
+        "timeout": "0",
+        "readonly": "off",
+        "tenant": null
+      },
+      "outsideTenant": null,
+      "ownership": "new pg.Client per tenant; control connection separate; app Lucid pool only snapshotted",
+      "executorReuse": false
+    }
+  }
+]

@@ -1,0 +1,558 @@
+[
+  {
+    "resolver": "header",
+    "port": 41140,
+    "result": {
+      "binding": true,
+      "bindingMatchesExport": true,
+      "modelMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "outsideBefore": null,
+      "concurrent": [
+        {
+          "tenant": "a",
+          "model": [
+            "a"
+          ],
+          "evalIds": [
+            "a",
+            "a"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketDomain": null,
+          "after": "a"
+        },
+        {
+          "tenant": "b",
+          "model": [
+            "b"
+          ],
+          "evalIds": [
+            "b",
+            "b"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketDomain": null,
+          "after": "b"
+        }
+      ],
+      "outsideAfter": null,
+      "unknownProgrammatic": {
+        "active": "unknown",
+        "rows": []
+      },
+      "rls": [
+        {
+          "tenant": "a",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "a"
+            }
+          ]
+        },
+        {
+          "tenant": "b",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "b"
+            }
+          ]
+        }
+      ],
+      "rlsMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "rlsOutside": [],
+      "rlsPoolSetting": [
+        {
+          "setting": null
+        }
+      ],
+      "rlsError": {
+        "ok": false,
+        "code": "42P01",
+        "message": "SELECT * FROM nonexistent_sh_table - relation \"nonexistent_sh_table\" does not exist"
+      },
+      "rlsAfterError": [
+        "b"
+      ],
+      "rlsContextOverride": {
+        "alsTenant": "a",
+        "rows": [
+          "b"
+        ]
+      },
+      "outsideFinal": null
+    }
+  },
+  {
+    "resolver": "subdomain",
+    "port": 41141,
+    "result": {
+      "binding": true,
+      "bindingMatchesExport": true,
+      "modelMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "outsideBefore": null,
+      "concurrent": [
+        {
+          "tenant": "a",
+          "model": [
+            "a"
+          ],
+          "evalIds": [
+            "a",
+            "a"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketDomain": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "after": "a"
+        },
+        {
+          "tenant": "b",
+          "model": [
+            "b"
+          ],
+          "evalIds": [
+            "b",
+            "b"
+          ],
+          "raw": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a",
+                "b"
+              ]
+            }
+          ],
+          "socketNoMiddleware": {
+            "status": 200,
+            "body": {
+              "alsTenant": null
+            }
+          },
+          "socketMissing": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketWrong": {
+            "status": 404,
+            "body": "Tenant not found"
+          },
+          "socketMapped": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "socketMappedOther": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "a",
+              "alsTenant": "a",
+              "rows": [
+                "a"
+              ]
+            }
+          },
+          "socketDomain": {
+            "status": 200,
+            "body": {
+              "middlewareTenant": "b",
+              "alsTenant": "b",
+              "rows": [
+                "b"
+              ]
+            }
+          },
+          "after": "b"
+        }
+      ],
+      "outsideAfter": null,
+      "unknownProgrammatic": {
+        "active": "unknown",
+        "rows": []
+      },
+      "rls": [
+        {
+          "tenant": "a",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "a"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "a"
+            }
+          ]
+        },
+        {
+          "tenant": "b",
+          "queries": [
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? OR 1=1 ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts /* WHERE tenant_id = 'a' */ ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            },
+            {
+              "sql": "SELECT * FROM sh_posts WHERE tenant_id = ? UNION SELECT * FROM sh_posts ORDER BY id",
+              "tenants": [
+                "b"
+              ]
+            }
+          ],
+          "session": [
+            {
+              "current_user": "sh_reader",
+              "setting": "b"
+            }
+          ]
+        }
+      ],
+      "rlsMissing": {
+        "ok": false,
+        "code": "E_TENANT_NOT_RESOLVED",
+        "message": "No tenant context available. Ensure runWithTenant() is used to set a tenant."
+      },
+      "rlsOutside": [],
+      "rlsPoolSetting": [
+        {
+          "setting": null
+        }
+      ],
+      "rlsError": {
+        "ok": false,
+        "code": "42P01",
+        "message": "SELECT * FROM nonexistent_sh_table - relation \"nonexistent_sh_table\" does not exist"
+      },
+      "rlsAfterError": [
+        "b"
+      ],
+      "rlsContextOverride": {
+        "alsTenant": "a",
+        "rows": [
+          "b"
+        ]
+      },
+      "outsideFinal": null
+    }
+  }
+]

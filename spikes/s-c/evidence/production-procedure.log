@@ -1,0 +1,36 @@
+[ info ] loading hooks...
+[ info ] generating indexes...
+[ info ] codegen: created 5 file(s)
+[ info ] cleaning up output directory (build)
+[ info ] compiling typescript source (tsc)
+[ info ] created ace file (build/ace.js)
+[ info ] copying meta files to the output directory
+[ success ] build completed
+
+╭────────────────────────────────────────────────────────────────────────╮
+│    Run the following commands to start the server in production        │
+│────────────────────────────────────────────────────────────────────────│
+│                                                                        │
+│    ❯ cd build                                                          │
+│    ❯ npm ci --omit="dev"                                               │
+│    ❯ node bin/server.js                                                │
+│                                                                        │
+╰────────────────────────────────────────────────────────────────────────╯
+
+
+added 371 packages in 2s
+
+STANDALONE /tmp/adonisjs-mcp-m0/s-c-api-17464-standalone
+PACKAGE_ABSENT ERR_MODULE_NOT_FOUND
+
+HTTP {"rootStatus":200,"root":{"hello":"world"},"errorStatus":500,"errorBody":{"error":"production-probe-error","request_id":"46b677a1-49db-42a6-8621-e51a6b208f74"},"normalLogStatus":200,"captureRouteStatus":404}
+MIGRATION_EXIT 0
+┌────────────────────────────────────────────────────────────────┬─────────────┬─────────┬───────────┐
+│  Name                                                          │  Status     │  Batch  │  Message  │
+├────────────────────────────────────────────────────────────────┼─────────────┼─────────┼───────────┤
+│  database/migrations/1761885935168_create_users_table          │  completed  │  1      │           │
+├────────────────────────────────────────────────────────────────┼─────────────┼─────────┼───────────┤
+│  database/migrations/1768620764696_create_access_tokens_table  │  completed  │  1      │           │
+└────────────────────────────────────────────────────────────────┴─────────────┴─────────┴───────────┘
+
+PRODUCTION_OBSERVATIONS {"root200":true,"customError500":true,"logOnce":true,"packageAbsent":true,"captureRouteAbsent":true,"providerNotLoaded":true,"migrationExit":0,"processStopped":true}

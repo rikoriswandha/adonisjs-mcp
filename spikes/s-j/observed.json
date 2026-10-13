@@ -1,0 +1,208 @@
+[
+  {
+    "node": "v24.21.0",
+    "os": "27.0",
+    "root": "/tmp/adonisjs-mcp-m0/s-j-api-1791855414816"
+  },
+  {
+    "scenario": "list",
+    "stdout": "[49847 characters; 43 commands]",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 49847,
+    "seenErr": 0,
+    "truncated": false,
+    "childPid": 83086
+  },
+  {
+    "scenario": "list:routes --json",
+    "stdout": "[\n  {\n    \"domain\": \"root\",\n    \"routes\": [\n      {\n        \"name\": \"\",\n        \"pattern\": \"/sj/ping\",\n        \"methods\": [\n          \"GET\"\n        ],\n        \"handler\": {\n          \"type\": \"closure\",\n          \"name\": \"closure\"\n        },\n        \"middleware\": []\n      },\n      {\n        \"name\": \"\",\n        \"pattern\": \"/sj/run\",\n        \"methods\": [\n          \"GET\"\n        ],\n        \"handler\": {\n          \"type\": \"closure\",\n          \"name\": \"closure\"\n        },\n        \"middleware\": []\n      },\n      {\n        \"name\": \"\",\n        \"pattern\": \"/\",\n        \"methods\": [\n          \"GET\"\n        ],\n        \"handler\": {\n          \"type\": \"closure\",\n          \"name\": \"closure\"\n        },\n        \"middleware\": []\n      },\n      {\n        \"name\": \"auth.new_account.store\",\n        \"pattern\": \"/api/v1/auth/signup\",\n        \"methods\": [\n          \"POST\"\n        ],\n        \"handler\": {\n          \"type\": \"controller\",\n          \"moduleNameOrPath\": \"#controllers/new_account_controller\",\n          \"method\": \"store\"\n        },\n        \"middleware\": []\n      },\n      {\n        \"name\": \"auth.access_tokens.store\",\n        \"pattern\": \"/api/v1/auth/login\",\n        \"methods\": [\n          \"POST\"\n        ],\n        \"handler\": {\n          \"type\": \"controller\",\n          \"moduleNameOrPath\": \"#controllers/access_tokens_controller\",\n          \"method\": \"store\"\n        },\n        \"middleware\": []\n      },\n      {\n        \"name\": \"profile.profile.show\",\n        \"pattern\": \"/api/v1/account/profile\",\n        \"methods\": [\n          \"GET\"\n        ],\n        \"handler\": {\n          \"type\": \"controller\",\n          \"moduleNameOrPath\": \"#controllers/profile_controller\",\n          \"method\": \"show\"\n        },\n        \"middleware\": [\n          {\n            \"type\": \"named\",\n            \"name\": \"auth\",\n            \"moduleNameOrPath\": \"#middleware/auth_middleware\",\n            \"method\": \"handle\"\n          }\n        ]\n      },\n      {\n        \"name\": \"profile.access_tokens.destroy\",\n        \"pattern\": \"/api/v1/account/logout\",\n        \"methods\": [\n          \"POST\"\n        ],\n        \"handler\": {\n          \"type\": \"controller\",\n          \"moduleNameOrPath\": \"#controllers/access_tokens_controller\",\n          \"method\": \"destroy\"\n        },\n        \"middleware\": [\n          {\n            \"type\": \"named\",\n            \"name\": \"auth\",\n            \"moduleNameOrPath\": \"#middleware/auth_middleware\",\n            \"method\": \"handle\"\n          }\n        ]\n      }\n    ]\n  }\n]\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 2462,
+    "seenErr": 0,
+    "truncated": false,
+    "childPid": 83135
+  },
+  {
+    "scenario": "make:controller spike_probe",
+    "stdout": "DONE:    create app/controllers/spike_probes_controller.ts\n",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 59,
+    "seenErr": 0,
+    "truncated": false,
+    "childPid": 83183
+  },
+  {
+    "scenario": "generator-file",
+    "path": "/tmp/adonisjs-mcp-m0/s-j-api-1791855414816/app/controllers/spike_probes_controller.ts",
+    "bytes": 105
+  },
+  {
+    "scenario": "generator-deleted",
+    "deleted": true
+  },
+  {
+    "scenario": "does:not:exist",
+    "stdout": "",
+    "stderr": "╭──────────────────────────────────────────────────────────────────────────────╮\n│                                                                              │\n│    Command \"does:not:exist\" is not defined                                   │\n│                                                                              │\n╰──────────────────────────────────────────────────────────────────────────────╯\n",
+    "exitCode": 1,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 0,
+    "seenErr": 737,
+    "truncated": false,
+    "childPid": 83233
+  },
+  {
+    "scenario": "migration:run --connection=nope",
+    "stdout": "",
+    "stderr": "[ error ] \"nope\" is not a valid connection name. Double check \"config/database\" file\n",
+    "exitCode": 1,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 0,
+    "seenErr": 85,
+    "truncated": false,
+    "childPid": 83281
+  },
+  {
+    "scenario": "make:controller",
+    "stdout": "",
+    "stderr": "  ERROR   Missing required argument \"name\"\n",
+    "exitCode": 1,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 0,
+    "seenErr": 43,
+    "truncated": false,
+    "childPid": 83330
+  },
+  {
+    "scenario": "spike:probe prompt",
+    "stdout": "\u001b[?25l\u001b[2m❯\u001b[22m Continue spike? (y/N) › false\u001b[10D\u001b[?25h",
+    "stderr": "",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 61,
+    "seenErr": 0,
+    "truncated": false,
+    "childPid": 83377
+  },
+  {
+    "scenario": "argv-literal",
+    "stdout": "{\"cwd\":\"/private/tmp/adonisjs-mcp-m0/s-j-api-1791855414816\",\"root\":\"file:///private/tmp/adonisjs-mcp-m0/s-j-api-1791855414816/\",\"value\":\"; touch SJ_SHELL_EXECUTED $(echo bad) | cat & > file\",\"port\":\"41180\",\"host\":\"127.0.0.1\",\"nodeEnv\":\"development\",\"stdinTTY\":false,\"pid\":83427}\n",
+    "stderr": "SEPARATE_STDERR\n",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 279,
+    "seenErr": 16,
+    "truncated": false,
+    "childPid": 83427
+  },
+  {
+    "scenario": "shell-marker",
+    "exists": false
+  },
+  {
+    "scenario": "bounded-output",
+    "stdout": "[4096 retained bytes]",
+    "stderr": "[4096 retained bytes]",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 100000,
+    "seenErr": 100000,
+    "truncated": true,
+    "childPid": 83482
+  },
+  {
+    "scenario": "responsive-during-child",
+    "alive": true,
+    "sentinel": "",
+    "pid": 83035,
+    "latencyMs": 2
+  },
+  {
+    "scenario": "deadline",
+    "stdout": "{\"childPid\":83576,\"pid\":83529}\n",
+    "stderr": "",
+    "exitCode": null,
+    "signal": "SIGKILL",
+    "timedOut": true,
+    "seenOut": 31,
+    "seenErr": 0,
+    "truncated": false,
+    "childPid": 83529
+  },
+  {
+    "scenario": "process-tree-cleanup",
+    "processes": [
+      {
+        "pid": 83529,
+        "alive": false
+      },
+      {
+        "pid": 83576,
+        "alive": false
+      }
+    ]
+  },
+  {
+    "scenario": "subprocess-state",
+    "stdout": "COMMAND_STDOUT\n",
+    "stderr": "COMMAND_STDERR\n",
+    "exitCode": 0,
+    "signal": null,
+    "timedOut": false,
+    "seenOut": 15,
+    "seenErr": 15,
+    "truncated": false,
+    "childPid": 83824
+  },
+  {
+    "scenario": "parent-after-subprocess",
+    "alive": true,
+    "sentinel": "",
+    "pid": 83035
+  },
+  {
+    "scenario": "inprocess-list",
+    "stdout": "[49847 characters; 43 commands]",
+    "stderr": "",
+    "exitCode": 0,
+    "sentinel": ""
+  },
+  {
+    "scenario": "neighbor-during-inprocess",
+    "alive": true,
+    "sentinel": "changed-by-command",
+    "pid": 83035
+  },
+  {
+    "scenario": "inprocess-capture",
+    "stdout": "COMMAND_STDOUT\nHTTP_NEIGHBOR_STDOUT\n",
+    "stderr": "COMMAND_STDERR\n",
+    "exitCode": 0,
+    "sentinel": "changed-by-command"
+  },
+  {
+    "scenario": "parent-after-inprocess",
+    "alive": true,
+    "sentinel": "changed-by-command",
+    "pid": 83035
+  },
+  {
+    "scenario": "server-stopped",
+    "pid": 83035
+  }
+]

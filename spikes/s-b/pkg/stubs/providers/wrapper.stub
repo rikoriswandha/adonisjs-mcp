@@ -1,0 +1,7 @@
+{{{ exports({ to: app.providersPath('mcp_dev_provider.ts') }) }}}
+import app from '@adonisjs/core/services/app'
+
+// Provider module is selected before Application constructs and runs its lifecycle.
+export default app.inDev
+  ? (await import('@rikology/adonisjs-mcp/providers/mcp_provider')).default
+  : class McpDisabledProvider {}

@@ -1,0 +1,17 @@
+[
+  {
+    "NODE_ENV": "development",
+    "exit": 0,
+    "output": "SB_PACKAGE_MODULE_LOADED\nSB_PACKAGE_BOOT {\"environment\":\"web\",\"inDev\":true,\"inProduction\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"web\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"console\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"repl\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"development\",\"environment\":\"test\",\"inDev\":true,\"inProduction\":false,\"inTest\":false}\n"
+  },
+  {
+    "NODE_ENV": "production",
+    "exit": 0,
+    "output": "SB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"web\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"console\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"repl\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\nSB_ENVIRONMENT {\"NODE_ENV\":\"production\",\"environment\":\"test\",\"inDev\":false,\"inProduction\":true,\"inTest\":false}\n"
+  },
+  {
+    "NODE_ENV": "test",
+    "exit": 0,
+    "output": "SB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"web\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"console\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"repl\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\nSB_ENVIRONMENT {\"NODE_ENV\":\"test\",\"environment\":\"test\",\"inDev\":false,\"inProduction\":false,\"inTest\":true}\n"
+  }
+]

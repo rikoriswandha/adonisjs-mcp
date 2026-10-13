@@ -1,0 +1,24 @@
+{
+  "status": 200,
+  "result": {
+    "expectedId": 4,
+    "result": {
+      "status": 200,
+      "body": {
+        "middleware": "auth-passed",
+        "id": 4,
+        "requestId": "c905e89d-264d-48e6-a378-2811680ce422",
+        "mode": "token-exposure"
+      }
+    },
+    "returnedCredentialHeaders": false
+  },
+  "exposure": {
+    "logLevel": "info",
+    "candidates": 2,
+    "secretsInAppLogs": 0,
+    "secretsInResult": 0,
+    "secretsInOuterHeaders": 0,
+    "authRequestLogCount": 1
+  }
+}

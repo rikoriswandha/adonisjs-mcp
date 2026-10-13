@@ -1,0 +1,84 @@
+{
+  "records": [
+    {
+      "time": 1791856853715,
+      "phase": "ready",
+      "root": "/tmp/adonisjs-mcp-m0/s-j-hmr-api-1791856849197",
+      "supervisorPid": 14371,
+      "pid": 14423
+    },
+    {
+      "time": 1791856853723,
+      "phase": "http-pid",
+      "pid": 14423
+    },
+    {
+      "time": 1791856854527,
+      "phase": "cleanup",
+      "processes": [
+        {
+          "pid": 14371,
+          "alive": false
+        }
+      ]
+    }
+  ],
+  "serverLogs": [
+    {
+      "time": 1791856853025,
+      "stream": "stdout",
+      "text": "\u001bc"
+    },
+    {
+      "time": 1791856853025,
+      "stream": "stdout",
+      "text": "[ info ] starting server in hmr mode...\n"
+    },
+    {
+      "time": 1791856853037,
+      "stream": "stdout",
+      "text": "[ info ] loading hooks...\n"
+    },
+    {
+      "time": 1791856853039,
+      "stream": "stdout",
+      "text": "[ info ] generating indexes...\n"
+    },
+    {
+      "time": 1791856853046,
+      "stream": "stdout",
+      "text": "[ info ] codegen: created 5 file(s)\n"
+    },
+    {
+      "time": 1791856853046,
+      "stream": "stdout",
+      "text": "[ info ] starting HTTP server...\n"
+    },
+    {
+      "time": 1791856853690,
+      "stream": "stdout",
+      "text": "{\"level\":30,\"time\":1791856853690,\"pid\":14423,\"hostname\":\"MacBook-Pro-3.local\",\"msg\":\"started HTTP server on 127.0.0.1:41180\"}\n"
+    },
+    {
+      "time": 1791856853692,
+      "stream": "stdout",
+      "text": "╭──────────────────────────────────────────────────╮\n│                                                  │\n│    Server address: http://127.0.0.1:41180        │\n│    Mode: hmr                                     │\n│    Ready in: 469 ms                              │\n│    Press h to show help                          │\n│                                                  │\n╰──────────────────────────────────────────────────╯\n"
+    },
+    {
+      "time": 1791856853705,
+      "stream": "stdout",
+      "text": "[ info ] watching file system for changes...\n"
+    },
+    {
+      "time": 1791856853710,
+      "stream": "stdout",
+      "text": "[ info ] tuyau: created api client registry (./.adonisjs/client/registry) (957 μs)\n"
+    },
+    {
+      "time": 1791856853840,
+      "stream": "stdout",
+      "text": "[ info ] Underlying HTTP server closed. Still watching for changes\n"
+    }
+  ],
+  "routeTrace": ""
+}

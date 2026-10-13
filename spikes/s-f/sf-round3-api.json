@@ -1,0 +1,186 @@
+{
+  "versions": "api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-f3-api\n├── @adonisjs/auth@10.1.0\n├── @adonisjs/core@7.6.0\n├── @adonisjs/lucid@22.4.2\n├── @adonisjs/session@8.1.0\n└── @rikology/adonisjs-tenant@1.0.2\n\n",
+  "status": 200,
+  "result": {
+    "expectedUsers": {
+      "a": 3,
+      "b": 4
+    },
+    "observations": [
+      {
+        "mismatchBeforeMint": "TENANT_MEMBERSHIP_DENIED",
+        "tokenRows": 0
+      },
+      {
+        "guard": "api",
+        "tenant": "a",
+        "mode": "success",
+        "expectedId": 3,
+        "before": 0,
+        "after": 0,
+        "tokenTenant": "a",
+        "http": {
+          "status": 200,
+          "body": {
+            "id": 3,
+            "email": "sf3-a-1791856970840@example.test",
+            "tenant": "a",
+            "rows": [
+              "A-private"
+            ],
+            "requestId": "695a07b4-d1fd-415d-b25b-c62f1513d4f6"
+          }
+        },
+        "crossTenant": {
+          "status": 401,
+          "body": {
+            "errors": [
+              {
+                "message": "Unauthorized access"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "guard": "api",
+        "tenant": "b",
+        "mode": "success",
+        "expectedId": 4,
+        "before": 0,
+        "after": 0,
+        "tokenTenant": "b",
+        "http": {
+          "status": 200,
+          "body": {
+            "id": 4,
+            "email": "sf3-b-1791856970880@example.test",
+            "tenant": "b",
+            "rows": [
+              "B-private"
+            ],
+            "requestId": "8713e2d6-8ce4-409c-91dc-595a7ccebb9a"
+          }
+        },
+        "crossTenant": {
+          "status": 401,
+          "body": {
+            "errors": [
+              {
+                "message": "Unauthorized access"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "guard": "api",
+        "tenant": "a",
+        "mode": "error",
+        "expectedId": 3,
+        "before": 0,
+        "after": 0,
+        "tokenTenant": "a",
+        "http": {
+          "status": 500,
+          "body": {
+            "message": "S-F3 deliberate app error"
+          }
+        },
+        "crossTenant": null
+      },
+      {
+        "guard": "api",
+        "tenant": "a",
+        "mode": "abort",
+        "expectedId": 3,
+        "before": 0,
+        "after": 0,
+        "tokenTenant": "a",
+        "http": {
+          "error": "AbortError"
+        },
+        "crossTenant": null
+      },
+      {
+        "guard": "web",
+        "tenant": "a",
+        "expectedId": 3,
+        "http": {
+          "status": 200,
+          "body": {
+            "id": 3,
+            "email": "sf3-a-1791856970840@example.test",
+            "tenant": "a",
+            "rows": [
+              "A-private"
+            ],
+            "requestId": "5f22166d-6733-46dd-afc6-5401734b1e44"
+          }
+        },
+        "crossTenant": {
+          "status": 401,
+          "body": {
+            "errors": [
+              {
+                "message": "Unauthorized access"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "guard": "web",
+        "tenant": "b",
+        "expectedId": 4,
+        "http": {
+          "status": 200,
+          "body": {
+            "id": 4,
+            "email": "sf3-b-1791856970880@example.test",
+            "tenant": "b",
+            "rows": [
+              "B-private"
+            ],
+            "requestId": "9718eb31-bfb1-441e-acaa-a681387122ba"
+          }
+        },
+        "crossTenant": {
+          "status": 401,
+          "body": {
+            "errors": [
+              {
+                "message": "Unauthorized access"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "anonymous": {
+      "status": 200,
+      "body": {
+        "authenticated": false,
+        "tenant": null
+      }
+    },
+    "anonymousProtected": {
+      "status": 401,
+      "body": {
+        "errors": [
+          {
+            "message": "Unauthorized access"
+          }
+        ]
+      }
+    },
+    "callerTenantAfter": null,
+    "finalTokenRows": 0
+  },
+  "exposure": {
+    "candidates": 14,
+    "secretsInLogs": 0,
+    "secretsInResult": 0,
+    "secretsInHeaders": 0
+  }
+}

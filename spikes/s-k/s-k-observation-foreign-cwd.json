@@ -1,0 +1,105 @@
+{
+  "tenant": {
+    "binding": true,
+    "sameExport": true,
+    "context": {
+      "id": "fixture-tenant",
+      "name": "Fixture",
+      "slug": "fixture"
+    },
+    "outside": null,
+    "runWithTenantMethod": "undefined"
+  },
+  "permission": {
+    "globalBinding": false,
+    "abilities": [
+      "viewInvoice",
+      "refundInvoice"
+    ],
+    "policies": [
+      "InvoicePolicy"
+    ],
+    "policyExecutions": 0
+  },
+  "plusPermissions": {
+    "keys": [
+      "invoice.view",
+      "invoice.refund",
+      "invoice.legacy"
+    ],
+    "active": [
+      "invoice.view",
+      "invoice.refund"
+    ],
+    "all": [
+      {
+        "key": "invoice.view",
+        "description": "View invoices",
+        "inactive": false,
+        "aliases": []
+      },
+      {
+        "key": "invoice.refund",
+        "description": "Invoice refund",
+        "inactive": false,
+        "aliases": []
+      },
+      {
+        "key": "invoice.legacy",
+        "description": "Invoice legacy",
+        "inactive": true,
+        "aliases": [
+          "invoice.old"
+        ]
+      }
+    ],
+    "abilities": [
+      "invoice.view",
+      "invoice.refund"
+    ]
+  },
+  "queue": {
+    "binding": true,
+    "registered": [
+      "manual.explicit"
+    ],
+    "sentinelRegistered": false,
+    "nativeList": "undefined",
+    "pendingTotal": 1,
+    "pendingDefault": 1,
+    "failed": "failed",
+    "stateCountsFromPhysicalSchema": [
+      {
+        "status": "failed",
+        "count": 1
+      },
+      {
+        "status": "pending",
+        "count": 1
+      }
+    ],
+    "jobExecutions": 0
+  },
+  "queueListing": {
+    "locations": [
+      "./app/jobs/**/*.ts",
+      "./custom_jobs/**/*.ts"
+    ],
+    "cwd": "/private/tmp/adonisjs-mcp-m0/s-k-api-1791855874761/tmp/s-k-foreign-cwd",
+    "appRoot": "/private/tmp/adonisjs-mcp-m0/s-k-api-1791855874761/",
+    "jobs": [],
+    "rejected": [],
+    "coverage": "configured locations relative to process.cwd(); manual registrations outside locations are not enumerable",
+    "publicLookup": "Locator.get(name)",
+    "configuredNames": [],
+    "groundTruth": [
+      "manual.explicit"
+    ],
+    "residualGroundTruth": [
+      "manual.explicit"
+    ],
+    "expectedConfiguredCoverage": false,
+    "manualRegisteredLookup": true
+  },
+  "rowsUnchanged": true
+}

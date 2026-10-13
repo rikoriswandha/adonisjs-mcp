@@ -1,0 +1,17 @@
+{
+  "name": "@rikology/adonisjs-mcp",
+  "version": "0.0.0-spike",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./configure": "./configure.js",
+    "./providers/mcp_provider": "./providers/mcp_provider.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "configure.js",
+    "providers",
+    "stubs"
+  ]
+}

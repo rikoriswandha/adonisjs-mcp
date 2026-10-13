@@ -1,0 +1,782 @@
+{
+  "direct": {
+    "rawSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "nested": {
+          "type": "object",
+          "properties": {
+            "age": {
+              "type": "number",
+              "minimum": 18
+            }
+          },
+          "required": [
+            "age"
+          ],
+          "additionalProperties": false
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "optional": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "nested",
+        "rows"
+      ],
+      "additionalProperties": false
+    },
+    "compiled": {
+      "schema": {
+        "type": "root",
+        "schema": {
+          "type": "object",
+          "fieldName": "",
+          "propertyName": "",
+          "bail": true,
+          "allowNull": false,
+          "isOptional": false,
+          "allowUnknownProperties": false,
+          "validations": [],
+          "properties": [
+            {
+              "type": "literal",
+              "subtype": "string",
+              "fieldName": "title",
+              "dataTypeValidatorFnId": "ref://1",
+              "propertyName": "title",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": false,
+              "validations": [
+                {
+                  "ruleFnId": "ref://2",
+                  "name": "minLength",
+                  "implicit": false,
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "type": "object",
+              "fieldName": "nested",
+              "propertyName": "nested",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": false,
+              "allowUnknownProperties": false,
+              "validations": [],
+              "properties": [
+                {
+                  "type": "literal",
+                  "subtype": "number",
+                  "fieldName": "age",
+                  "dataTypeValidatorFnId": "ref://3",
+                  "propertyName": "age",
+                  "bail": true,
+                  "allowNull": false,
+                  "isOptional": false,
+                  "validations": [
+                    {
+                      "ruleFnId": "ref://4",
+                      "name": "min",
+                      "implicit": false,
+                      "isAsync": false
+                    }
+                  ]
+                }
+              ],
+              "groups": []
+            },
+            {
+              "type": "array",
+              "fieldName": "rows",
+              "propertyName": "rows",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": false,
+              "each": {
+                "type": "object",
+                "fieldName": "*",
+                "propertyName": "*",
+                "bail": true,
+                "allowNull": false,
+                "isOptional": false,
+                "allowUnknownProperties": false,
+                "validations": [],
+                "properties": [
+                  {
+                    "type": "literal",
+                    "subtype": "string",
+                    "fieldName": "value",
+                    "dataTypeValidatorFnId": "ref://5",
+                    "propertyName": "value",
+                    "bail": true,
+                    "allowNull": true,
+                    "isOptional": false,
+                    "validations": []
+                  }
+                ],
+                "groups": []
+              },
+              "validations": [
+                {
+                  "ruleFnId": "ref://6",
+                  "name": "minLength",
+                  "implicit": false,
+                  "isAsync": false
+                }
+              ]
+            },
+            {
+              "type": "literal",
+              "subtype": "string",
+              "fieldName": "optional",
+              "dataTypeValidatorFnId": "ref://7",
+              "propertyName": "optional",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": true,
+              "validations": []
+            }
+          ],
+          "groups": []
+        }
+      },
+      "refs": {
+        "ref://1": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://2": {
+          "validator": {
+            "kind": "function",
+            "name": "minLength"
+          },
+          "options": {
+            "min": 3
+          }
+        },
+        "ref://3": {
+          "validator": {
+            "kind": "function",
+            "name": "number"
+          },
+          "options": {}
+        },
+        "ref://4": {
+          "validator": {
+            "kind": "function",
+            "name": "min"
+          },
+          "options": {
+            "min": 18
+          }
+        },
+        "ref://5": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://6": {
+          "validator": {
+            "kind": "function",
+            "name": "minLength"
+          },
+          "options": {
+            "min": 1
+          }
+        },
+        "ref://7": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        }
+      }
+    },
+    "jsonSchema": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 3
+        },
+        "nested": {
+          "type": "object",
+          "properties": {
+            "age": {
+              "type": "number",
+              "minimum": 18
+            }
+          },
+          "required": [
+            "age"
+          ],
+          "additionalProperties": false
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "optional": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "title",
+        "nested",
+        "rows"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "conditional": {
+    "rawSchema": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "company"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "person": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "person"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "compiled": {
+      "schema": {
+        "type": "root",
+        "schema": {
+          "type": "object",
+          "fieldName": "",
+          "propertyName": "",
+          "bail": true,
+          "allowNull": false,
+          "isOptional": false,
+          "allowUnknownProperties": false,
+          "validations": [],
+          "properties": [
+            {
+              "type": "literal",
+              "subtype": "string",
+              "fieldName": "kind",
+              "dataTypeValidatorFnId": "ref://1",
+              "propertyName": "kind",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": false,
+              "validations": []
+            }
+          ],
+          "groups": [
+            {
+              "type": "group",
+              "elseConditionalFnRefId": "ref://2",
+              "conditions": [
+                {
+                  "schema": {
+                    "type": "sub_object",
+                    "properties": [
+                      {
+                        "type": "literal",
+                        "subtype": "string",
+                        "fieldName": "company",
+                        "dataTypeValidatorFnId": "ref://3",
+                        "propertyName": "company",
+                        "bail": true,
+                        "allowNull": false,
+                        "isOptional": false,
+                        "validations": []
+                      }
+                    ],
+                    "groups": []
+                  },
+                  "conditionalFnRefId": "ref://4"
+                },
+                {
+                  "schema": {
+                    "type": "sub_object",
+                    "properties": [
+                      {
+                        "type": "literal",
+                        "subtype": "string",
+                        "fieldName": "person",
+                        "dataTypeValidatorFnId": "ref://5",
+                        "propertyName": "person",
+                        "bail": true,
+                        "allowNull": false,
+                        "isOptional": false,
+                        "validations": []
+                      }
+                    ],
+                    "groups": []
+                  },
+                  "conditionalFnRefId": "ref://6"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "refs": {
+        "ref://1": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://2": {
+          "kind": "function",
+          "name": "#otherwiseCallback"
+        },
+        "ref://3": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://4": {
+          "kind": "function",
+          "name": ""
+        },
+        "ref://5": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://6": {
+          "kind": "function",
+          "name": ""
+        }
+      }
+    },
+    "jsonSchema": {
+      "anyOf": [
+        {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "company": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "company"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "person": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "person"
+              ]
+            }
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    }
+  },
+  "union": {
+    "rawSchema": {
+      "type": "object",
+      "properties": {
+        "choice": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 2
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": [
+        "choice"
+      ],
+      "additionalProperties": false
+    },
+    "compiled": {
+      "schema": {
+        "type": "root",
+        "schema": {
+          "type": "object",
+          "fieldName": "",
+          "propertyName": "",
+          "bail": true,
+          "allowNull": false,
+          "isOptional": false,
+          "allowUnknownProperties": false,
+          "validations": [],
+          "properties": [
+            {
+              "type": "union",
+              "fieldName": "choice",
+              "propertyName": "choice",
+              "elseConditionalFnRefId": "ref://1",
+              "conditions": [
+                {
+                  "conditionalFnRefId": "ref://2",
+                  "schema": {
+                    "type": "literal",
+                    "subtype": "string",
+                    "fieldName": "choice",
+                    "dataTypeValidatorFnId": "ref://3",
+                    "propertyName": "choice",
+                    "bail": true,
+                    "allowNull": false,
+                    "isOptional": false,
+                    "validations": [
+                      {
+                        "ruleFnId": "ref://4",
+                        "name": "minLength",
+                        "implicit": false,
+                        "isAsync": false
+                      }
+                    ]
+                  }
+                },
+                {
+                  "conditionalFnRefId": "ref://5",
+                  "schema": {
+                    "type": "literal",
+                    "subtype": "number",
+                    "fieldName": "choice",
+                    "dataTypeValidatorFnId": "ref://6",
+                    "propertyName": "choice",
+                    "bail": true,
+                    "allowNull": false,
+                    "isOptional": false,
+                    "validations": []
+                  }
+                }
+              ]
+            }
+          ],
+          "groups": []
+        }
+      },
+      "refs": {
+        "ref://1": {
+          "kind": "function",
+          "name": "#otherwiseCallback"
+        },
+        "ref://2": {
+          "kind": "function",
+          "name": ""
+        },
+        "ref://3": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://4": {
+          "validator": {
+            "kind": "function",
+            "name": "minLength"
+          },
+          "options": {
+            "min": 2
+          }
+        },
+        "ref://5": {
+          "kind": "function",
+          "name": ""
+        },
+        "ref://6": {
+          "validator": {
+            "kind": "function",
+            "name": "number"
+          },
+          "options": {}
+        }
+      }
+    },
+    "jsonSchema": {
+      "type": "object",
+      "properties": {
+        "choice": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 2
+            },
+            {
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "required": [
+        "choice"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "custom": {
+    "rawSchema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "compiled": {
+      "schema": {
+        "type": "root",
+        "schema": {
+          "type": "object",
+          "fieldName": "",
+          "propertyName": "",
+          "bail": true,
+          "allowNull": false,
+          "isOptional": false,
+          "allowUnknownProperties": false,
+          "validations": [],
+          "properties": [
+            {
+              "type": "literal",
+              "subtype": "string",
+              "fieldName": "value",
+              "dataTypeValidatorFnId": "ref://1",
+              "propertyName": "value",
+              "bail": true,
+              "allowNull": false,
+              "isOptional": false,
+              "validations": [
+                {
+                  "ruleFnId": "ref://2",
+                  "name": "customAllowed",
+                  "implicit": false,
+                  "isAsync": false
+                }
+              ]
+            }
+          ],
+          "groups": []
+        }
+      },
+      "refs": {
+        "ref://1": {
+          "validator": {
+            "kind": "function",
+            "name": "string"
+          }
+        },
+        "ref://2": {
+          "validator": {
+            "kind": "function",
+            "name": ""
+          }
+        }
+      }
+    },
+    "jsonSchema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "actualValidation": {
+    "direct": {
+      "input": {
+        "title": "valid",
+        "nested": {
+          "age": 18
+        },
+        "rows": [
+          {}
+        ]
+      },
+      "errors": [
+        {
+          "message": "The value field must be defined",
+          "rule": "required",
+          "field": "rows.0.value"
+        }
+      ],
+      "output": null
+    },
+    "conditional": {
+      "input": {
+        "kind": "company",
+        "person": "not-company"
+      },
+      "errors": [
+        {
+          "message": "The company field must be defined",
+          "rule": "required",
+          "field": "company"
+        }
+      ],
+      "output": null
+    },
+    "union": {
+      "input": {
+        "choice": "x"
+      },
+      "errors": [
+        {
+          "message": "The choice field must have at least 2 characters",
+          "rule": "minLength",
+          "field": "choice",
+          "meta": {
+            "min": 2
+          }
+        }
+      ],
+      "output": null
+    },
+    "custom": {
+      "input": {
+        "value": "denied"
+      },
+      "errors": [
+        {
+          "message": "CUSTOM_DENIED",
+          "rule": "customAllowed",
+          "field": "value"
+        }
+      ],
+      "output": null
+    }
+  },
+  "messages": {
+    "metadata": {
+      "messages": {
+        "title.minLength": "TITLE_TOO_SHORT"
+      },
+      "fields": {
+        "title": "Judul"
+      }
+    },
+    "actualError": [
+      {
+        "message": "TITLE_TOO_SHORT",
+        "rule": "minLength",
+        "field": "title",
+        "meta": {
+          "min": 3
+        }
+      }
+    ]
+  },
+  "dynamicProvider": {
+    "enumerableKeys": [
+      "getMessage"
+    ],
+    "hasToJSON": false,
+    "actualError": [
+      {
+        "message": "DYNAMIC_minLength",
+        "rule": "minLength",
+        "field": "title",
+        "meta": {
+          "min": 3
+        }
+      }
+    ],
+    "introspection": "unknown-without-execution"
+  }
+}

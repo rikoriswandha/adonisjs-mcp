@@ -1,0 +1,31 @@
+Observed command:
+ps -p 17176,17228,18154,18233,18823,18925,20000,20063,20666,20715,21138,21139,21199 -o pid,ppid,pgid,command
+Observed output:
+PID PPID PGID COMMAND
+Observed exit code: 1 (no selected processes)
+
+Observed command (cwd /tmp/adonisjs-mcp-m0/s-j-hmr-api-1791857107116):
+npm ls @adonisjs/assembler hot-hook
+Observed output:
+api@0.0.0 /private/tmp/adonisjs-mcp-m0/s-j-hmr-api-1791857107116
+├── @adonisjs/assembler@8.5.2
+├─┬ @adonisjs/auth@10.1.0
+│ ├── @adonisjs/assembler@8.5.2 deduped
+│ └─┬ @adonisjs/presets@3.0.0
+│   └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @adonisjs/core@7.6.0
+│ ├─┬ @adonisjs/application@9.1.0
+│ │ └── @adonisjs/assembler@8.5.2 deduped
+│ └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @adonisjs/cors@3.0.0
+│ └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @adonisjs/lucid@22.4.2
+│ └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @adonisjs/session@8.1.0
+│ └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @adonisjs/shield@9.0.0
+│ └── @adonisjs/assembler@8.5.2 deduped
+├─┬ @tuyau/core@1.2.2
+│ └── @adonisjs/assembler@8.5.2 deduped
+└── hot-hook@1.0.0
+Observed exit code: 0
