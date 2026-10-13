@@ -113,7 +113,8 @@ function convert(
       return Object.fromEntries(
         [...object.entries()].flatMap(([key, item]) => {
           const converted = convert(item, depth + 1, ancestors, redactor)
-          return converted === undefined ? [] : [[String(key), converted]]
+          const name = redactor ? redactor.knownSecrets(String(key)) : String(key)
+          return converted === undefined ? [] : [[name, converted]]
         })
       )
     }
@@ -123,7 +124,9 @@ function convert(
     return Object.fromEntries(
       Object.entries(object).flatMap(([key, item]) => {
         const converted = convert(item, depth + 1, ancestors, redactor)
-        return converted === undefined ? [] : [[key, converted]]
+        return converted === undefined
+          ? []
+          : [[redactor ? redactor.knownSecrets(key) : key, converted]]
       })
     )
   } finally {

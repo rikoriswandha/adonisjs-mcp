@@ -9,6 +9,7 @@ export interface RuntimeSample {
   marker: number
   resources: Record<string, number>
   memory: { rss: number; heapUsed: number }
+  gcAvailable: boolean
   delay: { mean: number; p95: number; max: number }
   subscribers: { logs: number; exceptions: number }
   emitterListeners: number
@@ -25,11 +26,13 @@ const state = app as typeof app & { lifecycleHistogram?: IntervalHistogram }
 state.lifecycleHistogram ??= monitorEventLoopDelay({ resolution: 20 })
 state.lifecycleHistogram.enable()
 export default class LifecycleProbeController {
-  handle() {
+  handle({ request }: { request: { input(name: string): unknown } }) {
+    const gc = (globalThis as typeof globalThis & { gc?: () => void }).gc
+    if (request.input('gc') === 'true') { if (!gc) throw new Error('Runtime probe requires --expose-gc'); gc() }
     const resources: Record<string, number> = {}
     for (const name of process.getActiveResourcesInfo()) resources[name] = (resources[name] ?? 0) + 1
     const histogram = state.lifecycleHistogram!
-    return { pid: process.pid, marker: ${marker}, resources, memory: process.memoryUsage(), subscribers: instrumentationStatus().subscribers, emitterListeners: emitter.listenerCount(), delay: { mean: histogram.mean / 1e6, p95: histogram.percentile(95) / 1e6, max: histogram.max / 1e6 } }
+    return { pid: process.pid, marker: ${marker}, resources, memory: process.memoryUsage(), gcAvailable: Boolean(gc), subscribers: instrumentationStatus().subscribers, emitterListeners: emitter.listenerCount(), delay: { mean: histogram.mean / 1e6, p95: histogram.percentile(95) / 1e6, max: histogram.max / 1e6 } }
   }
 }
 `
@@ -57,8 +60,8 @@ if (lifecycleApp.getEnvironment() === 'web') lifecycleApp.terminating(async () =
   )
 }
 
-export async function sampleRuntime(app: RunningApp): Promise<RuntimeSample> {
-  const response = await app.fetch('/__fixture/lifecycle')
+export async function sampleRuntime(app: RunningApp, gc = false): Promise<RuntimeSample> {
+  const response = await app.fetch(`/__fixture/lifecycle${gc ? '?gc=true' : ''}`)
   if (!response.ok) throw new Error(`Runtime probe failed: ${response.status}`)
   return response.json() as Promise<RuntimeSample>
 }
@@ -84,4 +87,26 @@ export async function awaitRuntime(app: RunningApp, predicate: (sample: RuntimeS
     await sleep(100)
   }
   throw new Error(`Lifecycle change did not become visible\n${app.logs.text()}`)
+}
+
+// The 720-call reference smoke retained ~4.1 KiB/call in its final post-GC window.
+// 16 KiB allows roughly 4x that steady-state baseline without hiding large per-call leaks.
+export const RETAINED_HEAP_BYTES_PER_CALL = 16 * 1024
+
+export function capacityViolations(before: RuntimeSample, after: RuntimeSample, calls: number) {
+  const violations: string[] = []
+  if (after.pid !== before.pid) violations.push('process PID changed')
+  if (!before.gcAvailable || !after.gcAvailable) violations.push('GC is unavailable')
+  if (JSON.stringify(after.subscribers) !== JSON.stringify(before.subscribers))
+    violations.push('capture subscriber counts changed')
+  if (after.emitterListeners !== before.emitterListeners)
+    violations.push('emitter listener count changed')
+  for (const [name, count] of Object.entries(after.resources)) {
+    const allowance = name === 'TCPSocketWrap' ? 4 : name === 'Timeout' ? 2 : 0
+    if (count > (before.resources[name] ?? 0) + allowance)
+      violations.push(`${name} grew by ${count - (before.resources[name] ?? 0)}`)
+  }
+  if ((after.memory.heapUsed - before.memory.heapUsed) / calls > RETAINED_HEAP_BYTES_PER_CALL)
+    violations.push('retained heap growth exceeds 16 KiB per call after GC')
+  return violations
 }

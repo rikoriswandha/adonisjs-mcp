@@ -3,6 +3,7 @@ import { createRequire } from 'node:module'
 import { readFile, writeFile, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
+import { setTimeout as delay } from 'node:timers/promises'
 import { test } from '@japa/runner'
 import { FixtureApp } from '../helpers/fixture_app.js'
 import { connectMcpClient } from '../helpers/mcp_client.js'
@@ -45,6 +46,7 @@ test('Security | PostgreSQL extended corpus, AST blind spots and tenant boundari
       CREATE MATERIALIZED VIEW observer_materialized AS SELECT * FROM observer_rows;
       CREATE FUNCTION mutate(security_rows) RETURNS integer LANGUAGE plpgsql SECURITY DEFINER AS $$ BEGIN DELETE FROM observer_rows; RETURN 1; END $$;
       CREATE FUNCTION sleepy(security_rows) RETURNS integer LANGUAGE plpgsql AS $$ BEGIN PERFORM pg_sleep(5); RETURN 1; END $$;
+      CREATE FUNCTION long_sleepy(security_rows) RETURNS integer LANGUAGE plpgsql AS $$ BEGIN PERFORM pg_sleep(30); RETURN 1; END $$;
       CREATE DOMAIN mutating_type AS integer CHECK (nextval('observer_sequence') > 0);
       CREATE ROLE mcp_reader LOGIN NOSUPERUSER NOBYPASSRLS;
       GRANT USAGE ON SCHEMA public TO mcp_reader;
@@ -82,7 +84,10 @@ const securityMiddleware = router.named({ tenant: () => import('@rikology/adonis
 router.get('/__security/tenant', async () => (await SecurityRow.query()).map((row) => row.value)).use(securityMiddleware.tenant())
 `
     )
-    await writeMcpConfig(fixture, "  tools: { sql: { readers: { pg: { user: 'mcp_reader' } } } },")
+    await writeMcpConfig(
+      fixture,
+      "  tools: { sql: { timeout: 60000, readers: { pg: { user: 'mcp_reader' } } } },"
+    )
     const app = await fixture.start({
       nodeEnv: 'development',
       nodeOptions: '--experimental-vm-modules',
@@ -238,9 +243,17 @@ router.get('/__security/tenant', async () => (await SecurityRow.query()).map((ro
       )
       for (const [index, result] of mixed.entries()) {
         assert.notOk(result.isError, JSON.stringify(result))
-        const output = JSON.stringify(result)
-        assert.include(output, index < 3 ? 'A' : 'B')
-        assert.notInclude(output, index < 3 ? '"B"' : '"A"')
+        const expected = index < 3 ? 'A' : 'B'
+        const payload = toolPayload<{
+          data: { rows?: Array<{ value: string }>; body?: { json: string[] }; display?: string }
+        }>(result)
+        if (index % 3 === 0)
+          assert.deepEqual(
+            payload.data.rows?.map((row) => row.value),
+            [expected]
+          )
+        else if (index % 3 === 1) assert.deepEqual(payload.data.body?.json, [expected])
+        else assert.equal(payload.data.display, `[ '${expected}' ]`)
       }
       const slow = await client.callTool({
         name: 'execute_sql_query',
@@ -254,16 +267,39 @@ router.get('/__security/tenant', async () => (await SecurityRow.query()).map((ro
         'pg_sleep hidden behind attribute notation is cancelled and the reader closes'
       )
       const cancellation = new AbortController()
+      let cancellationResult: unknown
       const cancelled = client
         .callTool(
           {
             name: 'execute_sql_query',
-            arguments: { query: 'SELECT t.sleepy FROM security_rows t', tenant: 'a' },
+            arguments: {
+              query: 'SELECT t.long_sleepy FROM security_rows t',
+              tenant: 'a',
+              timeout: 60000,
+            },
           },
           { signal: cancellation.signal }
         )
         .catch((error: unknown) => error)
-      await new Promise((resolve) => setTimeout(resolve, 200))
+        .then((result) => {
+          cancellationResult = result
+          return result
+        })
+      let runningReader = '0'
+      for (let attempt = 0; attempt < 50; attempt++) {
+        runningReader = await cluster.query(
+          database.database,
+          "SELECT count(*) FROM pg_stat_activity WHERE application_name = 'adonisjs-mcp-reader' AND wait_event = 'PgSleep' AND state = 'active'"
+        )
+        if (runningReader === '1') break
+        await delay(100)
+      }
+      assert.equal(
+        runningReader,
+        '1',
+        `the long query actually started before cancellation: ${JSON.stringify(cancellationResult)}`
+      )
+      const cancellationStarted = performance.now()
       const survivingCall = client.callTool({
         name: 'execute_sql_query',
         arguments: { query: 'SELECT t.sleepy FROM security_rows t', tenant: 'b', timeout: 6000 },
@@ -277,9 +313,14 @@ router.get('/__security/tenant', async () => (await SecurityRow.query()).map((ro
       for (let attempt = 0; attempt < 50; attempt++) {
         afterCancel = await observe()
         if (afterCancel === before) break
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        await delay(100)
       }
       assert.equal(afterCancel, before)
+      assert.isBelow(
+        performance.now() - cancellationStarted,
+        15000,
+        'reader teardown precedes the 30-second query natural completion'
+      )
       const children = toolPayload<{ data: { display: string } }>(
         await client.callTool({
           name: 'project_eval',

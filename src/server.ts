@@ -300,15 +300,19 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
       continue
     }
     const build = async (args: unknown) => {
-      const output = await prompt.get(args as never, context)
-      return {
-        ...(output.description === undefined
-          ? {}
-          : { description: redactor.knownSecrets(output.description) }),
-        messages: output.messages.map((message) => ({
-          role: message.role,
-          content: { type: 'text' as const, text: redactor.knownSecrets(message.text) },
-        })),
+      try {
+        const output = await prompt.get(args as never, context)
+        return {
+          ...(output.description === undefined
+            ? {}
+            : { description: redactor.knownSecrets(output.description) }),
+          messages: output.messages.map((message) => ({
+            role: message.role,
+            content: { type: 'text' as const, text: redactor.knownSecrets(message.text) },
+          })),
+        }
+      } catch (error) {
+        throw new Error(redactor.text(error instanceof Error ? error.message : String(error)))
       }
     }
     const metadata = {

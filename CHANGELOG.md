@@ -22,6 +22,14 @@
 - English README with full configuration/extension references, compatibility boundaries, security limits, troubleshooting and client-specific recipes sourced from official documentation.
 - One profile-driven English agent skill distributed through npm and repository installation.
 
+### M9 security and release gates
+
+- Security regression suite covering network, SQL, HTTP, capture and serialization boundaries; lifecycle, OS/Node matrix and capacity smokes.
+- CI and release gates reuse one SHA-512-verified tarball across all verification jobs before publishing; post-publish smoke compares registry bytes with that exact artifact.
+- Success-output secret scrubbing without key-name masking of requested database/model fields; low-entropy registered values remain unchanged in success data.
+- Configure handles single-line `handle` wiring; eval reports `displayTruncated` explicitly.
+- Permissions are Bouncer-only; removed Adonis Plus and Flow coupling.
+
 ### Deviations from the original design
 
 The [implementation-plan decisions](docs/IMPLEMENTATION_PLAN.md#3-keputusan-dan-koreksi-eksplisit-terhadap-desain) record evidence and rationale; these are deliberate corrections, not compatibility aliases:
@@ -41,6 +49,6 @@ The [implementation-plan decisions](docs/IMPLEMENTATION_PLAN.md#3-keputusan-dan-
 
 ### Compatibility and remaining boundaries
 
-- Current evidence covers Node 24.21.0, Core 7.6.0, Lucid 22.4.2, SDK server 2.3.1/node 2.1.1 and MCP protocols 2026-07-28/2025-11-25 on macOS arm64; see the README for optional-package versions.
+- CI matrix: ubuntu-latest x64 and macos-latest arm64, Node 24.11.1 and latest 24, Core 7.6.0/Lucid 22.4.2 fixture lockfiles, SQLite and owned PostgreSQL (apt/Homebrew postgresql@18). The minimum tuple runs on both OSes with Node 24.11.1, Core 7.5.2 and Lucid 22.4.0; the Core peer range is `^7.5.2`. This describes configured gates, not a completed hosted CI run. SDK server 2.3.1/node 2.1.1 and MCP protocols 2026-07-28/2025-11-25 are covered; see the README for optional-package versions.
 - Claude Code 2.1.295 was exercised end to end (project `.mcp.json`, `debug_request` and `add_feature` prompts as slash commands, tool calls against a live app). Cursor, VS Code and Zed recipes use configuration formats from official docs and are not exercised by this release.
-- Other OS/Node/database matrices, actual assembler hard-restart behavior and registry HMR rebuild are not claimed. Generated type freshness, dynamic metadata coverage, capture coverage and trusted application-code side effects remain explicit limitations.
+- Windows, other Node major versions and other database drivers are not claimed. Generated type freshness, dynamic metadata coverage, capture coverage and trusted application-code side effects remain explicit limitations.

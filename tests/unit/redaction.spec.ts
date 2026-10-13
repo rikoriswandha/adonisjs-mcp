@@ -1,5 +1,6 @@
 import { test } from '@japa/runner'
 import { HTTP_SENSITIVE_WORDS, isSensitiveKey, project, Redactor } from '../../src/redaction.js'
+import { toJsonValue } from '../../src/result.js'
 
 const SECRET = 'sentinel-env-secret-value-42'
 const redactor = Redactor.fromEnvironment({ PAYMENT_SECRET: SECRET, LOG_LEVEL: 'informational' })
@@ -96,5 +97,23 @@ test.group('Redaction | project', () => {
     assert.equal(projected.pattern, '/a+/g')
     assert.equal(getterCalls, 0)
     assert.equal(resolverCalls, 0)
+  })
+})
+
+test('Redaction | success scrub distinguishes low entropy from strong registered values', ({
+  assert,
+}) => {
+  const scrubber = new Redactor(['postgres', 'abcdefgh', 'Abcdef12', 'abcdefghijklmnop'])
+  assert.equal(
+    scrubber.knownSecrets('postgres abcdefgh Abcdef12 abcdefghijklmnop'),
+    'postgres abcdefgh [REDACTED] [REDACTED]'
+  )
+  assert.equal(
+    scrubber.text('postgres abcdefgh Abcdef12 abcdefghijklmnop'),
+    '[REDACTED] [REDACTED] [REDACTED] [REDACTED]'
+  )
+  assert.deepEqual(toJsonValue({ postgres: 'postgres', Abcdef12: 'Abcdef12' }, scrubber), {
+    'postgres': 'postgres',
+    '[REDACTED]': '[REDACTED]',
   })
 })

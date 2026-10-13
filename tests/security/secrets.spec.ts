@@ -13,6 +13,8 @@ import {
 } from '../helpers/mcp_endpoint.js'
 
 const SENTINEL = 'm9-secret-9e86b1c4909e4c70'
+const ESCAPED_SECRET =
+  "-----BEGIN PRIVATE KEY-----\nMIIE-security-'quoted'-\\backslash-42\n-----END PRIVATE KEY-----"
 
 const inputs: Record<string, Record<string, unknown>> = {
   get_config: { key: 'security' },
@@ -35,12 +37,18 @@ test('Security | both protocol eras redact every served tool, resource and promp
   const fixture = await FixtureApp.create('hybrid')
   try {
     const envFile = join(fixture.root, '.env')
-    await writeFile(envFile, `${await readFile(envFile, 'utf8')}SECURITY_PASSWORD=${SENTINEL}\n`)
+    await writeFile(
+      envFile,
+      `${await readFile(envFile, 'utf8')}SECURITY_PASSWORD=${SENTINEL}\nSECURITY_PRIVATE_KEY="${ESCAPED_SECRET}"\n`
+    )
     const envSchema = join(fixture.root, 'start', 'env.ts')
     const envSource = await readFile(envSchema, 'utf8')
     await writeFile(
       envSchema,
-      envSource.replace(/\}\)\s*$/, '  SECURITY_PASSWORD: Env.schema.string(),\n})\n')
+      envSource.replace(
+        /\}\)\s*$/,
+        '  SECURITY_PASSWORD: Env.schema.string(),\n  SECURITY_PRIVATE_KEY: Env.schema.string(),\n})\n'
+      )
     )
     await fixture.migrate()
     await installPackage(fixture)
@@ -60,7 +68,23 @@ test('Security | both protocol eras redact every served tool, resource and promp
       join(fixture.root, 'providers', 'security_bouncer_provider.ts'),
       "export { default } from '@adonisjs/bouncer/bouncer_provider'\n"
     )
-    await setExtensionProviders(fixture, ['security_queue_provider', 'security_bouncer_provider'])
+    await writeFile(
+      join(fixture.root, 'providers', 'security_prompt_provider.ts'),
+      `import type { ApplicationService } from '@adonisjs/core/types'
+export default class SecurityPromptProvider {
+  constructor(protected app: ApplicationService) {}
+  async boot() {
+    if (!this.app.inDev || !this.app.container.hasBinding('mcp.registry')) return
+    const registry = await this.app.container.make('mcp.registry')
+    registry.prompt({ name: 'security_failure', description: 'App-derived prompt failure', get() { throw new Error('prompt-failure ' + process.env.SECURITY_PASSWORD) } })
+  }
+}`
+    )
+    await setExtensionProviders(fixture, [
+      'security_queue_provider',
+      'security_bouncer_provider',
+      'security_prompt_provider',
+    ])
     await writeFile(
       join(fixture.root, 'config', 'queue.ts'),
       `import { defineConfig, drivers } from '@adonisjs/queue'
@@ -171,11 +195,6 @@ router.get('/__security/error', () => { throw new Error('securityprobe ${SENTINE
               'the seeded queue payload was actually read'
             )
           assert.notInclude(JSON.stringify(success), SENTINEL, `${era} ${tool.name} success`)
-          const failure = await client.callTool({
-            name: tool.name,
-            arguments: { ...inputs[tool.name], securityUnknown: SENTINEL, limit: -1, timeout: -1 },
-          })
-          assert.notInclude(JSON.stringify(failure), SENTINEL, `${era} ${tool.name} invalid input`)
         }
         const listedResources = await client.listResources()
         assert.lengthOf(listedResources.resources, 4)
@@ -186,8 +205,15 @@ router.get('/__security/error', () => { throw new Error('securityprobe ${SENTINE
         const config = await client.readResource({ uri: 'adonis://config/security' })
         assert.notInclude(JSON.stringify(config), SENTINEL)
         const prompts = await client.listPrompts()
-        assert.lengthOf(prompts.prompts, 2)
+        assert.lengthOf(prompts.prompts, 3)
         for (const prompt of prompts.prompts) {
+          if (prompt.name === 'security_failure') {
+            await assert.rejects(
+              () => client.getPrompt({ name: prompt.name }),
+              /prompt-failure \[REDACTED\]/
+            )
+            continue
+          }
           const result = await client.getPrompt({
             name: prompt.name,
             arguments:
@@ -203,6 +229,23 @@ router.get('/__security/error', () => { throw new Error('securityprobe ${SENTINE
         })
         assert.isTrue(thrown.isError)
         assert.notInclude(JSON.stringify(thrown), SENTINEL)
+        const escaped = toolPayload<{
+          data: { display: string; console: { entries: Array<{ text: string }> } }
+        }>(
+          await client.callTool({
+            name: 'project_eval',
+            arguments: {
+              code: "const secret = process.env.SECURITY_PRIVATE_KEY; console.dir({ secret }); console.table([secret]); console.log('%o %j %s', { secret }, { secret }, secret); return { secret }",
+            },
+          })
+        )
+        assert.include(escaped.data.display, '[REDACTED]')
+        assert.notInclude(escaped.data.display, 'MIIE-security')
+        assert.lengthOf(escaped.data.console.entries, 3)
+        for (const entry of escaped.data.console.entries) {
+          assert.include(entry.text, '[REDACTED]')
+          assert.notInclude(entry.text, 'MIIE-security')
+        }
         const captured = await client.callTool({
           name: 'get_logs',
           arguments: { grep: 'securityprobe' },

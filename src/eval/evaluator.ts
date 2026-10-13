@@ -6,7 +6,7 @@
 | never execution. The application importer owns module identity and HMR.
 */
 import vm from 'node:vm'
-import { format, inspect } from 'node:util'
+import { formatWithOptions, inspect } from 'node:util'
 import { performance } from 'node:perf_hooks'
 import type { ApplicationService } from '@adonisjs/core/types'
 import { ToolError } from '../errors.js'
@@ -36,7 +36,8 @@ const INSPECT_OPTIONS = {
   depth: 4,
   colors: false,
   maxArrayLength: 100,
-  maxStringLength: 10_000,
+  maxStringLength: null,
+  breakLength: Infinity,
 } as const
 
 /**
@@ -58,7 +59,10 @@ class ConsoleCapture {
         this.dropped++
         return
       }
-      const text = bounded(redactor.text(format(...args)), Math.min(16_384, maxBytes))
+      const text = bounded(
+        redactor.inspectedText(formatWithOptions(INSPECT_OPTIONS, ...args)),
+        Math.min(16_384, maxBytes)
+      )
       const bytes = Buffer.byteLength(text)
       if (this.#bytes + bytes > maxBytes) {
         this.dropped++
@@ -199,7 +203,7 @@ export class ProjectEvaluator {
     )
     try {
       const value = await Promise.race([interrupted.promise, observed])
-      const inspected = this.redactor.text(inspect(value, INSPECT_OPTIONS))
+      const inspected = this.redactor.inspectedText(inspect(value, INSPECT_OPTIONS))
       const display = bounded(inspected, context.config.limits.maxResultBytes / 2)
       return {
         data: {
@@ -224,7 +228,10 @@ export class ProjectEvaluator {
       }
     } catch (error) {
       if (detached && error instanceof ToolError) throw error
-      const failure = error instanceof Error ? error : new Error(format(error))
+      const failure =
+        error instanceof Error
+          ? error
+          : new Error(this.redactor.inspectedText(formatWithOptions(INSPECT_OPTIONS, error)))
       throw new ToolError('EXECUTION_FAILED', bounded(this.redactor.text(failure.message), 4096), {
         details: {
           name: this.redactor.text(failure.name),

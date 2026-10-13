@@ -19,7 +19,10 @@ import {
   sampleRuntime,
   awaitRuntime,
   probeController,
+  RETAINED_HEAP_BYTES_PER_CALL,
+  capacityViolations,
 } from '../helpers/lifecycle.js'
+import type { RuntimeSample } from '../helpers/lifecycle.js'
 
 interface Models {
   data: {
@@ -35,6 +38,36 @@ const model = (extra = '') => `import { BaseModel, column } from '@adonisjs/luci
 export default class LifecycleRecord extends BaseModel { @column({ isPrimary: true }) declare id: number; ${extra} }
 `
 
+test('Lifecycle | capacity oracle rejects restarts and retained per-call leaks', ({ assert }) => {
+  const baseline: RuntimeSample = {
+    pid: 1,
+    marker: 0,
+    gcAvailable: true,
+    resources: {},
+    memory: { rss: 0, heapUsed: 1024 },
+    delay: { mean: 0, p95: 0, max: 0 },
+    subscribers: { logs: 1, exceptions: 1 },
+    emitterListeners: 1,
+  }
+  assert.deepEqual(capacityViolations(baseline, baseline, 240), [])
+  assert.include(capacityViolations(baseline, { ...baseline, pid: 2 }, 240), 'process PID changed')
+  assert.include(
+    capacityViolations(
+      baseline,
+      {
+        ...baseline,
+        memory: { ...baseline.memory, heapUsed: 1024 + 240 * (RETAINED_HEAP_BYTES_PER_CALL + 1) },
+      },
+      240
+    ),
+    'retained heap growth exceeds 16 KiB per call after GC'
+  )
+  assert.include(
+    capacityViolations(baseline, { ...baseline, gcAvailable: false }, 240),
+    'GC is unavailable'
+  )
+})
+
 test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart', async ({
   assert,
 }) => {
@@ -48,12 +81,32 @@ test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart'
     const app = await fixture.start({
       nodeEnv: 'development',
       runner: 'hmr',
-      nodeOptions: '--experimental-vm-modules',
+      nodeOptions: '--experimental-vm-modules --expose-gc',
     })
     await waitForMcp(app)
     let client = await connectMcpClient(new URL(DEFAULT_PATH, app.url), { era: 'modern' })
     try {
-      const before = await sampleRuntime(app)
+      // Warm all metadata caches before measuring retained call growth.
+      for (const name of [
+        'get_routes',
+        'get_models',
+        'get_events',
+        'get_logs',
+        'get_config',
+        'execute_sql_query',
+        'project_eval',
+      ])
+        await client.callTool({
+          name,
+          arguments:
+            name === 'project_eval'
+              ? { code: 'return 42' }
+              : name === 'execute_sql_query'
+                ? { query: 'SELECT 1 AS value' }
+                : {},
+        })
+      const before = await sampleRuntime(app, true)
+      assert.isTrue(before.gcAvailable)
       const eventsBefore = toolPayload<{
         data: { mappedListeners: number; totalTransportListeners: number }
       }>(await client.callTool({ name: 'get_events', arguments: {} }))
@@ -61,7 +114,8 @@ test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart'
         await client.callTool({ name: 'get_models', arguments: {} })
       )
       assert.exists(initial.data.models.find((item) => item.name === 'LifecycleRecord'))
-      for (let i = 0; i < 210; i++) {
+      const windows: RuntimeSample[] = []
+      for (let i = 0; i < 630; i++) {
         const names = [
           'get_routes',
           'get_models',
@@ -84,7 +138,12 @@ test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart'
                 : {},
         })
         assert.isNotTrue(result.isError)
+        if ((i + 1) % 210 === 0) windows.push(await sampleRuntime(app, true))
       }
+      const previousGrowth = windows[1].memory.heapUsed - windows[0].memory.heapUsed
+      const steadyGrowth = windows[2].memory.heapUsed - windows[1].memory.heapUsed
+      assert.isAtMost(steadyGrowth / 210, RETAINED_HEAP_BYTES_PER_CALL)
+      assert.isAtMost((steadyGrowth - previousGrowth) / 210, 8 * 1024)
       for (let marker = 1; marker <= 3; marker++) {
         const generationStart = app.logs.lines.length
         await writeFile(
@@ -99,15 +158,23 @@ test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart'
             line.text.includes('tuyau: created') && app.logs.lines.indexOf(line) >= generationStart,
           30_000
         )
+        const swapMarker = `lifecycle-after-swap-${marker}`
+        const logged = await client.callTool({
+          name: 'project_eval',
+          arguments: {
+            code: `const logger = await container.make('logger'); logger.info('${swapMarker}'); return 42`,
+          },
+        })
+        assert.isNotTrue(logged.isError)
         const logs = toolPayload<{ data: { entries: Array<{ message: string }> } }>(
-          await client.callTool({ name: 'get_logs', arguments: { grep: 'lifecycle-unique-209' } })
+          await client.callTool({ name: 'get_logs', arguments: { grep: swapMarker } })
         )
         assert.lengthOf(
-          logs.data.entries.filter((entry) => entry.message === 'lifecycle-unique-209'),
+          logs.data.entries.filter((entry) => entry.message === swapMarker),
           1
         )
       }
-      const after = await sampleRuntime(app)
+      const after = await sampleRuntime(app, true)
       assert.notProperty(
         after.resources,
         'ProcessWrap',
@@ -125,7 +192,7 @@ test('Lifecycle | bounded mixed traffic, three same-PID swaps and route restart'
       )
       for (const [name, count] of Object.entries(after.resources))
         assert.isAtMost(count, (before.resources[name] ?? 0) + 4, name)
-      assert.isAtMost(after.memory.heapUsed - before.memory.heapUsed, 128 * 1024 * 1024)
+      // HMR module retention is separate from the steady-state per-call leak oracle above.
       await writeFile(
         join(fixture.root, 'app/models/lifecycle_record.ts'),
         model('@column() declare added: string')
@@ -316,10 +383,8 @@ this.defer(async db => { await db.table('lifecycle_payload').insert({ body: 'z'.
           truncated: boolean
           data: { displayTruncated?: boolean; truncated?: boolean }
         }>(result)
-        assert.isTrue(
-          payload.truncated || payload.data.displayTruncated || payload.data.truncated,
-          name
-        )
+        if (name === 'project_eval') assert.isTrue(payload.data.displayTruncated, name)
+        else assert.isTrue(payload.truncated || payload.data.truncated, name)
         const content = result.content as Array<{ type: string; text: string }>
         assert.isAtMost(Buffer.byteLength(content[0].text), 4096)
       }

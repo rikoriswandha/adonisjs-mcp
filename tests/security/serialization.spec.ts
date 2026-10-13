@@ -11,6 +11,7 @@ test('Security | success scrubbing preserves requested data semantics and JSON c
     token: 'visible-token',
     key: 'visible-key',
     neutral: secret,
+    [secret]: 'dynamic-key',
   }
   circular.self = circular
   const result = encodeOutput(
@@ -18,7 +19,10 @@ test('Security | success scrubbing preserves requested data semantics and JSON c
       data: {
         circular,
         date: new Date('2026-10-13T00:00:00Z'),
-        map: new Map([['neutral', secret]]),
+        map: new Map([
+          ['neutral', secret],
+          [secret, 'map-key'],
+        ]),
         set: new Set([secret]),
         custom: { toJSON: () => ({ neutral: secret }) },
         error: new Error(secret),
@@ -48,7 +52,9 @@ test('Security | success scrubbing preserves requested data semantics and JSON c
     self: '[Circular]',
   })
   assert.equal(output.data.date, '2026-10-13T00:00:00.000Z')
-  assert.deepEqual(output.data.map, { neutral: '[REDACTED]' })
+  assert.equal(output.data.circular['[REDACTED]'], 'dynamic-key')
+  assert.notProperty(output.data.circular, secret)
+  assert.deepEqual(output.data.map, { 'neutral': '[REDACTED]', '[REDACTED]': 'map-key' })
   assert.deepEqual(output.data.set, ['[REDACTED]'])
   assert.equal(output.data.custom.neutral, '[REDACTED]')
   assert.equal(output.data.error.message, '[REDACTED]')
@@ -58,14 +64,19 @@ test('Security | success scrubbing preserves requested data semantics and JSON c
 })
 
 test('Security | scrubbing runs before shrinking and byte accounting', ({ assert }) => {
-  const shortSecret = 'abcdefgh'
+  const secret = 'CutPointSecret-123456789'
+  const prefix = 'x'.repeat(16_380)
   const result = encodeOutput(
-    { data: Array.from({ length: 1000 }, () => shortSecret) },
-    { maxBytes: 512, durationMs: 0, redactor: new Redactor([shortSecret]) }
+    { data: prefix + secret + 'y'.repeat(1000) },
+    { maxBytes: 16_600, durationMs: 0, redactor: new Redactor([secret]) }
   )
-  assert.isAtMost(Buffer.byteLength(result.text), 512)
-  assert.notInclude(result.text, shortSecret)
+  assert.isAtMost(Buffer.byteLength(result.text), 16_600)
   assert.isTrue(result.truncated)
-  const parsed = JSON.parse(result.text) as { data: string[] }
-  assert.isTrue(parsed.data.every((item) => item === '[REDACTED]'))
+  const parsed = JSON.parse(result.text) as { data: string }
+  assert.include(parsed.data, prefix)
+  assert.notInclude(
+    parsed.data,
+    'CutP',
+    'no secret prefix survives a cut through the original value'
+  )
 })

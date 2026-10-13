@@ -1,5 +1,14 @@
 name: CI
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_call:
+    inputs:
+      artifact:
+        description: Uploaded artifact containing exactly one tarball and its SHA-512
+        type: string
+        required: false
+        default: ''
 permissions:
   contents: read
 concurrency:
@@ -16,6 +25,27 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: &select-artifact |
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import crypto from "node:crypto";
+            import assert from "node:assert/strict";
+            import path from "node:path";
+            const files = fs.readdirSync("release-artifact");
+            const tarballs = files.filter(file => file.endsWith(".tgz"));
+            assert.equal(tarballs.length, 1, "Expected exactly one tarball");
+            assert.deepEqual(files.sort(), [tarballs[0], `${tarballs[0]}.sha512`].sort(), "Unexpected artifact files");
+            const file = path.resolve("release-artifact", tarballs[0]);
+            assert.equal(crypto.createHash("sha512").update(fs.readFileSync(file)).digest("hex"), fs.readFileSync(`${file}.sha512`, "utf8").trim(), "Release artifact SHA-512 mismatch");
+            fs.appendFileSync(process.env.GITHUB_ENV, `ADONISJS_MCP_TARBALL=${file}\n`);
+          '
       - run: npm run lint && npm run typecheck && npm test && npm run build && npm run check:licenses && npm run verify:exports
   integration:
     strategy:
@@ -41,6 +71,14 @@ jobs:
             echo "ADONISJS_MCP_PG_BIN=$(brew --prefix postgresql@18)/bin" >> "$GITHUB_ENV"
           fi
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: *select-artifact
       - run: npm run test:integration
   security:
     runs-on: ubuntu-latest
@@ -53,6 +91,14 @@ jobs:
           cache: npm
       - run: sudo apt-get update && sudo apt-get install -y postgresql
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: *select-artifact
       - run: npm run test:security
   smoke:
     strategy:
@@ -68,6 +114,14 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: *select-artifact
       - run: npm run smoke:pack && npm run smoke:clients
   offline-docs:
     runs-on: ubuntu-latest
@@ -82,6 +136,14 @@ jobs:
           cache: npm
       - run: sudo mkdir -p "$ADONISJS_MCP_FIXTURE_ROOT" && sudo chown "$(id -u):$(id -g)" "$ADONISJS_MCP_FIXTURE_ROOT"
       - run: npm ci && npm run build
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: *select-artifact
       - name: Populate fixture dependency caches
         run: node --import=@poppinss/ts-exec bin/test.ts integration --files=tests/integration/source_docs.spec.ts
       - name: Prove docs and source work without network
@@ -89,13 +151,17 @@ jobs:
         run: |
           npm config set offline true
           trap 'npm config delete offline' EXIT
-          sudo --preserve-env=PATH,ADONISJS_MCP_FIXTURE_ROOT unshare --net bash -c '
+          sudo --preserve-env=PATH,ADONISJS_MCP_FIXTURE_ROOT,ADONISJS_MCP_TARBALL unshare --net bash -c '
             ip link set lo up
             if curl --connect-timeout 3 https://1.1.1.1; then exit 1; fi
-            exec runuser -u "'"$(id -un)"'" -- env PATH="'"$PATH"'" ADONISJS_MCP_FIXTURE_ROOT="$ADONISJS_MCP_FIXTURE_ROOT" node --import=@poppinss/ts-exec bin/test.ts integration --files=tests/integration/source_docs.spec.ts
+            exec runuser -u "'"$(id -un)"'" -- env PATH="'"$PATH"'" ADONISJS_MCP_FIXTURE_ROOT="$ADONISJS_MCP_FIXTURE_ROOT" ADONISJS_MCP_TARBALL="$ADONISJS_MCP_TARBALL" node --import=@poppinss/ts-exec bin/test.ts integration --files=tests/integration/source_docs.spec.ts
           '
   compat-min:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 25
     env:
       ADONISJS_MCP_FIXTURE_OVERRIDES: '@adonisjs/core@7.5.2 @adonisjs/lucid@22.4.0'
@@ -106,4 +172,12 @@ jobs:
           node-version: '24.11.1'
           cache: npm
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        if: inputs.artifact != ''
+        with:
+          name: ${{ inputs.artifact }}
+          path: release-artifact
+      - name: Verify and select release artifact
+        if: inputs.artifact != ''
+        run: *select-artifact
       - run: npm run smoke:pack

@@ -18,6 +18,8 @@ jobs:
   pack:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    outputs:
+      artifact: release-tarball
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,7 +36,7 @@ jobs:
             const { version } = JSON.parse(fs.readFileSync("package.json", "utf8"));
             assert.equal(process.env.RELEASE_REF, `refs/tags/v${version}`, "Select the matching version tag");
             const notes = fs.readFileSync("CHANGELOG.md", "utf8");
-            assert.ok(notes.split("\n").some(line => line.startsWith(`## ${version} (`)), "Missing CHANGELOG section");
+            assert.ok(notes.split("\n").some(line => line.startsWith(`## ${version} `) && /^## \S+ \(\d{4}-\d{2}-\d{2}\)$/.test(line)), "Missing dated CHANGELOG section (YYYY-MM-DD)");
           '
       - run: npm ci
       - run: npm run build
@@ -54,55 +56,13 @@ jobs:
           name: release-tarball
           path: release-artifact/*
           if-no-files-found: error
-  verify:
+  ci:
     needs: pack
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24'
-          cache: npm
-      - name: Install owned-cluster binaries
-        shell: bash
-        run: |
-          if [[ "$RUNNER_OS" == Linux ]]; then
-            sudo apt-get update && sudo apt-get install -y postgresql
-          else
-            brew install postgresql@18
-            echo "ADONISJS_MCP_PG_BIN=$(brew --prefix postgresql@18)/bin" >> "$GITHUB_ENV"
-          fi
-      - run: npm ci
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-tarball
-          path: release-artifact
-      - name: Select the packed artifact
-        shell: bash
-        run: |
-          cd release-artifact
-          file=$(ls *.tgz)
-          node -e 'const [f, s] = process.argv.slice(1); const c = require("node:crypto"); const fs = require("node:fs"); if (c.createHash("sha512").update(fs.readFileSync(f)).digest("hex") !== fs.readFileSync(s, "utf8").trim()) process.exit(1)' "$file" "$file.sha512"
-          echo "ADONISJS_MCP_TARBALL=$PWD/$file" >> "$GITHUB_ENV"
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      # Script bodies run directly: every helper uses ADONISJS_MCP_TARBALL instead of packing.
-      - name: Verify the packed consumer, both client eras and shipped files
-        run: |
-          node --import=@poppinss/ts-exec scripts/smoke_pack.ts
-          node --import=@poppinss/ts-exec scripts/smoke_clients.ts
-          node --import=@poppinss/ts-exec scripts/check_licenses.ts
-          node scripts/verify_exports.ts
-      - name: Security suite against the packed artifact
-        run: node --import=@poppinss/ts-exec --enable-source-maps bin/test.ts security
+    uses: ./.github/workflows/ci.yml
+    with:
+      artifact: ${{ needs.pack.outputs.artifact }}
   publish:
-    needs: [pack, verify]
+    needs: [pack, ci]
     if: startsWith(github.ref, 'refs/tags/') && (github.event_name == 'push' || inputs.dry-run == false)
     runs-on: ubuntu-latest
     environment: npm
@@ -161,6 +121,10 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-tarball
+          path: release-artifact
       - name: Verify registry install, provenance and live MCP calls
         # smoke_published retries registry/provenance propagation six times.
-        run: npm run smoke:published -- "${GITHUB_REF_NAME#v}"
+        run: npm run smoke:published -- "${GITHUB_REF_NAME#v}" --expected-sha512 release-artifact/*.sha512

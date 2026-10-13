@@ -5,13 +5,14 @@ Publishing is deliberately not part of local milestone preparation. Do not annou
 ## Prerequisites
 
 - The GitHub repository in `package.json` exists and Actions is enabled.
-- Configure the npm package's trusted publisher for this repository, `release.yml`, and the `npm` environment. The publish job requests GitHub OIDC (`id-token: write`) and uses npm 11. Alternatively, set the repository/environment `NPM_TOKEN` secret to an npm automation token permitted to publish this package; the job supplies it as `NODE_AUTH_TOKEN`. Both paths request public provenance.
 - Create the GitHub environment `npm` with required reviewers. Protect release tags and restrict who can approve publishing.
+- For the first publish (0.1.0), the npm package does not exist yet, so its trusted publisher cannot be configured in advance. Create an npm granular access token with publish rights and **Bypass 2FA** enabled for automation, and store it as the `NPM_TOKEN` secret in the `npm` environment. The publish job supplies it as `NODE_AUTH_TOKEN` and requests public provenance using npm 11 and GitHub OIDC (`id-token: write`).
+- After the first successful publish, configure the package's trusted publisher for repository `rikoriswandha/adonisjs-mcp`, workflow `release.yml`, environment `npm`, then delete the `NPM_TOKEN` secret and revoke the token. Subsequent releases use trusted publishing.
 - Close the design/implementation release gates: compatibility, optional integrations, security, lifecycle cleanup, licenses, production prune, consumer exports and client recipes. A passing release workflow does not replace those reviews.
 
 ## Steps
 
-1. Update the version's CHANGELOG section with final release notes and its release date. During preparation, retain `## 0.1.0 (unreleased)`.
+1. Update the version's CHANGELOG section with final release notes. In the release commit, replace `(unreleased)` with the release date so the heading is exactly `## <version> (YYYY-MM-DD)`; the workflow rejects an undated section. During preparation, retain `## 0.1.0 (unreleased)`.
 2. Bump using `npm version <version> --no-git-tag-version`, review and commit `package.json`, `package-lock.json` and CHANGELOG together.
 3. Create the matching tag (`git tag v<version>`) and push the commit and tag. Never move an existing release tag.
 4. Review the verification results, then approve the `npm` environment. The workflow publishes and creates the GitHub release from that CHANGELOG section.
@@ -21,11 +22,11 @@ For verification only, dispatch the workflow with an existing matching version t
 
 ## Artifact and smoke checks
 
-Each OS builds once and packs once. Tests consume that exact tarball: package/install/prune smoke, official modern and legacy MCP clients, strict export verification, lint, types, unit and security suites. The Linux tarball and SHA-512 are retained as the publish artifact; publishing downloads and checks those bytes rather than rebuilding or repacking. The GitHub release attaches the same tarball and checksum.
+The single Linux `pack` job builds and packs exactly once, uploads the tarball plus its SHA-512 as `release-tarball`, and passes that artifact name to the reusable CI workflow. Every verification job (`checks`, OS/Node `integration`, `security`, OS `smoke`, `offline-docs`, and both-OS `compat-min`) downloads that same artifact, verifies its checksum and exports `ADONISJS_MCP_TARBALL` for package-consuming helpers and scripts. Push/PR CI without an artifact retains its normal local-pack behavior. Publishing waits for `pack` and the entire reusable CI workflow, downloads and checks the same bytes rather than rebuilding or repacking, and attaches the tarball and checksum to the GitHub release.
 
-Post-publish smoke uses a fresh API fixture outside the checkout, installs the exact registry version as a devDependency, checks installed lockfile integrity against `npm view` metadata, requires a provenance attestation and runs `npm audit signatures`. It resolves/imports all exports, configures instrumentation and VM modules, boots development, and exercises both official protocol eras with two tools and the profile resource. Registry/attestation propagation retries are bounded to six attempts, ten seconds apart.
+Post-publish smoke downloads the verified `release-tarball` artifact's checksum and fetches the exact registry version with `npm pack`. It asserts SHA-512 equality with the verified artifact before creating a fresh API fixture outside the checkout and installing the exact version as a devDependency. It requires a provenance attestation and runs `npm audit signatures`. It resolves/imports all exports, configures instrumentation and VM modules, boots development, and exercises both official protocol eras with two tools and the profile resource. Registry tarball/attestation propagation retries are bounded to six attempts, ten seconds apart.
 
-Local rehearsal: `npm run build`, `npm pack --ignore-scripts`, then `npm run smoke:published -- --tarball /absolute/path/to/package.tgz`. This does **not** exercise registry integrity or provenance.
+Local rehearsal: `npm run build`, `npm pack --ignore-scripts --pack-destination /tmp`, then `npm run smoke:published -- --tarball /absolute/path/to/package.tgz`. Add `--expected-sha512 /absolute/path/to/package.tgz.sha512` to exercise the checksum comparison locally. This does **not** exercise registry retrieval or provenance.
 
 ## Failure policy
 

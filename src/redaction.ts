@@ -17,6 +17,8 @@
 |
 */
 
+import { inspect } from 'node:util'
+
 export const REDACTED = '[REDACTED]'
 
 /**
@@ -62,10 +64,27 @@ export function isSecretEnvName(name: string): boolean {
 
 export class Redactor {
   readonly #secrets: readonly string[]
+  readonly #strongSecrets: readonly string[]
+  readonly #inspectedSecrets: readonly string[]
 
   constructor(secrets: Iterable<string>) {
     this.#secrets = [...new Set(secrets)]
       .filter((secret) => secret.length >= MIN_SECRET_LENGTH)
+      .sort((left, right) => right.length - left.length)
+    this.#strongSecrets = this.#secrets.filter((secret) => {
+      if (secret.length >= 16) return true
+      const classes = [/[a-z]/, /[A-Z]/, /[0-9]/, /[^a-zA-Z0-9]/]
+      return classes.filter((pattern) => pattern.test(secret)).length >= 2
+    })
+    this.#inspectedSecrets = this.#secrets
+      .flatMap((secret) => {
+        const rendered = inspect(secret, { breakLength: Infinity, maxStringLength: null }).slice(
+          1,
+          -1
+        )
+        const escaped = JSON.stringify(secret).slice(1, -1)
+        return [rendered, escaped, escaped.replaceAll('\\"', '"').replaceAll("'", "\\'")]
+      })
       .sort((left, right) => right.length - left.length)
   }
 
@@ -89,12 +108,13 @@ export class Redactor {
   }
 
   /**
-   * Scrubs only registered secret values, preserving data under neutral or
-   * sensitive-looking keys. Used by the shared success-result serializer.
+   * Scrubs registered values with >=16 characters, or >=8 characters in two
+   * character classes. Low-entropy env values stay usable in success data;
+   * sensitive-looking key names alone do not mask database/model fields.
    */
   knownSecrets(input: string): string {
     let output = input
-    for (const secret of this.#secrets) {
+    for (const secret of this.#strongSecrets) {
       if (output.includes(secret)) {
         output = output.split(secret).join(REDACTED)
       }
@@ -103,11 +123,26 @@ export class Redactor {
   }
 
   text(input: string): string {
-    let output = this.knownSecrets(input)
+    let output = input
+    for (const secret of this.#secrets) {
+      output = output.split(secret).join(REDACTED)
+    }
     for (const [pattern, replacement] of TEXT_PATTERNS) {
       output = output.replace(pattern, replacement)
     }
     return output
+  }
+
+  /**
+   * Scrubs inspect/JSON escapes before display truncation. Rendering must
+   * disable line splitting and string truncation so complete secrets match.
+   */
+  inspectedText(input: string): string {
+    let output = input
+    for (const secret of this.#inspectedSecrets) {
+      output = output.split(secret).join(REDACTED)
+    }
+    return this.text(output)
   }
 
   /**
