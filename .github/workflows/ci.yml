@@ -1,0 +1,109 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint && npm run typecheck && npm test && npm run build && npm run check:licenses && npm run verify:exports
+  integration:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node: ['24.11.1', '24']
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install owned-cluster binaries
+        shell: bash
+        run: |
+          if [[ "$RUNNER_OS" == Linux ]]; then
+            sudo apt-get update && sudo apt-get install -y postgresql
+          else
+            brew install postgresql@18
+            echo "ADONISJS_MCP_PG_BIN=$(brew --prefix postgresql@18)/bin" >> "$GITHUB_ENV"
+          fi
+      - run: npm ci
+      - run: npm run test:integration
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y postgresql
+      - run: npm ci
+      - run: npm run test:security
+  smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:pack && npm run smoke:clients
+  offline-docs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ADONISJS_MCP_FIXTURE_ROOT: /var/lib/adonisjs-mcp-fixtures
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: sudo mkdir -p "$ADONISJS_MCP_FIXTURE_ROOT" && sudo chown "$(id -u):$(id -g)" "$ADONISJS_MCP_FIXTURE_ROOT"
+      - run: npm ci && npm run build
+      - name: Populate fixture dependency caches
+        run: node --import=@poppinss/ts-exec bin/test.ts integration --files=tests/integration/source_docs.spec.ts
+      - name: Prove docs and source work without network
+        shell: bash
+        run: |
+          npm config set offline true
+          trap 'npm config delete offline' EXIT
+          sudo --preserve-env=PATH,ADONISJS_MCP_FIXTURE_ROOT unshare --net bash -c '
+            ip link set lo up
+            if curl --connect-timeout 3 https://1.1.1.1; then exit 1; fi
+            exec runuser -u "'"$(id -un)"'" -- env PATH="'"$PATH"'" ADONISJS_MCP_FIXTURE_ROOT="$ADONISJS_MCP_FIXTURE_ROOT" node --import=@poppinss/ts-exec bin/test.ts integration --files=tests/integration/source_docs.spec.ts
+          '
+  compat-min:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      ADONISJS_MCP_FIXTURE_OVERRIDES: '@adonisjs/core@7.5.2 @adonisjs/lucid@22.4.0'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.11.1'
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:pack

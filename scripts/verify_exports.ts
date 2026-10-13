@@ -17,7 +17,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const projectRoot = fileURLToPath(new URL('../', import.meta.url))
@@ -215,23 +215,32 @@ console.log('runtime exports ok')
 
 let tarball: string | undefined
 try {
-  const [packed] = JSON.parse(
-    run(
-      'npm',
-      ['pack', '--json', '--ignore-scripts', '--pack-destination', consumerRoot],
-      projectRoot
-    )
-  ) as [{ filename: string; files: { path: string }[] }]
-  tarball = join(consumerRoot, packed.filename)
-
-  const shipped = packed.files.map((file) => file.path)
+  let shipped: string[]
+  if (process.env.ADONISJS_MCP_TARBALL) {
+    tarball = resolve(process.env.ADONISJS_MCP_TARBALL)
+    shipped = run('tar', ['-tzf', tarball], projectRoot)
+      .trim()
+      .split('\n')
+      .filter((file) => !file.endsWith('/'))
+      .map((file) => file.replace(/^package\//, ''))
+  } else {
+    const [packed] = JSON.parse(
+      run(
+        'npm',
+        ['pack', '--json', '--ignore-scripts', '--pack-destination', consumerRoot],
+        projectRoot
+      )
+    ) as [{ filename: string; files: { path: string }[] }]
+    tarball = join(consumerRoot, packed.filename)
+    shipped = packed.files.map((file) => file.path)
+  }
   const missing = REQUIRED_FILES.filter((file) => !shipped.includes(file))
   const unexpected = shipped.filter(
     (file) =>
       !(
         file.startsWith('build/') ||
         file === 'skills/adonisjs-mcp/SKILL.md' ||
-        ['package.json', 'README.md', 'LICENSE.md'].includes(file)
+        ['package.json', 'README.md', 'LICENSE.md', 'CHANGELOG.md'].includes(file)
       ) ||
       /^build\/(tests|bin|scripts)\//.test(file) ||
       (file.endsWith('.ts') && !file.endsWith('.d.ts'))
@@ -292,7 +301,7 @@ try {
   }
   run(join(consumerRoot, 'node_modules', '.bin', 'tsc'), ['-p', 'tsconfig.json'], consumerRoot)
   process.stdout.write(run(process.execPath, ['runtime.mjs'], consumerRoot))
-  console.log(`verify:exports ok (${packed.files.length} files in ${packed.filename})`)
+  console.log(`verify:exports ok (${shipped.length} files in ${tarball})`)
 } finally {
   await rm(consumerRoot, { recursive: true, force: true })
 }

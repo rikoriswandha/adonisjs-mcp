@@ -8,23 +8,35 @@ The server is named `adonis` and uses Streamable HTTP at `/__adonis/mcp` by defa
 
 ## Requirements and compatibility
 
-Install in an AdonisJS v7 application and run its development HTTP process. The tested tuple is deliberately narrower than a claim of universal compatibility:
+Install as a development dependency in an AdonisJS v7 application and run its development HTTP process. CI keeps proving the minimum and current tuples below; this is not a claim of universal driver, platform or patch-version compatibility.
 
 | Component          | Tested version or boundary                                                        |
 | ------------------ | --------------------------------------------------------------------------------- |
-| Node.js            | 24.21.0                                                                           |
-| AdonisJS Core      | `@adonisjs/core` 7.6.0                                                            |
-| Lucid              | `@adonisjs/lucid` 22.4.2                                                          |
+| Node.js            | Minimum 24.11.1; current Node 24 release 24.21.0                                    |
+| AdonisJS Core      | Minimum 7.5.2; current 7.6.0 (`@adonisjs/http-server` 9.3.1)                         |
+| Lucid              | Minimum complete starter-kit tuple 22.4.0; current 22.4.2                          |
 | MCP SDK v2         | `@modelcontextprotocol/server` 2.3.1; `@modelcontextprotocol/node` 2.1.1          |
-| MCP protocol       | 2026-07-28 and 2025-11-25                                                         |
-| Operating system   | macOS arm64 only so far                                                           |
-| Raw SQL            | SQLite file databases (`better-sqlite3`); PostgreSQL with a dedicated reader role |
+| MCP protocol       | Official SDK clients: 2026-07-28 and 2025-11-25                                     |
+| Operating system   | macOS arm64; Debian bookworm Linux arm64 (Node 24 container)                        |
+| Raw SQL            | SQLite file databases (`better-sqlite3` 13.0.3); owned PostgreSQL 17.5 on macOS and 15.19 on Linux, with a dedicated reader role |
 | Inertia            | React and Vue tested; Svelte and Solid not claimed                                |
 | Tenant integration | `@rikology/adonisjs-tenant` 1.0.2                                                 |
 | Queue              | `@adonisjs/queue` 0.6.2 + `@boringnode/queue` 0.6.0, database driver              |
 | Permissions        | `@adonisjs/bouncer` 4.0.1: abilities and policy registrations                     |
 
-Optional integrations are not prerequisites for boot. Tools that need them are withheld with a reason. Source AST extraction and source symbol lines require the application's TypeScript compiler. Linux, Windows, other Node versions and other database drivers are not covered by the current evidence.
+Runtime tuples exercised by the release gates:
+
+| OS (arm64) | Node | Core / Lucid | Database | Gate |
+| --- | --- | --- | --- | --- |
+| macOS | 24.11.1 | 7.6.0 / 22.4.2 | SQLite; PostgreSQL 17.5 | Endpoint, eval/HMR, database and tarball-install integration |
+| macOS | 24.21.0 | 7.6.0 / 22.4.2 | SQLite | Pack/production-prune and both protocol-era clients |
+| Linux bookworm | 24.21.0 | 7.6.0 / 22.4.2 | SQLite; PostgreSQL 15.19 | Full integration and pack/client gates |
+| Linux bookworm | 24.11.1 | 7.6.0 / 22.4.2 | SQLite; PostgreSQL 15.19 | Full integration, including real Ace/HMR hard-restart cleanup |
+| macOS and Linux bookworm | 24.11.1 | 7.5.2 / 22.4.0 | SQLite | Minimum-framework pack, database inspection and production-prune gate |
+
+Node 24.0.0 and 24.0.2 fail the starter kit's Knex imports under the synchronous TypeScript loader. HMR fails with an undefined `source` on the tested 24.1.0, 24.2.0, 24.5.0, 24.8.0, 24.10.0 and 24.11.0 releases; 24.11.1 is the first passing boundary tested. Core releases before 7.5.1 lack the current starter kit's `./ignitor` export, and the 7.5.1 tarball lacks its exported commands entry. Lucid 22.0.0 works for the live database inspection scenario, but the current starter kit's production build needs the `./plugins/db` export introduced in 22.4.0. The declared Core range and CI minimum tuple therefore use 7.5.2/22.4.0.
+
+Optional integrations are not prerequisites for boot. Tools that need them are withheld with a reason. Source AST extraction and source symbol lines require the application's TypeScript compiler. Installed documentation and source lookup are tested with outbound networking disabled. Windows, other Node major versions and other database drivers are not covered. Linux test containers need an init process (`docker run --init`) to reap orphaned Ace children after an HTTP hard restart; tests never use an existing PostgreSQL service.
 
 ## Install and configure
 
