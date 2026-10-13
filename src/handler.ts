@@ -45,6 +45,9 @@ export class McpEndpoint {
   #runtime?: ServerRuntime
   #closing?: Promise<void>
   #detached = false
+  #middleware?: () => Promise<{
+    default: new () => { handle(ctx: HttpContext, next: NextFn): unknown }
+  }>
 
   constructor(config: ResolvedMcpConfig, logger: Logger) {
     this.path = config.path
@@ -146,6 +149,9 @@ export class McpEndpoint {
    * Lazy middleware reference for `server.use()`.
    */
   middleware() {
+    if (this.#middleware) {
+      return this.#middleware
+    }
     const path = this.path
     const intercepts = (ctx: HttpContext) => !this.#detached && ctx.request.url() === path
     const handle = (ctx: HttpContext) => this.handle(ctx)
@@ -157,8 +163,16 @@ export class McpEndpoint {
         return next()
       }
     }
-    return async function adonisMcpEndpoint() {
+    this.#middleware = async function adonisMcpEndpoint() {
       return { default: AdonisMcpEndpointMiddleware }
     }
+    return this.#middleware
+  }
+
+  /**
+   * Whether `reference` is the middleware reference of this endpoint.
+   */
+  isOwnMiddleware(reference: unknown): boolean {
+    return this.#middleware !== undefined && reference === this.#middleware
   }
 }

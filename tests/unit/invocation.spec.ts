@@ -18,6 +18,8 @@ function context(signal = new AbortController().signal): ToolContext {
     profile: () => Promise.reject(new Error('not used')),
     callId: 'call-1',
     signal,
+    logs: null,
+    exceptions: null,
   }
 }
 

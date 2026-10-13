@@ -21,6 +21,8 @@ import {
   type ServerContext,
 } from '@modelcontextprotocol/server'
 import type { ApplicationService } from '@adonisjs/core/types'
+import { captureStatus } from './buffers/gateway.js'
+import { callScope } from './call_scope.js'
 import { ToolError } from './errors.js'
 import { isPlainObject } from './define_tool.js'
 import { describeFailure, invokeTool, redactFailure } from './invocation.js'
@@ -31,6 +33,8 @@ import type {
   Availability,
   AvailabilityContext,
   CapabilityReport,
+  ExceptionReader,
+  LogReader,
   ProjectProfile,
   ResolvedMcpConfig,
   ToolContext,
@@ -61,6 +65,8 @@ export interface ServerRuntime {
   snapshot: RegistrySnapshot
   redactor: Redactor
   version: string
+  logs: LogReader | null
+  exceptions: ExceptionReader | null
   detectProfile(): Promise<ProjectProfile>
 }
 
@@ -170,8 +176,19 @@ export async function describeCapabilities(
   }
 }
 
-function toolContext(base: AvailabilityContext, request: ServerContext): ToolContext {
-  return { ...base, callId: randomUUID(), signal: request.mcpReq.signal }
+function toolContext(
+  base: AvailabilityContext,
+  runtime: ServerRuntime,
+  request: ServerContext
+): ToolContext {
+  const instrumented = captureStatus().hooksLoaded
+  return {
+    ...base,
+    callId: randomUUID(),
+    signal: request.mcpReq.signal,
+    logs: instrumented ? runtime.logs : null,
+    exceptions: instrumented ? runtime.exceptions : null,
+  }
 }
 
 /**
@@ -202,7 +219,7 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
         ...(tool.annotations === undefined ? {} : { annotations: tool.annotations }),
       },
       async (input, request) => {
-        const result = await invokeTool(tool, input, toolContext(context, request), {
+        const result = await invokeTool(tool, input, toolContext(context, runtime, request), {
           wrappers: snapshot.wrappers,
           redactor,
           maxResultBytes: config.limits.maxResultBytes,
@@ -230,9 +247,11 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
       request: ServerContext
     ) => {
       const started = performance.now()
-      const callContext = toolContext(context, request)
+      const callContext = toolContext(context, runtime, request)
       try {
-        const output = await resource.read({ uri, variables }, callContext)
+        const output = await callScope.run({ callId: callContext.callId }, () =>
+          resource.read({ uri, variables }, callContext)
+        )
         const encoded = encodeOutput(output, {
           maxBytes: config.limits.maxResultBytes,
           durationMs: performance.now() - started,
@@ -246,7 +265,9 @@ export async function createServer(runtime: ServerRuntime): Promise<McpServer> {
         }
         const failure = redactFailure(describeFailure(error, callContext.signal), redactor)
         throw new ProtocolError(
-          ProtocolErrorCode.InternalError,
+          failure.code === 'INPUT_INVALID'
+            ? ProtocolErrorCode.InvalidParams
+            : ProtocolErrorCode.InternalError,
           `${failure.code}: ${failure.message}`,
           { code: failure.code }
         )

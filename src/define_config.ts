@@ -163,8 +163,18 @@ const configSchema = z.strictObject({
         .optional(),
       logs: z
         .strictObject({
-          bufferSize: positiveInteger.optional(),
-          exceptionBufferSize: positiveInteger.optional(),
+          bufferSize: positiveInteger.max(100_000).optional(),
+          bufferBytes: z
+            .int()
+            .min(64 * 1024)
+            .max(256 * 1024 * 1024)
+            .optional(),
+          exceptionBufferSize: positiveInteger.max(10_000).optional(),
+          exceptionBufferBytes: z
+            .int()
+            .min(64 * 1024)
+            .max(256 * 1024 * 1024)
+            .optional(),
         })
         .optional(),
       docs: z
@@ -270,7 +280,9 @@ export function resolveConfig(input: unknown): ResolvedMcpConfig {
       },
       logs: {
         bufferSize: tools.logs?.bufferSize ?? 1000,
+        bufferBytes: tools.logs?.bufferBytes ?? 2 * 1024 * 1024,
         exceptionBufferSize: tools.logs?.exceptionBufferSize ?? 100,
+        exceptionBufferBytes: tools.logs?.exceptionBufferBytes ?? 1024 * 1024,
       },
       docs: {
         include: unique(tools.docs?.include ?? ['@adonisjs/*', '@rikology/*']),

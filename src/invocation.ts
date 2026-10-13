@@ -10,6 +10,7 @@
 |
 */
 
+import { callScope } from './call_scope.js'
 import { ToolError } from './errors.js'
 import { isPlainObject } from './define_tool.js'
 import { encodeFailure, encodeOutput, type ToolFailure } from './result.js'
@@ -108,7 +109,9 @@ export async function invokeTool(
   const started = performance.now()
   const call: ToolCall = Object.freeze({ name: definition.name, input, context })
   try {
-    const output: unknown = await dispatch(definition, call, options.wrappers, 0)
+    const output: unknown = await callScope.run({ callId: context.callId }, () =>
+      dispatch(definition, call, options.wrappers, 0)
+    )
     assertOutput(output)
     const encoded = encodeOutput(output, {
       maxBytes: options.maxResultBytes,

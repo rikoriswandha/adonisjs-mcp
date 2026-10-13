@@ -770,8 +770,40 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
       tuyauRegistry: false,
     })
     assert.deepEqual(profile.data.limitations, [])
-    assert.deepEqual(profile.data.capabilities.tools, [
-      { name: 'get_project_profile', status: 'served' },
-    ])
+    const statuses = Object.fromEntries(
+      profile.data.capabilities.tools.map((entry) => [entry.name, entry.code ?? entry.status])
+    )
+    assert.deepEqual(statuses, {
+      get_config: 'served',
+      get_container_bindings: 'served',
+      get_env: 'served',
+      get_events: 'served',
+      get_last_exceptions: 'CAPABILITY_UNSUPPORTED',
+      get_logs: 'CAPABILITY_UNSUPPORTED',
+      get_middleware: 'served',
+      get_project_profile: 'served',
+      get_routes: 'served',
+    })
+    const logs = profile.data.capabilities.tools.find((entry) => entry.name === 'get_logs')
+    assert.include(logs!.reason, 'hooks: { streamWrite }')
+
+    const bindings = await withClient(app, 'modern', async (client) =>
+      toolPayload<{
+        data: {
+          bindings: Array<{
+            key: string
+            kind: string | null
+            origin: string | null
+            evidence: string[]
+          }>
+          lanes: { runtimeObserved: { enabled: boolean } }
+        }
+      }>(await client.callTool({ name: 'get_container_bindings', arguments: {} }))
+    )
+    assert.isFalse(bindings.data.lanes.runtimeObserved.enabled)
+    const router = bindings.data.bindings.find((entry) => entry.key === 'router')
+    assert.deepInclude(router, { kind: null, origin: null })
+    assert.deepEqual(router!.evidence, ['source-declared', 'runtime-verified'])
+    assert.isUndefined(bindings.data.bindings.find((entry) => entry.key === 'lucid.db'))
   })
 })

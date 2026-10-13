@@ -69,9 +69,21 @@ export interface LogsToolConfig {
   bufferSize?: number
 
   /**
+   * Serialized bytes kept in the log ring buffer. The oldest entries are
+   * evicted first; one oversized entry is shortened instead of growing
+   * the buffer.
+   */
+  bufferBytes?: number
+
+  /**
    * Number of handled exceptions kept in the ring buffer.
    */
   exceptionBufferSize?: number
+
+  /**
+   * Serialized bytes kept in the exception ring buffer.
+   */
+  exceptionBufferBytes?: number
 }
 
 export interface DocsToolConfig {
@@ -242,7 +254,9 @@ export interface ResolvedMcpConfig {
     }
     readonly logs: {
       readonly bufferSize: number
+      readonly bufferBytes: number
       readonly exceptionBufferSize: number
+      readonly exceptionBufferBytes: number
     }
     readonly docs: {
       readonly include: readonly string[]
@@ -446,6 +460,194 @@ export interface AvailabilityContext {
   profile(): Promise<ProjectProfile>
 }
 
+export type LogLevelName = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal'
+
+/**
+ * One log record captured from the application logger, redacted before
+ * it was stored.
+ */
+export interface CapturedLog {
+  /**
+   * Capture order, increasing across log entries of the process.
+   */
+  seq: number
+  time: string | null
+  level: number | null
+  levelName: LogLevelName | null
+  message: string | null
+
+  /**
+   * `request_id` bound by `ctx.logger`. Records written with the root
+   * logger during a request have none.
+   */
+  requestId: string | null
+
+  /**
+   * MCP call whose async context wrote the record, if any.
+   */
+  callId: string | null
+
+  /**
+   * Remaining record fields and bindings (without pid, hostname, time).
+   */
+  fields: Record<string, unknown>
+
+  /**
+   * The record was shortened to fit the per-entry byte budget.
+   */
+  truncated: boolean
+}
+
+export interface LogQuery {
+  /**
+   * Number of most recent matching entries.
+   *
+   * @default 100
+   */
+  tail?: number
+
+  /**
+   * Minimum level.
+   */
+  level?: LogLevelName
+
+  /**
+   * Case-insensitive literal text searched in the message and fields.
+   */
+  grep?: string
+  requestId?: string
+  callId?: string
+
+  /**
+   * Only entries with a greater `seq`; pass a previous `lastSeq` to read
+   * what was logged since.
+   */
+  afterSeq?: number
+}
+
+export interface CaptureStats {
+  /**
+   * Items delivered by the instrumentation hook since the process started,
+   * captured or not.
+   */
+  observed: number
+  retained: number
+  retainedBytes: number
+
+  /**
+   * Items evicted by the count or byte budget.
+   */
+  evicted: number
+}
+
+export interface LogPage {
+  entries: CapturedLog[]
+
+  /**
+   * Matching entries in the buffer, before `tail` was applied.
+   */
+  matched: number
+
+  /**
+   * Cursor to pass as `afterSeq` next time. When `hasMore`, it is the last
+   * returned entry; otherwise the latest captured `seq`.
+   */
+  lastSeq: number
+
+  /**
+   * More entries after the cursor than `tail` allowed (cursor reads only).
+   */
+  hasMore: boolean
+
+  /**
+   * Entries after `afterSeq` that were evicted before they could be read.
+   */
+  missed: number
+  stats: CaptureStats
+}
+
+export interface LogReader {
+  query(query?: LogQuery): LogPage
+}
+
+/**
+ * One exception handled by the application's HTTP exception handler,
+ * redacted before it was stored.
+ */
+export interface CapturedException {
+  seq: number
+  time: string
+  name: string
+  code: string | null
+  message: string
+
+  /**
+   * Response status once the response finished (`statusSource:
+   * 'response'`), otherwise the status the error declares.
+   */
+  status: number | null
+  statusSource: 'response' | 'error' | null
+
+  /**
+   * Stack frames, paths inside the application root made relative.
+   */
+  stack: string[]
+  cause: { name: string; message: string } | null
+  request: {
+    id: string | null
+    method: string
+
+    /**
+     * Path without the query string.
+     */
+    url: string
+    route: { pattern: string; name: string | null } | null
+  } | null
+  callId: string | null
+
+  /**
+   * Same name, code, message shape and first stack frame.
+   */
+  fingerprint: string
+  truncated: boolean
+}
+
+export interface ExceptionQuery {
+  /**
+   * Most recent exceptions to return.
+   *
+   * @default 10
+   */
+  limit?: number
+  requestId?: string
+
+  /**
+   * Only the most recent exception of each fingerprint.
+   */
+  distinct?: boolean
+  afterSeq?: number
+}
+
+export interface ExceptionPage {
+  /**
+   * Newest first. `occurrences` counts buffered exceptions with the same
+   * fingerprint.
+   */
+  exceptions: Array<CapturedException & { occurrences: number }>
+  matched: number
+  /**
+   * Same cursor semantics as `LogPage.lastSeq`, with `limit`.
+   */
+  lastSeq: number
+  hasMore: boolean
+  missed: number
+  stats: CaptureStats
+}
+
+export interface ExceptionReader {
+  query(query?: ExceptionQuery): ExceptionPage
+}
+
 /**
  * Per-call context handed to tool handlers. Nothing in it outlives the
  * call.
@@ -460,6 +662,18 @@ export interface ToolContext extends AvailabilityContext {
    * Aborted when the client cancels the call or disconnects.
    */
   signal: AbortSignal
+
+  /**
+   * Captured application logs, or `null` when the application is not
+   * instrumented (see `@rikology/adonisjs-mcp/hooks`).
+   */
+  logs: LogReader | null
+
+  /**
+   * Captured handled exceptions, or `null` when the application is not
+   * instrumented.
+   */
+  exceptions: ExceptionReader | null
 }
 
 /**

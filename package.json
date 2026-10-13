@@ -21,6 +21,10 @@
       "types": "./build/configure.d.ts",
       "default": "./build/configure.js"
     },
+    "./hooks": {
+      "types": "./build/hooks.d.ts",
+      "default": "./build/hooks.js"
+    },
     "./types": {
       "types": "./build/src/types.d.ts",
       "default": "./build/src/types.js"
@@ -98,6 +102,7 @@
     "entry": {
       "index": "./index.ts",
       "configure": "./configure.ts",
+      "hooks": "./hooks.ts",
       "src/types": "./src/types.ts",
       "providers/mcp_provider": "./providers/mcp_provider.ts",
       "stubs/main": "./stubs/main.ts"

@@ -143,6 +143,26 @@ function shrink(value: unknown, limits: { items: number; chars: number }): unkno
 }
 
 /**
+ * Returns `value` unchanged when `fits(value)`, otherwise the first
+ * successively shortened copy that fits, or `undefined` when none does.
+ */
+export function shrinkToFit(
+  value: unknown,
+  fits: (candidate: unknown) => boolean
+): { value: unknown; truncated: boolean } | undefined {
+  if (fits(value)) {
+    return { value, truncated: false }
+  }
+  for (const limits of SHRINK_STEPS) {
+    const candidate = shrink(value, limits)
+    if (fits(candidate)) {
+      return { value: candidate, truncated: true }
+    }
+  }
+  return undefined
+}
+
+/**
  * Serializes a successful tool or resource payload within `maxBytes`.
  */
 export function encodeOutput(

@@ -107,6 +107,53 @@ console.log(\`MCP_PROBE \${app.getEnvironment()} \${app.container.hasBinding('mc
   )
 }
 
+/**
+ * App-local dev gateway for the opt-in capture hooks, in the shape the
+ * configure hook is planned to generate (WP-33): the package is imported
+ * only in development.
+ */
+export const DEV_HOOKS_GATEWAY = `import app from '@adonisjs/core/services/app'
+import type { HttpContext } from '@adonisjs/core/http'
+
+const hooks = app.inDev ? await import('@rikology/adonisjs-mcp/hooks') : undefined
+hooks?.observeContainer()
+
+export const streamWrite = hooks?.streamWrite ?? ((line: string) => line)
+export const observeException =
+  hooks?.observeException ?? ((_error: unknown, _ctx: HttpContext) => {})
+`
+
+/**
+ * Wires the capture hooks into the API kit: the gateway, `hooks.streamWrite`
+ * in the logger config, and one observer call in the exception handler.
+ */
+export async function instrumentCapture(fixture: FixtureApp) {
+  await writeFile(join(fixture.root, 'start', 'mcp_dev_hooks.ts'), DEV_HOOKS_GATEWAY)
+
+  const loggerFile = join(fixture.root, 'config', 'logger.ts')
+  const logger = await readFile(loggerFile, 'utf8')
+  const instrumentedLogger = logger
+    .replace(/^/, "import { streamWrite } from '#start/mcp_dev_hooks'\n")
+    .replace(/(level: env\.get\('LOG_LEVEL'\),)/, '$1\n\n      hooks: { streamWrite },')
+  if (!instrumentedLogger.includes('hooks: { streamWrite }')) {
+    throw new Error('config/logger.ts has no LOG_LEVEL level entry to anchor the hook')
+  }
+  await writeFile(loggerFile, instrumentedLogger)
+
+  const handlerFile = join(fixture.root, 'app', 'exceptions', 'handler.ts')
+  const handler = await readFile(handlerFile, 'utf8')
+  const instrumentedHandler = handler
+    .replace(/^/, "import { observeException } from '#start/mcp_dev_hooks'\n")
+    .replace(
+      /(async handle\(error: unknown, ctx: HttpContext\) \{\n)/,
+      '$1    observeException(error, ctx)\n'
+    )
+  if (!instrumentedHandler.includes('observeException(error, ctx)')) {
+    throw new Error('app/exceptions/handler.ts has no handle() method to instrument')
+  }
+  await writeFile(handlerFile, instrumentedHandler)
+}
+
 export interface RawResponse {
   status: number
   headers: Record<string, string | string[] | undefined>

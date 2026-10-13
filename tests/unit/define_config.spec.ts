@@ -31,7 +31,12 @@ test.group('resolveConfig | defaults and merge', () => {
         disabled: [],
         projectEval: { timeout: 30_000 },
         sql: { readOnly: true, maxRows: 100, allowCrossTenant: false },
-        logs: { bufferSize: 1000, exceptionBufferSize: 100 },
+        logs: {
+          bufferSize: 1000,
+          bufferBytes: 2 * 1024 * 1024,
+          exceptionBufferSize: 100,
+          exceptionBufferBytes: 1024 * 1024,
+        },
         docs: { include: ['@adonisjs/*', '@rikology/*'] },
         http: { timeout: 30_000 },
         ace: { timeout: 30_000 },
@@ -44,7 +49,12 @@ test.group('resolveConfig | defaults and merge', () => {
     const config = resolveConfig({ tools: { sql: { maxRows: 5 }, logs: { bufferSize: 10 } } })
 
     assert.deepEqual(config.tools.sql, { readOnly: true, maxRows: 5, allowCrossTenant: false })
-    assert.deepEqual(config.tools.logs, { bufferSize: 10, exceptionBufferSize: 100 })
+    assert.deepEqual(config.tools.logs, {
+      bufferSize: 10,
+      bufferBytes: 2 * 1024 * 1024,
+      exceptionBufferSize: 100,
+      exceptionBufferBytes: 1024 * 1024,
+    })
     assert.deepEqual(config.tools.http, { timeout: 30_000 })
   })
 

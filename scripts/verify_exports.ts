@@ -37,6 +37,8 @@ const REQUIRED_FILES = [
   'build/index.d.ts',
   'build/configure.js',
   'build/configure.d.ts',
+  'build/hooks.js',
+  'build/hooks.d.ts',
   'build/src/types.js',
   'build/src/types.d.ts',
   'build/providers/mcp_provider.js',
@@ -65,6 +67,13 @@ import type {
   ToolOutput,
 } from '@rikology/adonisjs-mcp/types'
 import McpProvider from '@rikology/adonisjs-mcp/providers/mcp_provider'
+import {
+  instrumentationStatus,
+  observeException,
+  streamWrite,
+  type CaptureStatus,
+} from '@rikology/adonisjs-mcp/hooks'
+import type { HttpContext } from '@adonisjs/core/http'
 import type { ApplicationService } from '@adonisjs/core/types'
 import { z } from 'zod'
 
@@ -120,7 +129,14 @@ const providerConfig: ResolvedMcpConfig | undefined = provider.config
 const hook: typeof configure = configureHook
 const error = new ToolError('NOT_FOUND', 'missing', { details: { name: 'x' } })
 
+declare const ctx: HttpContext
+const written: string = streamWrite('{}')
+observeException(new Error('x'), ctx)
+const captureStatus: CaptureStatus = instrumentationStatus()
+const reader = (context: ToolContext) => context.logs?.query({ tail: 5, level: 'warn' }).entries
+
 void [resolved, reusable, typo, evalOn, providerConfig, hook, error, stubsRoot]
+void [written, captureStatus, reader]
 void [InvalidDefinitionError, InvalidMcpConfigError]
 `
 
@@ -131,6 +147,18 @@ import * as root from '@rikology/adonisjs-mcp'
 import * as configureModule from '@rikology/adonisjs-mcp/configure'
 import * as types from '@rikology/adonisjs-mcp/types'
 import McpProvider from '@rikology/adonisjs-mcp/providers/mcp_provider'
+import * as hooks from '@rikology/adonisjs-mcp/hooks'
+
+assert.deepEqual(Object.keys(hooks).sort(), [
+  'instrumentationStatus',
+  'observeContainer',
+  'observeException',
+  'streamWrite',
+])
+assert.equal(hooks.streamWrite('{"level":30}\\n'), '{"level":30}\\n')
+const status = hooks.instrumentationStatus()
+assert.equal(status.hooksLoaded, true)
+assert.deepEqual(status.subscribers, { logs: 0, exceptions: 0 })
 
 assert.deepEqual(Object.keys(root).sort(), [
   'InvalidDefinitionError',
@@ -151,6 +179,7 @@ assert.throws(() => root.defineConfig({ path: 'x' }), root.InvalidMcpConfigError
 const bindings = new Map()
 const appFor = (inDev, environment, mcp) => ({
   inDev,
+  appRoot: new URL('file:///tmp/consumer-app/'),
   getEnvironment: () => environment,
   config: { get: () => mcp },
   container: { bindValue: (key, value) => bindings.set(key, value) },

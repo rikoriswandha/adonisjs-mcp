@@ -1,17 +1,35 @@
+import { fileURLToPath } from 'node:url'
 import type { ApplicationService } from '@adonisjs/core/types'
+import { ExceptionCapture } from '../src/buffers/exception_capture.js'
+import { containerObserver, subscribeExceptions, subscribeLogs } from '../src/buffers/gateway.js'
+import { LogCapture } from '../src/buffers/log_capture.js'
 import { resolveConfig } from '../src/define_config.js'
 import { loadExtraTools } from '../src/define_tool.js'
 import { McpEndpoint } from '../src/handler.js'
+import { ConfigIntrospection } from '../src/introspection/config.js'
+import { ContainerIntrospection } from '../src/introspection/container.js'
+import { EnvIntrospection } from '../src/introspection/env.js'
+import { EventIntrospection } from '../src/introspection/events.js'
+import { RouteIntrospection } from '../src/introspection/routes.js'
 import { packageVersion } from '../src/package_info.js'
 import { detectProfile } from '../src/profile.js'
 import { Redactor } from '../src/redaction.js'
 import { DefinitionRegistry } from '../src/registry.js'
 import { profileResource } from '../src/resources/profile.js'
 import { describeCapabilities, type ServerRuntime } from '../src/server.js'
+import { configResource, getConfigTool } from '../src/tools/app/get_config.js'
+import { getContainerBindingsTool } from '../src/tools/app/get_container_bindings.js'
+import { getEnvTool } from '../src/tools/app/get_env.js'
+import { getEventsTool } from '../src/tools/app/get_events.js'
+import { getMiddlewareTool } from '../src/tools/app/get_middleware.js'
 import {
   getProjectProfileTool,
   type DescribeProject,
 } from '../src/tools/app/get_project_profile.js'
+import { getRoutesTool, routesResource } from '../src/tools/app/get_routes.js'
+import { CaptureSource } from '../src/tools/runtime/capture_source.js'
+import { getLastExceptionsTool } from '../src/tools/runtime/get_last_exceptions.js'
+import { getLogsTool } from '../src/tools/runtime/get_logs.js'
 import type { ResolvedMcpConfig } from '../src/types.js'
 
 /**
@@ -21,28 +39,40 @@ import type { ResolvedMcpConfig } from '../src/types.js'
 const ROUTE_METHODS = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS']
 
 /**
+ * Log and exception buffers fed by the application's opt-in hooks.
+ */
+interface Capture {
+  logs: LogCapture
+  exceptions: ExceptionCapture
+  unsubscribe: Array<() => void>
+}
+
+/**
  * Registers the MCP endpoint for the `web` process in development.
  *
  * Applications load it through the app-local `#providers/mcp_dev_provider`
  * wrapper, which never imports this module outside development. The
  * environment checks below are defense in depth for direct registration:
  * outside a development `web` process, or with `enabled: false`, nothing
- * is bound, mounted or listened to.
+ * is bound, mounted, buffered or listened to.
  *
- * - register: validate config, bind `mcp.registry`.
+ * - register: validate config, bind `mcp.registry`, subscribe the log and
+ *   exception buffers to the capture hooks.
  * - boot: add builtin definitions. Other packages register from their own
  *   `boot()`, in any order.
  * - start: load `extraTools`, mount the endpoint before the HTTP server
  *   boots.
  * - ready: finalize the registry and start serving, or step aside when an
- *   application route owns the path; close in-flight MCP exchanges when
- *   the application terminates.
+ *   application route owns the path; on termination, close in-flight MCP
+ *   exchanges and release the buffers and observers.
  */
 export default class McpProvider {
   #config?: ResolvedMcpConfig
   #registry?: DefinitionRegistry
   #endpoint?: McpEndpoint
   #runtime?: ServerRuntime
+  #redactor?: Redactor
+  #capture?: Capture
 
   constructor(protected app: ApplicationService) {}
 
@@ -65,6 +95,7 @@ export default class McpProvider {
     const config = resolveConfig(this.app.config.get('mcp', undefined))
     this.#config = config
     if (!config.enabled || this.app.getEnvironment() !== 'web') {
+      this.#release()
       return
     }
 
@@ -73,19 +104,69 @@ export default class McpProvider {
       registry.disable(name)
     }
     this.#registry = registry
+    this.#redactor = Redactor.fromEnvironment(process.env)
     this.app.container.bindValue('mcp.registry', registry)
+
+    /**
+     * Buffers are subscribed even when the hooks module is not loaded yet:
+     * the gateway may load it later (e.g. from the exception handler, which
+     * the HTTP server imports after providers registered). Tools report
+     * capture as unavailable until the hooks are loaded.
+     */
+    const logs = new LogCapture({
+      capacity: config.tools.logs.bufferSize,
+      maxBytes: config.tools.logs.bufferBytes,
+      redactor: this.#redactor,
+    })
+    const exceptions = new ExceptionCapture({
+      capacity: config.tools.logs.exceptionBufferSize,
+      maxBytes: config.tools.logs.exceptionBufferBytes,
+      redactor: this.#redactor,
+      appRoot: fileURLToPath(this.app.appRoot),
+    })
+    this.#capture = {
+      logs,
+      exceptions,
+      unsubscribe: [subscribeLogs(logs.handleLine), subscribeExceptions(exceptions.handle)],
+    }
   }
 
   boot() {
-    if (!this.#registry) {
+    const registry = this.#registry
+    const config = this.#config
+    const redactor = this.#redactor
+    if (!registry || !config || !redactor) {
       return
     }
+    const app = this.app
+    const appRoot = fileURLToPath(app.appRoot)
     const describe: DescribeProject = async (context) => ({
       ...(await context.profile()),
       capabilities: await describeCapabilities(this.#runtime!, context),
     })
-    this.#registry.tool(getProjectProfileTool(describe))
-    this.#registry.resource(profileResource(describe))
+    const capture = new CaptureSource(config)
+    const routes = new RouteIntrospection({
+      app,
+      config,
+      redactor,
+      isOwnMiddleware: (reference) => this.#endpoint?.isOwnMiddleware(reference) ?? false,
+    })
+    const settings = new ConfigIntrospection(app, redactor)
+
+    registry.tool(getProjectProfileTool(describe))
+    registry.tool(getLogsTool(capture))
+    registry.tool(getLastExceptionsTool(capture))
+    registry.tool(getRoutesTool(routes))
+    registry.tool(getMiddlewareTool(routes))
+    registry.tool(
+      getContainerBindingsTool(new ContainerIntrospection(app, appRoot, containerObserver))
+    )
+    registry.tool(getEventsTool(new EventIntrospection(app)))
+    registry.tool(getConfigTool(settings))
+    registry.tool(getEnvTool(new EnvIntrospection(app, appRoot)))
+    registry.resource(profileResource(describe))
+    registry.resource(routesResource(routes))
+    registry.resource(configResource(settings))
   }
 
   async start() {
@@ -114,7 +195,8 @@ export default class McpProvider {
     const config = this.#config
     const registry = this.#registry
     const endpoint = this.#endpoint
-    if (!config || !registry || !endpoint) {
+    const redactor = this.#redactor
+    if (!config || !registry || !endpoint || !redactor) {
       return
     }
 
@@ -124,6 +206,7 @@ export default class McpProvider {
     const shadowed = ROUTE_METHODS.filter((method) => router.match(config.path, method, false))
     if (shadowed.length > 0) {
       endpoint.detach()
+      this.#release()
       logger.error(
         'MCP endpoint disabled: "%s" is also an application route (%s). Set a different "path" in config/mcp.ts.',
         config.path,
@@ -137,8 +220,10 @@ export default class McpProvider {
       app,
       config,
       snapshot,
-      redactor: Redactor.fromEnvironment(process.env),
+      redactor,
       version: await packageVersion(),
+      logs: this.#capture?.logs ?? null,
+      exceptions: this.#capture?.exceptions ?? null,
       detectProfile: () => detectProfile(app, config),
     }
     endpoint.activate(this.#runtime)
@@ -148,7 +233,10 @@ export default class McpProvider {
      * HTTP server registered its own close hook, this one runs first, so
      * open MCP exchanges cannot hold the server close.
      */
-    this.app.terminating(() => endpoint.close())
+    this.app.terminating(async () => {
+      await endpoint.close()
+      this.#release()
+    })
 
     const server = await this.app.container.make('server')
     const address = server.getNodeServer()?.address()
@@ -157,5 +245,23 @@ export default class McpProvider {
     } else {
       logger.info('MCP endpoint ready at %s', config.path)
     }
+  }
+
+  /**
+   * Detaches the buffers from the capture hooks, drops what they hold and
+   * restores the container methods wrapped by the opt-in observer.
+   * Idempotent.
+   */
+  #release() {
+    const capture = this.#capture
+    if (capture) {
+      for (const unsubscribe of capture.unsubscribe) {
+        unsubscribe()
+      }
+      capture.logs.clear()
+      capture.exceptions.clear()
+      this.#capture = undefined
+    }
+    containerObserver()?.stop()
   }
 }

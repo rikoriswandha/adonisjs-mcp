@@ -1,7 +1,7 @@
 # Implementation Plan — @rikology/adonisjs-mcp
 
 Tanggal: 13 Oktober 2026  
-Status: M0 (spike dan obligation ledger), M1 (fondasi package dan fixture, §6.1), dan M2 (registry, provider, transport, security boundary, §6.2) selesai; M3 belum dimulai
+Status: M0 (spike dan obligation ledger), M1 (fondasi package dan fixture, §6.1), M2 (registry, provider, transport, security boundary, §6.2), dan M3 (runtime observability dan metadata dasar, §6.3) selesai; M4 belum dimulai
 Sumber kebutuhan: [DESIGN.md](./DESIGN.md)  
 Obligation ledger: [OBLIGATION_LEDGER.md](./OBLIGATION_LEDGER.md); bukti spike: [spikes/](./spikes/)  
 Target deliverable: package npm `@rikology/adonisjs-mcp@0.1.0`, MIT, untuk aplikasi AdonisJS v7 dalam development.
@@ -143,6 +143,20 @@ Keputusan implementasi M2, dengan bukti di §6.2. Statusnya keputusan rencana, b
 | D35 | idem | Route app pada path MCP tidak di-shadow: saat `ready()` provider memeriksa `router.match` untuk semua method; bila ada, endpoint melepaskan path (request diteruskan ke route app) dan mencatat error berisi path dan method. Gagal boot tidak dipakai karena error di `ready()` terjadi setelah server listening dan tidak menghentikan proses | WP-06 "route name/path conflict handling" |
 | D36 | idem | Shutdown: provider mendaftarkan `app.terminating` di `ready()`, setelah hook close HTTP server milik Core, sehingga hook MCP berjalan lebih dulu (urutan terbalik) dan exchange MCP yang masih terbuka tidak menahan `server.close()`. Exchange modern dibatalkan lewat `handler.close()`; koneksi legacy yang tersisa di-destroy | D23 (penutupan handler) |
 | D37 | idem | Profile: `active` hanya dari sinyal runtime terverifikasi (binding container string/kelas yang diimpor lewat `app.import`, flag `app.usingEdgeJS`/`usingVineJS`); paket tanpa sinyal (Tuyau, Transmit, permissions, Bouncer) melaporkan `active: null`, bukan `false`. `kind` hybrid hanya bila surface web (renderer Inertia/Edge aktif) dan surface api (config, route `/api`/domain `api.*`) sama-sama ada. Profile dihitung lazy, paling banyak sekali per request MCP (`AvailabilityContext.profile()`), dan `available()` dievaluasi per request; `available()` yang throw atau mengembalikan nilai invalid menjadi `INTEGRATION_FAILED` | §4.5, D14 |
+
+### 3.3 Keputusan hasil M3
+
+Keputusan implementasi M3, dengan bukti di §6.3. Statusnya keputusan rencana, belum persetujuan pengguna.
+
+| ID | Bukti | Keputusan | Mengubah |
+| --- | --- | --- | --- |
+| D38 | `tests/integration/observability.spec.ts` | Instrumentasi opt-in diekspor sebagai `@rikology/adonisjs-mcp/hooks` (`streamWrite`, `observeException`, `observeContainer`, `instrumentationStatus`). Gateway app-local `start/mcp_dev_hooks.ts` meng-import modul itu hanya bila `app.inDev`; `config/logger.ts` memakai `hooks: { streamWrite }`, `HttpExceptionHandler.handle()` memanggil `observeException(error, ctx)` sekali. Hook hanya meneruskan ke subscriber modul `gateway`; tanpa subscriber (console, `enabled: false`, sesudah shutdown) hook hanya menghitung dan tidak menyimpan data. Codemod configure untuk gateway tetap WP-33 | D24, OB-08 |
+| D39 | idem | Observasi container dimulai dari gateway saat config dimuat (sebelum provider mana pun `register()`), bukan dari provider di posisi pertama: config diproses sebelum `providersManager.register()` di Application 9.1, sehingga tidak perlu codemod reorder (`addProvider` hanya append). Hanya proses `web`; `enabled: false` dan shutdown mengembalikan method container dan melepas trace `providerRegister` | OB-14 (posisi observer) |
+| D40 | idem | Buffer log/exception dibuat dan di-subscribe setiap kali provider aktif (dev, `web`, `enabled`), dimiliki provider, dilepas dan dikosongkan saat terminating/route conflict. Availability `get_logs`/`get_last_exceptions` dan `ToolContext.logs`/`exceptions` dihitung per request dari `instrumentationStatus().hooksLoaded`; tanpa hooks tool tidak disajikan (`CAPABILITY_UNSUPPORTED` dengan langkah wiring) | §4.3 `ToolContext`, API-03 |
+| D41 | idem, `tests/unit/capture.spec.ts` | Config aditif `tools.logs.bufferBytes` (default 2 MiB) dan `exceptionBufferBytes` (default 1 MiB), 64 KiB–256 MiB; count dibatasi 100.000 log / 10.000 exception. Entry log maksimal 16 KiB, exception 32 KiB (dipendekkan, bukan ditolak); baris log > 64 KiB tidak di-parse dan dicatat sebagai placeholder berukuran. Cursor `afterSeq` mengembalikan entry tertua sesudah cursor dengan `hasMore`/`missed`, sehingga burst tidak terlewat diam-diam | CF-05, §4.4 |
+| D42 | idem | Korelasi: `requestId` hanya dari binding `request_id` milik `ctx.logger` (root logger tidak direkayasa); `callId` dari `AsyncLocalStorage` yang membungkus wrapper + handler tool dan pembacaan resource, sehingga traffic HTTP konkuren tidak pernah diatribusikan ke call. Exception di-dedup per objek error; status diisi dari response saat `finish` | §8.1 `get_logs`/`get_last_exceptions` |
+| D43 | idem | Router stack `get_middleware` diturunkan dari middleware `global` terdepan pada stack route yang ter-commit (Router tidak mengekspos `router.use()`); named middleware tak terpakai hanya dari export `middleware` modul preload, dan factory hanya dipanggil bila source-nya identik dengan factory `router.named()` milik framework | OB-11 |
+| D44 | idem | Resource `adonis://routes` dan `adonis://config/{key}` dibuat di M3 dari service yang sama dengan tool; WP-32 tinggal memverifikasi konsistensi lintas resource. Redaksi data terstruktur (`project()`): key sensitif (termasuk sufiks angka), nilai env rahasia, kredensial URL; getter, `toJSON`, config provider lazy, dan instance kelas tidak dievaluasi | §8.2, SEC-18 |
 
 ## 4. Arsitektur dan kontrak yang dibekukan sebelum ekspansi fitur
 
@@ -345,6 +359,26 @@ Prasyarat: M2, S-C, S-D.
 | WP-13 | `get_config`, `get_env` | Resolved values ter-redaksi recursive; env hanya key/presence, tidak nilainya; tidak men-dump seluruh `process.env` |
 
 **Exit gate M3:** request fixture sukses dan gagal muncul sebagai route/log/exception yang benar; sentinel secret tidak keluar dari tools maupun resource projection.
+
+#### 6.3 Hasil M3 (13 Oktober 2026)
+
+Exit gate M3 terpenuhi pada macOS arm64, Node 24.21.0, npm 11.19.0, tuple §2.3. Kit API diinstrumentasi lewat gateway dev (D38) dan diberi route probe, binding container, listener event, named middleware tak terpakai, serta sentinel secret (`FIXTURE_SENTINEL_SECRET` di `.env`, literal `password`/kredensial URL di `config/sentinel.ts`). Dua belas request sukses, empat request gagal, satu route tak dikenal, dan satu tool call yang menulis log berjalan konkuren; client resmi kemudian membaca route, log, dan exception yang tepat. Sentinel tidak muncul di output kesembilan tool maupun di resource `adonis://profile`, `adonis://routes`, `adonis://config/sentinel`, dan `adonis://config/app` pada kedua era protokol, sementara aplikasi sendiri tetap mencetaknya di stdout. Temuan review adversarial (cursor `afterSeq` melompati burst, capture bergantung pada urutan load hooks, key bersufiks angka tidak ter-mask, field `__proto__`, alokasi ring berdasarkan count, biaya parse 1 MiB, grep atas teks JSON-escaped, `./hooks` tidak diperiksa `verify:exports`) sudah diperbaiki dan diuji.
+
+| WP | Artefak | Bukti |
+| --- | --- | --- |
+| WP-10 | `hooks.ts` (export `./hooks`), `src/buffers/{gateway,ring_buffer,log_capture,exception_capture}.ts`, `src/call_scope.ts`, `src/tools/runtime/{get_logs,get_last_exceptions,capture_source}.ts`, config `tools.logs.bufferBytes`/`exceptionBufferBytes`, `ToolContext.logs`/`exceptions` | `tests/unit/{ring_buffer,capture}.spec.ts`; integrasi: setiap record root/ctx/child tepat sekali di buffer dan sekali di stdout; `get_logs({ requestId })` hanya record ctx/child request itu; `get_logs({ callId })` hanya record yang ditulis di dalam call, traffic HTTP `callId: null`; empat exception dengan status 500 dari response, route `/__fixture/fail/:id`, request id, pesan ter-redaksi, `occurrences` 4; route tak dikenal 404 `E_ROUTE_NOT_FOUND` tanpa route |
+| WP-11 | `src/introspection/{routes,references}.ts`, `src/tools/app/{get_routes,get_middleware}.ts`, resource `adonis://routes` | Integrasi: route API dengan nama `profile.profile.show`, handler `#controllers/profile_controller#show`, stack bodyparser → session → Shield → initialize_auth → silent_auth → named `auth`, surface api `inferred`; route `/` closure `name: null`, surface `default`; server stack diawali middleware MCP lalu force_json → container_bindings → CORS; router stack diturunkan; named `auth` dipakai 2 route dan `fixtureUnused` 0 route dari export preload; resource identik dengan tool tanpa filter |
+| WP-12 | `src/introspection/{container,container_observer,events,typescript}.ts`, `src/tools/app/{get_container_bindings,get_events}.ts` | Integrasi: `coverage: 'partial'`; singleton/bind/alias/bindValue dengan origin `FixtureBindingsProvider`/`DatabaseServiceProvider`/`McpProvider` dari trace `providerRegister`, binding yang dibuat di `boot()` origin `null`, key deklarasi tanpa binding di `declaredUnavailable`, counter konstruksi factory tetap 0; tanpa observasi (kit `api-bare`, `endpoint.spec`) kind/origin `null` dengan evidence `source-declared`+`runtime-verified`. Event: listener inline bernama dan lazy `#listeners/fixture_listener#handle`, event `once()` tidak terdaftar, listener tidak pernah berjalan |
+| WP-13 | `src/introspection/{config,env}.ts`, `src/tools/app/{get_config,get_env}.ts`, resource `adonis://config/{key}`, `project()`/`isSensitiveKey()` di `src/redaction.ts` | `tests/unit/{redaction,introspection}.spec.ts`; integrasi: `database.connection` = `sqlite`, subtree sentinel ter-redaksi (key sensitif, nilai env rahasia di key netral, password URL), `__proto__` → `INPUT_INVALID`, key tak ada → `NOT_FOUND` (resource: error protokol); `get_env` membaca schema `start/env.ts`: tipe, optional, secret, presence, tanpa nilai |
+
+PF-08 tetap terjaga: dengan `enabled: false` hooks termuat tetapi subscriber 0/0 dan observer container nonaktif; proses `NODE_ENV=test` tanpa subscriber; deployment production pruned dari app yang diinstrumentasi boot, route sukses/gagal ditangani handler app, log app tercetak sekali, hooks tidak dapat di-resolve, endpoint 404. Jumlah test setelah M3: 77 unit, 35 integration; `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:integration`, dan `npm run verify:exports` (consumer strict meng-import `./hooks` dan `ToolContext.logs`) lulus.
+
+Batas yang tetap terbuka setelah M3:
+
+- Configure belum menulis gateway, wiring logger, dan observer handler (WP-33); fixture memasangnya lewat helper test `instrumentCapture` dengan bentuk yang sama.
+- Capture hanya mencakup logger yang memakai `hooks.streamWrite`; named logger lain, transport worker, exception di luar HTTP, dan `report()` yang throw sebelum `handle()` tidak tercakup dan dilabel di output tool. Korelasi `http_request` ↔ log (E02) menunggu M5.
+- Inventory container tetap parsial: registrasi sebelum gateway berjalan dan key tanpa deklarasi yang tidak teramati tidak dapat ditemukan; deklarasi butuh `typescript` di app. Event `once()`/`onAny()` hanya terlihat dari jumlah listener transport.
+- Metadata dibaca segar setiap request (tanpa cache); regression HMR/restart (OB-13, OB-15) tetap WP-37.
 
 ### M4 — Lucid, SQL, schema, dan tenant foundation
 
@@ -703,9 +737,9 @@ Bila post-publish smoke gagal, hentikan promosi dan terbitkan perbaikan versi ba
 3. ~~Bekukan public schema/config/result/error contracts dan lifecycle registry~~ — selesai di M1–M2 (§6.1, §6.2, D34–D37).
 4. ~~Bangun vertical slice M2 dengan `get_project_profile` dan `adonis://profile` sebagai fitur nyata~~ — selesai (§6.2).
 5. ~~Jalankan spike log/auth/SQL/tenant/eval/introspection yang tersisa~~ — selesai di M0; B-01 diputuskan (opsi a).
-6. Eksekusi M3–M8 sesuai dependensi, tutup dengan M9. Jangan memindahkan risiko keamanan ke akhir hanya karena tool sudah tampak bekerja.
+6. ~~Eksekusi M3~~ — selesai (§6.3). Eksekusi M4–M8 sesuai dependensi, tutup dengan M9. Jangan memindahkan risiko keamanan ke akhir hanya karena tool sudah tampak bekerja.
 
-Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Sejak M1, tests dan smoke package mencakup fondasi (§6.1); sejak M2 juga endpoint MCP, registry, guard, dan satu tool + satu resource nyata (§6.2). Tool lain belum ada.
+Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Sejak M1, tests dan smoke package mencakup fondasi (§6.1); sejak M2 juga endpoint MCP, registry, guard, dan satu tool + satu resource nyata (§6.2); sejak M3 juga capture log/exception opt-in, delapan tool observability/metadata, dan resource routes/config (§6.3). Tool M4–M7 belum ada.
 
 ## 14. Referensi
 
