@@ -1,0 +1,133 @@
+name: Release
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Verify only (select an existing version tag as the ref)
+        type: boolean
+        default: true
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Verify version tag and release notes
+        env:
+          RELEASE_REF: ${{ github.ref }}
+        run: |
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import assert from "node:assert/strict";
+            const { version } = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            assert.equal(process.env.RELEASE_REF, `refs/tags/v${version}`, "Select the matching version tag");
+            const notes = fs.readFileSync("CHANGELOG.md", "utf8");
+            assert.ok(notes.split("\n").some(line => line.startsWith(`## ${version} (`)), "Missing CHANGELOG section");
+          '
+      - run: npm ci
+      - run: npm run build
+      - name: Pack exactly once and record SHA-512
+        run: |
+          mkdir release-artifact
+          npm pack --ignore-scripts --json --pack-destination release-artifact > pack.json
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import crypto from "node:crypto";
+            const [{ filename }] = JSON.parse(fs.readFileSync("pack.json", "utf8"));
+            const file = `release-artifact/${filename}`;
+            fs.writeFileSync(`${file}.sha512`, crypto.createHash("sha512").update(fs.readFileSync(file)).digest("hex") + "\n");
+            fs.appendFileSync(process.env.GITHUB_ENV, `ADONISJS_MCP_TARBALL=${process.cwd()}/${file}\n`);
+          '
+      # Run the script bodies directly: npm wrappers rebuild; this job builds once.
+      - name: Verify the packed consumer and both client eras
+        run: |
+          node --import=@poppinss/ts-exec scripts/smoke_pack.ts
+          node --import=@poppinss/ts-exec scripts/smoke_clients.ts
+          node scripts/verify_exports.ts
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - name: Security suite against the verified artifact
+        run: node --import=@poppinss/ts-exec --enable-source-maps bin/test.ts security
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.os }}
+          path: release-artifact/*
+          if-no-files-found: error
+  publish:
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/') && (github.event_name == 'push' || inputs.dry-run == false)
+    runs-on: ubuntu-latest
+    environment: npm
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+      - run: npm install --global npm@11
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-ubuntu-latest
+          path: release-artifact
+      - name: Verify the immutable tarball and extract release notes
+        run: |
+          node --input-type=module -e '
+            import fs from "node:fs";
+            import crypto from "node:crypto";
+            import assert from "node:assert/strict";
+            const files = fs.readdirSync("release-artifact").filter(file => file.endsWith(".tgz"));
+            assert.equal(files.length, 1);
+            const file = `release-artifact/${files[0]}`;
+            assert.equal(crypto.createHash("sha512").update(fs.readFileSync(file)).digest("hex"), fs.readFileSync(`${file}.sha512`, "utf8").trim());
+            fs.appendFileSync(process.env.GITHUB_ENV, `RELEASE_TARBALL=${file}\n`);
+            const { version } = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            const lines = fs.readFileSync("CHANGELOG.md", "utf8").split("\n");
+            const start = lines.findIndex(line => line.startsWith(`## ${version} (`));
+            assert.ok(start >= 0);
+            const end = lines.findIndex((line, index) => index > start && line.startsWith("## "));
+            fs.writeFileSync("release-notes.md", lines.slice(start + 1, end < 0 ? undefined : end).join("\n").trim() + "\n");
+          '
+      - name: Publish the verified tarball with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish "$RELEASE_TARBALL" --provenance --access public
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "$RELEASE_TARBALL" "$RELEASE_TARBALL.sha512" --verify-tag --notes-file release-notes.md
+  post-publish-smoke:
+    needs: publish
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - name: Verify registry install, provenance and live MCP calls
+        # smoke_published retries registry/provenance propagation six times.
+        run: npm run smoke:published -- "${GITHUB_REF_NAME#v}"

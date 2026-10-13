@@ -1,7 +1,7 @@
 {
   "name": "@rikology/adonisjs-mcp",
   "description": "Development-only MCP endpoint embedded in a running AdonisJS v7 application",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "engines": {
     "node": ">=24.0.0"
   },
