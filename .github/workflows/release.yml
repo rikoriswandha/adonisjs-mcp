@@ -88,7 +88,8 @@ jobs:
             import assert from "node:assert/strict";
             const files = fs.readdirSync("release-artifact").filter(file => file.endsWith(".tgz"));
             assert.equal(files.length, 1);
-            const file = `release-artifact/${files[0]}`;
+            // "./" is required: npm treats a bare "dir/file.tgz" as a GitHub owner/repo spec.
+            const file = `./release-artifact/${files[0]}`;
             assert.equal(crypto.createHash("sha512").update(fs.readFileSync(file)).digest("hex"), fs.readFileSync(`${file}.sha512`, "utf8").trim());
             fs.appendFileSync(process.env.GITHUB_ENV, `RELEASE_TARBALL=${file}\n`);
             const { version } = JSON.parse(fs.readFileSync("package.json", "utf8"));
