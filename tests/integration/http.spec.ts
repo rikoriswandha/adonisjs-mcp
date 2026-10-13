@@ -278,7 +278,10 @@ test.group('HTTP | hybrid Inertia and API kit', (group) => {
       assert.equal(surfaces.surfaces.api!.prefix, '/api')
       assert.isNull(surfaces.surfaces.default)
 
-      const undecided = await httpError(client, { path: '/' })
+      const rendered = await http(client, { path: '/' })
+      assert.equal(rendered.data.request.surface.name, 'web')
+      assert.equal(rendered.data.request.surface.source, 'route-render')
+      const undecided = await httpError(client, { path: '/__fixture/whoami' })
       assert.equal(undecided.code, 'INPUT_INVALID')
       assert.include(undecided.message, "surface: 'web' or 'api'")
 

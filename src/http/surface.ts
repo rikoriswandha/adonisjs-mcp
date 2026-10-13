@@ -5,7 +5,8 @@
 |
 | Decides whether a request is sent like a JSON API client or like the web
 | surface (Inertia or Edge), in this order (plan §4.5): explicit `surface`
-| → explicit `as.guard` → the auth guards the matched route declares →
+| → explicit `as.guard` → the auth guards the matched route declares → the
+| matched route handler statically renders a literal Inertia component →
 | `profile.surfaces.*.prefix` in config/mcp.ts → an observed `/api` prefix
 | or `api.*` domain → a route protected by the default auth guard → the
 | default surface. Explicit inputs that contradict each other are
@@ -22,7 +23,8 @@ import { ToolError } from '../errors.js'
 import { routeSurface } from '../introspection/routes.js'
 import type { ProjectProfile, ResolvedMcpConfig, SurfaceName } from '../types.js'
 
-export type SurfaceSource = 'input' | 'guard' | 'route-guard' | 'config' | 'inferred' | 'default'
+export type SurfaceSource =
+  'input' | 'guard' | 'route-guard' | 'route-render' | 'config' | 'inferred' | 'default'
 
 export interface SurfaceDecision {
   name: SurfaceName
@@ -68,6 +70,7 @@ export interface SurfaceInput {
   explicit?: SurfaceName
   guard?: string
   route: { pattern: string; domain: string } | null
+  render?: { component: string; location: { file: string; line: number } } | null
   pathname: string
   auth: RouteAuth | null
   defaultGuard: string | null
@@ -152,6 +155,13 @@ export function decideSurface(input: SurfaceInput): SurfaceDecision {
         `the route authenticates with ${input.auth.guards.map((guard) => `"${guard}"`).join(', ')}`
       )
     }
+  }
+  if (input.render) {
+    return decision(
+      'web',
+      'route-render',
+      `the route renders Inertia component "${input.render.component}" at ${input.render.location.file}:${input.render.location.line}`
+    )
   }
 
   const byRoute = routeSurface(

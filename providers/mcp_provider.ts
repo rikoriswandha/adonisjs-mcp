@@ -14,7 +14,11 @@ import { ConfigIntrospection } from '../src/introspection/config.js'
 import { ContainerIntrospection } from '../src/introspection/container.js'
 import { EnvIntrospection } from '../src/introspection/env.js'
 import { EventIntrospection } from '../src/introspection/events.js'
+import { InertiaIntrospection } from '../src/introspection/inertia.js'
 import { RouteIntrospection } from '../src/introspection/routes.js'
+import { TuyauIntrospection } from '../src/introspection/tuyau.js'
+import { ValidatorIntrospection } from '../src/introspection/validators.js'
+import { ViewIntrospection } from '../src/introspection/views.js'
 import { packageVersion } from '../src/package_info.js'
 import { detectProfile } from '../src/profile.js'
 import { Redactor } from '../src/redaction.js'
@@ -25,12 +29,23 @@ import { configResource, getConfigTool } from '../src/tools/app/get_config.js'
 import { getContainerBindingsTool } from '../src/tools/app/get_container_bindings.js'
 import { getEnvTool } from '../src/tools/app/get_env.js'
 import { getEventsTool } from '../src/tools/app/get_events.js'
+import {
+  getInertiaPagesTool,
+  getSharedPropsTool,
+  getTransformersTool,
+} from '../src/tools/app/get_inertia.js'
 import { getMiddlewareTool } from '../src/tools/app/get_middleware.js'
+import { getPermissionsTool } from '../src/tools/app/get_permissions.js'
 import {
   getProjectProfileTool,
   type DescribeProject,
 } from '../src/tools/app/get_project_profile.js'
+import { getQueueJobsTool } from '../src/tools/app/get_queue_jobs.js'
 import { getRoutesTool, routesResource } from '../src/tools/app/get_routes.js'
+import { getTuyauSchemaTool } from '../src/tools/app/get_tuyau_schema.js'
+import { getValidatorsTool } from '../src/tools/app/get_validators.js'
+import { getViewsTool } from '../src/tools/edge/get_views.js'
+import { renderViewTool } from '../src/tools/edge/render_view.js'
 import { CaptureSource } from '../src/tools/runtime/capture_source.js'
 import { diffSchemaTool } from '../src/tools/database/diff_schema.js'
 import { executeSqlQueryTool } from '../src/tools/database/execute_sql_query.js'
@@ -189,7 +204,21 @@ export default class McpProvider {
     registry.tool(diffSchemaTool(new SchemaDiff(lucid, models, migrations)))
     registry.resource(modelsResource(models))
 
-    registry.tool(httpRequestTool(new HttpRequestService({ app, redactor, catalog: models })))
+    const inertia = new InertiaIntrospection(app, routes)
+    registry.tool(
+      httpRequestTool(new HttpRequestService({ app, redactor, catalog: models, inertia }))
+    )
+
+    const views = new ViewIntrospection(app, appRoot, redactor)
+    registry.tool(getValidatorsTool(new ValidatorIntrospection(app, redactor)))
+    registry.tool(getInertiaPagesTool(inertia))
+    registry.tool(getSharedPropsTool(inertia))
+    registry.tool(getTransformersTool(inertia))
+    registry.tool(getTuyauSchemaTool(new TuyauIntrospection(app)))
+    registry.tool(getViewsTool(views))
+    registry.tool(renderViewTool(views, config))
+    registry.tool(getPermissionsTool(redactor))
+    registry.tool(getQueueJobsTool(redactor))
   }
 
   async start() {

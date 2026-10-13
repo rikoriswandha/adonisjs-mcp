@@ -52,7 +52,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-10 | Read-only SQL ditegakkan DB/connection; statement filter hanya lapisan tambahan; tanpa fallback read-write | Plan D10 | SP-G | WP-16 | SEC-10–SEC-12 | SELESAI (M4: reader PostgreSQL READ ONLY + role SELECT-only, SQLite proses readonly; policy hanya lapisan tambahan; tanpa reader/driver capability `CAPABILITY_UNSUPPORTED`, tidak pernah fallback ke pool app; `database.spec`) |
 | DC-11 | Tenant raw SQL tanpa boundary DB terbukti ditolak; bukan string matching | Plan D11 | SP-H | WP-18 | E06, SEC-13 | SELESAI (M4: `tenant` hanya untuk tabel FORCE RLS; tabel TenantScope tanpa RLS dan SQLite → `TENANT_SCOPE_REQUIRED`; `database.spec`) |
 | DC-12 | Tenant `http_request` lewat middleware tenant app dengan mapping tepercaya | Plan D12 | SP-H | WP-21 | E06 | SELESAI (M5: kunci tenant di-lookup lalu dipetakan ke header resolver `X-Tenant-ID` yang dibaca middleware tenant app sebelum auth; header itu tidak dapat diisi caller; A/B konkuren dan anonymous-after-call; `http.spec`) |
-| DC-13 | Evidence `runtime`/`generated`/`source` dipisahkan pada metadata | Plan D13 | SP-I | WP-11, WP-23–WP-25 | golden fixture introspeksi | TERBUKA |
+| DC-13 | Evidence `runtime`/`generated`/`source` dipisahkan pada metadata | Plan D13 | SP-I | WP-11, WP-23–WP-25 | golden fixture introspeksi | SELESAI (M3 route; M6 validator runtime AST, Inertia source + generated `pages.d.ts`/`data.d.ts`, Tuyau generated `typeOnly`, Edge runtime loader + source scan, queue `config-declared+runtime-verified`/`internal-physical-schema`; D56–D60, `validators.spec`, `inertia.spec`, `tuyau.spec`, `edge.spec`, `authz_queue.spec`) |
 | DC-14 | Hybrid ditentukan surface terkonfigurasi/teramati, bukan kehadiran package | Plan D14 | SP-I | WP-09, WP-21 | PF-06 | SELESAI (M5: kit hybrid Inertia React + route `/api` → `kind: hybrid`, default `null`, request tanpa surface ditolak; `http.spec`) |
 | DC-15 | Origin binding hanya bila framework mengekspos bukti; selain itu `unknown` | Plan D15 | SP-D | WP-12 | E01 | SELESAI (M3: origin binding hanya dari trace `providerRegister` sinkron saat observasi gateway aktif; binding dari `boot()` dan tanpa observasi `origin: null`; `observability.spec`, `endpoint.spec` kit `api-bare`) |
 | DC-16 | Package ekstensi bisa memberi definisi tanpa runtime import; helper di-lazy-import setelah guard | Plan D16 | — | WP-03, WP-05 | E07 | SELESAI (M2: provider ekstensi fixture memberi object literal, `zod`/`ToolError` di-import di dalam `boot()` setelah `hasBinding`; `endpoint.spec`) |
@@ -69,9 +69,9 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-27 | Impersonation: token handle + delete `finally`; cookie `e:` ber-expiry deadline call; semantik tanpa residu + replay terbatas, bukan revocation | Plan D27 | SP-F | WP-20, WP-35 | E04, E06 | SELESAI untuk WP-20 (M5, D52: token handle + delete `finally`, cookie `e:` dengan expiry deadline dan rewrap setiap cookie `e:` response; `http.spec`); dokumentasi semantik replay tetap WP-35 |
 | DC-28 | Executor SQL milik MCP: PG reader least-privilege + extended protocol + READ ONLY + AST; SQLite child readonly + SIGKILL deadline; tanpa reader PG → capability nonaktif | Plan D28 | SP-G | WP-16, WP-36 | E03, SEC-10–SEC-12 | SELESAI dengan perubahan D46–D47 (M4: koneksi reader per call ditutup alih-alih `DISCARD ALL` + reuse; SQLite diperiksa lewat program terkompilasi native, bukan `sqlite-parser`; `database.spec`, `sql_policy.spec`) |
 | DC-29 | Raw SQL tenant hanya lewat FORCE RLS + reader NOBYPASSRLS + `set_config` parameterized milik MCP; tenant lookup/authorize sebelum run | Plan D29 | SP-H | WP-16, WP-18, WP-21 | E06, SEC-13 | SELESAI (M4: lookup resolver app sebelum `TenantService.run`, `app.tenant_id` diset MCP, setiap relasi harus FORCE RLS, role BYPASSRLS ditolak; `database.spec`. M5: mapping HTTP tenant lewat resolver tepercaya, D54; `http.spec`) |
-| DC-30 | Sumber evidence introspeksi per artefak (Vine AST, Tuyau runtime vs type-only, Inertia TS AST, Edge mounted roots) | Plan D30 | SP-I | WP-23–WP-26 | golden fixture | TERBUKA |
+| DC-30 | Sumber evidence introspeksi per artefak (Vine AST, Tuyau runtime vs type-only, Inertia TS AST, Edge mounted roots) | Plan D30 | SP-I | WP-23–WP-26 | golden fixture | SELESAI (M6, D56–D59) |
 | DC-31 | Ace subprocess + process group + watchdog independen parent; outcome unknown saat hard restart | Plan D31 | SP-J | WP-29, WP-38 | E08 | TERBUKA |
-| DC-32 | Identitas paket opsional: tenant 1.0.2, `@adonisplus/permissions` 0.0.4 (privat), Bouncer 4 alternatif, queue 0.6.2 + boringnode 0.6.0 | Plan D32 | SP-K | WP-09, WP-18, WP-27 | PF-07 | TERBUKA |
+| DC-32 | Identitas paket opsional: tenant 1.0.2, `@adonisplus/permissions` 0.0.4 (privat), Bouncer 4 alternatif, queue 0.6.2 + boringnode 0.6.0 | Plan D32 | SP-K | WP-09, WP-18, WP-27 | PF-07 | SELESAI (M4 tenant; M6 permissions 0.0.4 dari registry Plus, Bouncer 4.0.1, queue 0.6.2 + boringnode 0.6.0 terpasang di fixture dan positive test, D60, `authz_queue.spec`) |
 | DC-33 | Dependency tambahan dengan alasan tercatat: parser SQL, TypeScript compiler milik app | Plan D33 | SP-G, SP-I | WP-01, WP-16, WP-24 | review lisensi | TERBUKA |
 
 ## 4. Kontrak publik dan lifecycle
@@ -131,15 +131,15 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | T13 | `get_migrations` | ran/pending/batch/file tanpa menjalankan migration | — | WP-17 | E03 | SELESAI (M4: status dari `sourceFiles` Lucid + tabel histori, tabel histori tidak dibuat bila absen; `database.spec`) |
 | T14 | `diff_schema` | model vs DB physical columns; computed tidak dianggap missing | SP-G | WP-17 | E03 | SELESAI (M4: kolom hilang dari migration pending, kolom tak dideklarasikan, computed terpisah, tabel `schema.table` dan connection model; `database.spec`) |
 | T15 | `http_request` | loopback nyata; method/path/body/headers/as/surface/tenant; safe headers; logs | SP-F, SP-H, SP-A | WP-19–WP-22 | E02, E04–E06 | SELESAI (M5, D51–D55: loopback, method/path/body/form/headers/as/surface/tenant/domain, header aman, body summary, validasi, log/exception; `http.spec`, `endpoint.spec`) |
-| T16 | `get_validators` | field/rule/message/reference; dynamic → unknown | SP-I | WP-23 | golden fixture | TERBUKA |
-| T17 | `get_inertia_pages` | route → component/prop evidence tanpa menjalankan controller | SP-I | WP-24 | PF-03, PF-04 | TERBUKA |
-| T18 | `get_shared_props` | declared/observed shared props; lazy tidak dievaluasi | SP-I | WP-24 | PF-03 | TERBUKA |
-| T19 | `get_transformers` | transformer + generated Data shape | SP-I | WP-24 | PF-03 | TERBUKA |
-| T20 | `get_tuyau_schema` | typed routes/input/response; missing vs stale vs empty | SP-I | WP-25 | PF-02 | TERBUKA |
-| T21 | `get_views` | template/component/slot/path dari view roots | SP-I | WP-26 | PF-05 | TERBUKA |
-| T22 | `render_view` | view + JSON state → HTML terbatas via Edge nyata | SP-I | WP-26 | PF-05 | TERBUKA |
-| T23 | `get_permissions` | metadata dari `@adonisplus/permissions` (`#start/permissions`) atau adapter Bouncer eksplisit (D32) | SP-K | WP-27 | PF-07 | TERBUKA |
-| T24 | `get_queue_jobs` | jobs dari `queue.locations` + `Locator.get`, manual registration unknown; pending count publik, status lain adapter versi-terikat (D32) | SP-K | WP-27 | PF-07 | TERBUKA |
+| T16 | `get_validators` | field/rule/message/reference; dynamic → unknown | SP-I | WP-23 | golden fixture | SELESAI (M6, D56: AST terkompilasi, regresi nullable-required, rule kustom/kondisional `unknown`, callback tidak berjalan; `validators.spec`) |
+| T17 | `get_inertia_pages` | route → component/prop evidence tanpa menjalankan controller | SP-I | WP-24 | PF-03, PF-04 | SELESAI (M6, D57: controller/closure/`renderInertia`, dinamis/spread berlabel, React dan Vue; `inertia.spec`) |
+| T18 | `get_shared_props` | declared/observed shared props; lazy tidak dievaluasi | SP-I | WP-24 | PF-03 | SELESAI (M6, D57: middleware terpasang, wrapper `always`, flash; `inertia.spec`) |
+| T19 | `get_transformers` | transformer + generated Data shape | SP-I | WP-24 | PF-03 | SELESAI (M6, D57: kunci output source + alias `Data` generated, stale/missing; `inertia.spec`) |
+| T20 | `get_tuyau_schema` | typed routes/input/response; missing vs stale vs empty | SP-I | WP-25 | PF-02 | SELESAI (M6, D58: `stale`/`fresh-routes`/`missing`, teks tipe `typeOnly`; `tuyau.spec`) |
+| T21 | `get_views` | template/component/slot/path dari view roots | SP-I | WP-26 | PF-05 | SELESAI (M6, D59: disk mounted + template in-memory, tag dari `listComponents()`, slot literal/dinamis, symlink keluar root dilewati; `edge.spec`) |
+| T22 | `render_view` | view + JSON state → HTML terbatas via Edge nyata | SP-I | WP-26 | PF-05 | SELESAI (M6, D59: hanya nama inventaris, state ter-escape, HTML dipotong, error `EXECUTION_FAILED`; `edge.spec`) |
+| T23 | `get_permissions` | metadata dari `@adonisplus/permissions` (`#start/permissions`) atau adapter Bouncer eksplisit (D32) | SP-K | WP-27 | PF-07 | SELESAI (M6, D60: dua adapter terpisah, policy/ability tidak berjalan; `authz_queue.spec`) |
+| T24 | `get_queue_jobs` | jobs dari `queue.locations` + `Locator.get`, manual registration unknown; pending count publik, status lain adapter versi-terikat (D32) | SP-K | WP-27 | PF-07 | SELESAI (M6, D60; `authz_queue.spec`) |
 | T25 | `project_eval` | code/timeout/tenant; display/console/duration; audit; evaluator D26 | SP-E, SP-H | WP-28, WP-18 | E08, E06 | TERBUKA |
 | T26 | `run_ace_command` | argv terstruktur, tanpa shell; stdout/stderr/exitCode/signal; watchdog process group (D31) | SP-J | WP-29 | E08 | TERBUKA |
 | T27 | `get_source_location` | path/line terbukti; package exports; tanpa line karangan | SP-E | WP-30 | E11 | TERBUKA |
@@ -161,11 +161,11 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Fixture | Yang harus terbukti | Gate | Status |
 | --- | --- | --- | --- | --- |
-| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2, tool database M4, dan impersonation M5 (kit `api-bare`: lima tool database + `adonis://models` `DEPENDENCY_UNAVAILABLE`; `http_request` disajikan, `as` `DEPENDENCY_UNAVAILABLE`; `endpoint.spec`); availability view dibuktikan ulang saat tool tersebut ada (M6) |
-| PF-02 | API + Lucid + token auth + Tuyau | DB tools, JSON default, token cleanup | SP-F, SP-I | TERBUKA |
-| PF-03 | Inertia React + session/Shield | page/shared/transformer, X-Inertia/version, flash, CSRF | SP-F, SP-I | TERBUKA |
-| PF-04 | Inertia Vue | tanpa asumsi React | SP-I | TERBUKA |
-| PF-05 | Edge + session | views/render, HTML bound, web guard, tanpa X-Inertia | SP-I | TERBUKA |
+| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2, tool database M4, impersonation M5, dan tool framework M6 (kit `api-bare`: lima tool database + `adonis://models` `DEPENDENCY_UNAVAILABLE`; `http_request` disajikan, `as` `DEPENDENCY_UNAVAILABLE`; `get_views`/`render_view`, validator, Inertia, Tuyau, permission, queue `DEPENDENCY_UNAVAILABLE`, `get_transformers` disajikan; `endpoint.spec`) |
+| PF-02 | API + Lucid + token auth + Tuyau | DB tools, JSON default, token cleanup | SP-F, SP-I | SELESAI (M4 tool database, M5 JSON default + cleanup token, M6 `get_tuyau_schema` dan tool set kit API; `database.spec`, `http.spec`, `tuyau.spec`, `profiles.spec`) |
+| PF-03 | Inertia React + session/Shield | page/shared/transformer, X-Inertia/version, flash, CSRF | SP-F, SP-I | SELESAI (M5 X-Inertia/versi, flash, CSRF; M6 page/shared/transformer pada kit `hybrid`; `http.spec`, `inertia.spec`) |
+| PF-04 | Inertia Vue | tanpa asumsi React | SP-I | SELESAI (M6 kit `vue`: page `.vue`, mapping route → render, shared props, transformer, `http_request` mendapat page Inertia dengan versi app, profile `adapter: 'vue'`; `inertia.spec`, `profiles.spec`) |
+| PF-05 | Edge + session | views/render, HTML bound, web guard, tanpa X-Inertia | SP-I | SELESAI (M6 kit `edge`: `kind: 'edge'`, view/render, `Accept` HTML tanpa `X-Inertia`, guard session `web`; `edge.spec`, `profiles.spec`) |
 | PF-06 | Hybrid API + Inertia + domain routes | surface per route, tenant/domain mapping | SP-D, SP-H | TERBUKA |
 | PF-07 | Tenant + permission + queue | positive adapter, isolasi dua tenant | SP-H, SP-K | TERBUKA |
 | PF-08 | Config disabled / production | tanpa endpoint/listener/buffer/import failure | SP-B | SELESAI (M1 production prune `package_install.spec`; M2 `enabled: false` tanpa binding/endpoint, `endpoint.spec`). M3: `enabled: false` dan proses test tanpa subscriber/observer, production pruned dari app terinstrumentasi boot tanpa hooks (`observability.spec`) |
@@ -198,7 +198,7 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | SEC-20 | Data log/docs/model diperlakukan untrusted di skill; eval didokumentasikan sebagai trusted REPL | SP-E | WP-28, WP-34 | TERBUKA |
 | SEC-21 | Source/doc traversal terbatas root app/package; source map tidak ditebak | — | WP-30, WP-31 | TERBUKA |
 | SEC-22 | Ace argv terstruktur, deadline membunuh process milik tool saja | SP-J | WP-29 | TERBUKA |
-| SEC-23 | `render_view` tidak diberi klaim read-only | SP-I | WP-26 | TERBUKA |
+| SEC-23 | `render_view` tidak diberi klaim read-only | SP-I | WP-26 | SELESAI (M6: annotation `readOnlyHint: false`, `destructiveHint: true`; deskripsi menyatakan helper/global app dapat ber-side-effect; helper ber-counter membuktikan eksekusi, `edge.spec`) |
 
 ### 9.2 Non-functional (plan §9.5)
 
@@ -219,7 +219,7 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | E02 | Debug request: status, exception matching, log correlation | SP-C, SP-F | SELESAI (M5: request gagal lewat `http_request` → 500, exception cocok, log hanya request id call di tengah enam request gagal lain; `http.spec`) |
 | E03 | Data semantics: scoped/soft-delete/serializeAs vs raw; schema diff; status tanpa migrasi | SP-G | SELESAI (M4: `database.spec`) |
 | E04 | Auth: anonymous ditolak, `as` valid, invalid gagal, cleanup success/error/abort | SP-F | SELESAI (M5: anonymous 401/redirect login, `as` token/session valid, user/guard/model invalid gagal eksplisit, cleanup token sukses/500/timeout/cancel, tanpa identitas pada request berikutnya; `http.spec`) |
-| E05 | Surface API JSON / Inertia / Edge, validation mapping, domain route | SP-F, SP-I | TERBUKA |
+| E05 | Surface API JSON / Inertia / Edge, validation mapping, domain route | SP-F, SP-I | SELESAI (M5 API JSON, Inertia React, validasi, domain route; M6 kit Edge-only dan Inertia Vue, surface `route-render`; `http.spec`, `edge.spec`, `inertia.spec`) |
 | E06 | Tenant concurrency model/eval/HTTP; missing/wrong tenant; raw SQL bypass ditolak | SP-H | TERBUKA |
 | E07 | Extensibility: provider domain register, wrapper sekali, disable menang, duplicate gagal boot | — | SELESAI (M2: `endpoint.spec`) |
 | E08 | Eval/Ace: alias import, service, console, timeout jujur; generator; nonzero exit | SP-E, SP-J | TERBUKA |
@@ -282,17 +282,17 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-33 | Raw SQL tenant: shared-table tanpa RLS ditolak; jalur RLS memakai reader MCP + `set_config('app.tenant_id', $1, true)` parameterized milik MCP di tx READ ONLY + recipe OB-27/OB-28; executor package tenant tidak dipakai pada pool app | S-H | WP-16, WP-18 | SELESAI (M4: `database.spec`) |
 | OB-34 | Strategi schema/database-per-tenant tidak didukung sampai ada adapter host dan bukti grants/isolasi/reset | S-H | WP-18 | SELESAI (M4: hanya tabel FORCE RLS yang diterima untuk `tenant`; strategi lain ditolak `TENANT_SCOPE_REQUIRED`) |
 | OB-35 | Regression tenant eval (ALS, model query, concurrency A/B) diulang dengan evaluator final S-E | S-H, S-E | WP-18, WP-28 | TERBUKA |
-| OB-36 | Vine: compiled AST `toJSON().schema` sebagai authority required/nullability/rules; JSON Schema hanya projection; regression nullable-required Vine 4.4.0; callback tidak dieksekusi | S-I | WP-23 | TERBUKA |
-| OB-37 | Tuyau: route runtime dipisah dari shape type-only; missing/stale/filtered eksplisit; freshness shape butuh generation tracking | S-I | WP-25 | TERBUKA |
-| OB-38 | Inertia: ekstraksi TypeScript AST terbatas untuk route/render/shared keys dengan location + completeness; dynamic/spread unknown; config v5 tanpa `sharedData`; controller/lazy props tidak dieksekusi | S-I | WP-24 | TERBUKA |
-| OB-39 | Edge: mounted roots + scan realpath terbatas; render hanya nama ter-inventaris; konvensi component/slot source-only; peringatan helper executable | S-I | WP-26 | TERBUKA |
-| OB-40 | Cache mengikuti source hash/generation; fixture di `/tmp` mengoreksi ignore Vite `**/tmp/**` | S-I | WP-04, WP-37 | TERBUKA |
+| OB-36 | Vine: compiled AST `toJSON().schema` sebagai authority required/nullability/rules; JSON Schema hanya projection; regression nullable-required Vine 4.4.0; callback tidak dieksekusi | S-I | WP-23 | SELESAI (M6, D56: JSON Schema tidak dikeluarkan; regresi nullable-required dan counter callback 0 di `validators.spec`) |
+| OB-37 | Tuyau: route runtime dipisah dari shape type-only; missing/stale/filtered eksplisit; freshness shape butuh generation tracking | S-I | WP-25 | SELESAI (M6, D58: `typeShapesVerified: false` dinyatakan, pelacakan generation shape tetap WP-37; `tuyau.spec`) |
+| OB-38 | Inertia: ekstraksi TypeScript AST terbatas untuk route/render/shared keys dengan location + completeness; dynamic/spread unknown; config v5 tanpa `sharedData`; controller/lazy props tidak dieksekusi | S-I | WP-24 | SELESAI (M6, D57; `inertia.spec`) |
+| OB-39 | Edge: mounted roots + scan realpath terbatas; render hanya nama ter-inventaris; konvensi component/slot source-only; peringatan helper executable | S-I | WP-26 | SELESAI (M6, D59: tag component dari `listComponents()` runtime, slot source; `edge.spec`) |
+| OB-40 | Cache mengikuti source hash/generation; fixture di `/tmp` mengoreksi ignore Vite `**/tmp/**` | S-I | WP-04, WP-37 | TERBUKA (M6: tool M6 membaca source segar setiap call tanpa cache; fixture berada di `$TMPDIR/adonisjs-mcp-fixtures`, bukan `/tmp`, dan test M6 tidak menjalankan Vite. Regression HMR WP-37) |
 | OB-41 | Ace: `spawn(process.execPath, ['ace.js', command, ...argv], { cwd: appRoot, shell: false })`; tanpa import console entrypoint, `process.chdir`, atau pewarisan `execArgv` buta | S-J | WP-29 | TERBUKA |
 | OB-42 | Ace: env snapshot tanpa menampilkan secret, stdin tertutup; dokumentasi command interaktif unsupported dan exit 0 bukan bukti prompt selesai; console app baru tidak berbagi state HTTP | S-J | WP-29, WP-35 | TERBUKA |
 | OB-43 | Ace: deadline pada process group (SIGTERM→SIGKILL) oleh watchdog independen parent (assembler mengirim SIGKILL ke HTTP child saat restart); exitCode nullable + signal; drain bounded 256 KiB | S-J | WP-29 | TERBUKA |
 | OB-44 | Ace di bawah HMR: hard restart = outcome unknown, tanpa auto-retry; E08 mencakup generator HMR, held request, hard restart, cleanup, Linux | S-J | WP-29, WP-38 | TERBUKA |
-| OB-45 | Permission: `@adonisplus/permissions` (plural) dari modul aplikasi `#start/permissions`; CI memerlukan akses Plus berlisensi; tanpa redistribusi; Bouncer adapter eksplisit, bukan pengganti diam-diam | S-K | WP-27, WP-38 | TERBUKA |
-| OB-46 | Queue: pin `@adonisjs/queue@0.6.2` + `@boringnode/queue@0.6.0`; listing mengikuti semantik loader (glob relatif `process.cwd()`, URL `file://` mentah, nama `options.name` atau fallback `class.name`) + verifikasi identitas `Locator.get`; manual registration unknown; status non-pending lewat adapter versi-terikat | S-K | WP-27 | TERBUKA |
+| OB-45 | Permission: `@adonisplus/permissions` (plural) dari modul aplikasi `#start/permissions`; CI memerlukan akses Plus berlisensi; tanpa redistribusi; Bouncer adapter eksplisit, bukan pengganti diam-diam | S-K | WP-27, WP-38 | TERBUKA (M6 bagian WP-27 selesai: adapter `#start/permissions` + Bouncer terpisah, paket dipasang di fixture dari registry Plus lewat `.npmrc` scope, tidak masuk tarball; sisa: akses Plus berlisensi di CI, WP-38) |
+| OB-46 | Queue: pin `@adonisjs/queue@0.6.2` + `@boringnode/queue@0.6.0`; listing mengikuti semantik loader (glob relatif `process.cwd()`, URL `file://` mentah, nama `options.name` atau fallback `class.name`) + verifikasi identitas `Locator.get`; manual registration unknown; status non-pending lewat adapter versi-terikat | S-K | WP-27 | SELESAI (M6, D60; `authz_queue.spec`) |
 | OB-47 | Tenant memakai `TenantService.run(context, cb)` atau export standalone `runWithTenant`; method `TenantService.runWithTenant` tidak ada | S-K | WP-18 | SELESAI (M4: `src/tenant.ts` memanggil `run()` dari binding `tenant.service`; `database.spec`) |
 | OB-48 | `extraTools` dan definisi tool app tidak boleh di-import saat runtime production (zod/package absen); bentuk lazy dibuktikan di WP-03 | Integrasi M0 | WP-03, WP-33 | SELESAI (M1: `ExtraToolLoader` + `loadExtraTools`; production prune dengan `() => import('#start/mcp_tools')` yang meng-import zod + package) |
 | OB-49 | Configure menawarkan penambahan `--experimental-vm-modules` ke proses dev (mis. `NODE_OPTIONS` pada script `dev`) dengan konfirmasi, idempotent, tanpa mengubah diam-diam; README/skill menjelaskan flag, ExperimentalWarning, dan perilaku tanpa flag | B-01 | WP-28, WP-33, WP-34, WP-35 | TERBUKA |
@@ -317,6 +317,7 @@ Belum ada pengurangan cakupan. M0 tidak menghapus tool, resource, atau prompt. K
 - M2 (plan §3.2): endpoint MCP dipasang sebagai server middleware, bukan route (D34), sehingga configure tidak menulis exemption Shield/`Accept`; route app pada path MCP membuat endpoint melepaskan path dengan error log, bukan gagal boot (D35). Tidak ada fitur yang dihapus.
 - M3 (plan §3.3): instrumentasi capture diekspor sebagai `@rikology/adonisjs-mcp/hooks` dan dipasang lewat gateway app-local (D38); observasi container dimulai dari gateway saat config load, bukan provider di posisi pertama (D39); resource `adonis://routes` dan `adonis://config/{key}` dibuat lebih awal dari WP-32 (D44). Tidak ada fitur yang dihapus.
 - M4 (plan §3.4): executor PostgreSQL membuka koneksi reader per call dan menutupnya, bukan `DISCARD ALL` + reuse (D46); SQLite diperiksa lewat program terkompilasi (`EXPLAIN`), bukan `sqlite-parser` (D47); `tenant` pada raw SQL hanya untuk tabel FORCE RLS, tanpa tenant tabel tenant-scoped memerlukan `allowCrossTenant` (D48); desain "tolak query tanpa `WHERE tenant_id`" diganti boundary database (D11/D29). Opsi `explain` menggantikan teks `EXPLAIN` bebas. Tidak ada fitur yang dihapus.
+- M6 (plan §3.6): `get_validators` tidak mengeluarkan JSON Schema Vine (D56); bentuk props page Inertia tidak diekstrak dari komponen, hanya referensi `pages.d.ts` (D57); kesegaran Tuyau hanya untuk himpunan route, bentuk tipe tidak diverifikasi (D58); status queue di luar pending hanya untuk driver database pada tuple 0.6.2/0.6.0 dengan config statis (D60). Surface `http_request` menambah sumber `route-render` (aturan desain ke-4). Tidak ada fitur yang dihapus.
 
 ## 13. Progres M1 (13 Oktober 2026)
 
@@ -422,3 +423,20 @@ Bukti parsial; baris tetap `TERBUKA`:
 | SEC-18 | Output `http_request` diproyeksikan dengan kredensial yang di-mint dan nilai cookie jar sebagai secret tambahan | Queue/docs (WP-27, WP-31), adversarial suite (WP-36) |
 | NF-03 | Timeout `http_request` tidak memengaruhi request lain; handler app tetap berjalan, tanpa retry | Eval/Ace (WP-28, WP-29) |
 | NF-04 | Body response HTTP dibaca sampai `limits.maxResultBytes` lalu koneksi ditutup (4 MiB → 256 KiB, app tetap melayani) | Mode read-write SQL memuat hasil penuh dari driver (dilabel) |
+
+## 18. Progres M6 (13 Oktober 2026)
+
+M6 (WP-23–WP-27) diimplementasikan; bukti pada macOS arm64, Node 24.21.0, npm 11.19.0: `npm run lint`, `npm run typecheck`, `npm test` (146 unit), `npm run test:integration` (88 integration), `npm run verify:exports`. Spec baru: `validators.spec`, `inertia.spec`, `tuyau.spec`, `edge.spec`, `authz_queue.spec`, `profiles.spec` (`tests/integration/`), unit `views.spec`; kit fixture baru `edge` dan `vue`. Baris yang berpindah ke `SELESAI`: DC-13, DC-30, DC-32, T16–T24, PF-02–PF-05, SEC-23, E05, OB-36–OB-39, OB-46; PF-01 diperkuat untuk tool framework.
+
+Bukti parsial; baris tetap `TERBUKA`:
+
+| ID | Sudah terbukti di M6 | Sisa |
+| --- | --- | --- |
+| T01 | Profile kit `api`, `hybrid`, `edge`, `vue` (kind, renderer, adapter) dan tool set framework per kit (`profiles.spec`) | PF-06, PF-07 |
+| T02 | Surface route statis dari render Inertia dipakai `http_request` (`route-render`) | `get_routes` pada kit Inertia/Edge/hybrid (E05 untuk tool ini) |
+| PF-06 | Tool set dan profile kit `hybrid`; surface `route-render` | Mapping tenant/domain pada kit hybrid yang sama |
+| PF-07 | Positive adapter permission (Plus + Bouncer) dan queue (database + sync) pada kit API, tenant pada M4/M5 | Satu fixture gabungan tenant + permission + queue (WP-37) |
+| OB-13 | Tool M6 membaca source/artefak segar setiap call dan melabel file yang berubah setelah start | Regression HMR/restart (WP-37) |
+| SEC-18 | Opsi rule Vine, metadata permission, payload queue, pesan error template diproyeksikan dengan redactor (sentinel payload queue tidak keluar) | Docs (WP-31), adversarial suite (WP-36) |
+| DC-33 | TypeScript compiler di-resolve dari app (optional), dipakai juga oleh tool Inertia/Tuyau/transformer/queue config; tanpa dependency runtime baru di M6 | Review lisensi distribusi (WP-38) |
+| NF-01 | Availability tool M6 hanya membaca profile/TypeScript app; scan dan import hanya saat tool dipanggil | Docs index (WP-31) |

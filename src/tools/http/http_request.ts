@@ -42,6 +42,8 @@ import { exchange, type ExchangeResult } from '../../http/client.js'
 import { CookieJar, type JarUpdate } from '../../http/cookie_jar.js'
 import { SessionAccess } from '../../http/session.js'
 import { summarizeBody, validationErrors } from '../../http/summary.js'
+import type { InertiaIntrospection } from '../../introspection/inertia.js'
+import { typescriptAvailability } from '../../introspection/integrations.js'
 import {
   decideSurface,
   guardSurface,
@@ -170,6 +172,7 @@ interface StoredRouteLike {
   name?: string
   domain: string
   methods: string[]
+  handler: unknown
   middleware: { all(): Iterable<unknown> }
 }
 
@@ -247,12 +250,19 @@ export class HttpRequestService {
   readonly #redactor: Redactor
   readonly #auth: AuthAccess
   readonly #session: SessionAccess
+  readonly #inertia: InertiaIntrospection
 
-  constructor(options: { app: ApplicationService; redactor: Redactor; catalog: ModelCatalog }) {
+  constructor(options: {
+    app: ApplicationService
+    redactor: Redactor
+    catalog: ModelCatalog
+    inertia: InertiaIntrospection
+  }) {
     this.#app = options.app
     this.#redactor = options.redactor
     this.#auth = new AuthAccess(options.app, options.catalog)
     this.#session = new SessionAccess(options.app)
+    this.#inertia = options.inertia
   }
 
   async #target(): Promise<LoopbackAddress | { reason: string }> {
@@ -460,10 +470,26 @@ export class HttpRequestService {
         `Unknown auth guard "${input.as.guard}"; configured guards: ${[...(guards?.guards.keys() ?? [])].join(', ') || 'none'}`
       )
     }
+    /**
+     * A matched route whose handler renders a literal Inertia component is
+     * a web route (static source evidence; the handler is not executed).
+     */
+    let render: { component: string; location: { file: string; line: number } } | null = null
+    if (matched && profile.surfaces.web?.renderer === 'inertia') {
+      const staticSource = await typescriptAvailability(context)
+      if (staticSource.available) {
+        const report = await this.#inertia.routeRender(matched.route)
+        const literal = report.renders.find((item) => item.component !== null)
+        if (literal?.component) {
+          render = { component: literal.component, location: literal.location }
+        }
+      }
+    }
     const surface = decideSurface({
       explicit: input.surface,
       guard: input.as?.guard,
       route,
+      render,
       pathname: current.pathname,
       auth,
       defaultGuard: guards?.default ?? null,
