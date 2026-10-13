@@ -30,7 +30,13 @@ test.group('resolveConfig | defaults and merge', () => {
       tools: {
         disabled: [],
         projectEval: { timeout: 30_000 },
-        sql: { readOnly: true, maxRows: 100, allowCrossTenant: false },
+        sql: {
+          readOnly: true,
+          maxRows: 100,
+          allowCrossTenant: false,
+          timeout: 10_000,
+          readers: {},
+        },
         logs: {
           bufferSize: 1000,
           bufferBytes: 2 * 1024 * 1024,
@@ -48,7 +54,13 @@ test.group('resolveConfig | defaults and merge', () => {
   test('nested partial values keep sibling defaults', ({ assert }) => {
     const config = resolveConfig({ tools: { sql: { maxRows: 5 }, logs: { bufferSize: 10 } } })
 
-    assert.deepEqual(config.tools.sql, { readOnly: true, maxRows: 5, allowCrossTenant: false })
+    assert.deepEqual(config.tools.sql, {
+      readOnly: true,
+      maxRows: 5,
+      allowCrossTenant: false,
+      timeout: 10_000,
+      readers: {},
+    })
     assert.deepEqual(config.tools.logs, {
       bufferSize: 10,
       bufferBytes: 2 * 1024 * 1024,
@@ -224,6 +236,30 @@ test.group('resolveConfig | validation', () => {
     assert.match(issues[0], /^profile\.surfaces\.api\.prefix: /)
     assert.match(issues[1], /^profile\.surfaces\.api\.guard: /)
     assert.match(issues[2], /^profile\.surfaces\.default: /)
+  })
+
+  test('SQL readers are a login or a connection string, keyed by connection', ({ assert }) => {
+    const config = resolveConfig({
+      tools: {
+        sql: {
+          readers: {
+            pg: { user: 'app_reader', password: 'secret', port: 6432 },
+            replica: { connectionString: 'postgres://reader@replica/app' },
+          },
+        },
+      },
+    })
+    assert.deepEqual(config.tools.sql.readers, {
+      pg: { user: 'app_reader', password: 'secret', port: 6432 },
+      replica: { connectionString: 'postgres://reader@replica/app' },
+    })
+    for (const reader of [{}, { password: 'x' }, { user: '' }, { user: 'x', role: 'admin' }]) {
+      assert.match(
+        issuesOf({ tools: { sql: { readers: { pg: reader } } } })[0],
+        /^tools\.sql\.readers\.pg(\.\w+)?: /,
+        JSON.stringify(reader)
+      )
+    }
   })
 
   test('the error message lists every issue for the developer', ({ assert }) => {

@@ -774,6 +774,8 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
       profile.data.capabilities.tools.map((entry) => [entry.name, entry.code ?? entry.status])
     )
     assert.deepEqual(statuses, {
+      diff_schema: 'DEPENDENCY_UNAVAILABLE',
+      execute_sql_query: 'DEPENDENCY_UNAVAILABLE',
       get_config: 'served',
       get_container_bindings: 'served',
       get_env: 'served',
@@ -781,9 +783,14 @@ test.group('Endpoint | API without Lucid, auth or views', (group) => {
       get_last_exceptions: 'CAPABILITY_UNSUPPORTED',
       get_logs: 'CAPABILITY_UNSUPPORTED',
       get_middleware: 'served',
+      get_migrations: 'DEPENDENCY_UNAVAILABLE',
+      get_models: 'DEPENDENCY_UNAVAILABLE',
       get_project_profile: 'served',
       get_routes: 'served',
+      query_model: 'DEPENDENCY_UNAVAILABLE',
     })
+    const models = profile.data.capabilities.resources.find((entry) => entry.name === 'models')
+    assert.deepInclude(models, { status: 'unavailable', code: 'DEPENDENCY_UNAVAILABLE' })
     const logs = profile.data.capabilities.tools.find((entry) => entry.name === 'get_logs')
     assert.include(logs!.reason, 'hooks: { streamWrite }')
 

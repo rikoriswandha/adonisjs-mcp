@@ -66,6 +66,7 @@
   "dependencies": {
     "@modelcontextprotocol/node": "^2.1.1",
     "@modelcontextprotocol/server": "^2.3.1",
+    "pgsql-ast-parser": "^12.0.2",
     "zod": "^4.6.7"
   },
   "peerDependencies": {
@@ -105,6 +106,7 @@
       "hooks": "./hooks.ts",
       "src/types": "./src/types.ts",
       "providers/mcp_provider": "./providers/mcp_provider.ts",
+      "src/database/sqlite_reader": "./src/database/sqlite_reader.ts",
       "stubs/main": "./stubs/main.ts"
     },
     "outDir": "./build",

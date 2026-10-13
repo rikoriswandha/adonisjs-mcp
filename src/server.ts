@@ -37,6 +37,7 @@ import type {
   LogReader,
   ProjectProfile,
   ResolvedMcpConfig,
+  TenantAccess,
   ToolContext,
   UnavailableCode,
 } from './types.js'
@@ -67,6 +68,11 @@ export interface ServerRuntime {
   version: string
   logs: LogReader | null
   exceptions: ExceptionReader | null
+
+  /**
+   * `@rikology/adonisjs-tenant` integration, when its binding exists.
+   */
+  tenancy: TenantAccess | null
   detectProfile(): Promise<ProjectProfile>
 }
 
@@ -188,6 +194,7 @@ function toolContext(
     signal: request.mcpReq.signal,
     logs: instrumented ? runtime.logs : null,
     exceptions: instrumented ? runtime.exceptions : null,
+    tenancy: runtime.tenancy,
   }
 }
 

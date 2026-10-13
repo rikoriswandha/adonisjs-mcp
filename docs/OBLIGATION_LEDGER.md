@@ -49,8 +49,8 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-07 | `allowRemoteAccess` hanya membuka peer; Host/Origin tetap exact allowlist | Plan D07 | — | WP-08 | SEC-05 | SELESAI (M2: `network_guards.spec` "allowRemoteAccess opens the peer check only") |
 | DC-08 | Timeout eval kooperatif, didokumentasikan bukan preemption | Plan D08 | SP-E | WP-28, WP-34 | E08 | TERBUKA |
 | DC-09 | `await import('#models/user')` natural pada eval; tanpa chdir/regex rewrite | Plan D09, D26 | SP-E | WP-28 | E08 | TERBUKA |
-| DC-10 | Read-only SQL ditegakkan DB/connection; statement filter hanya lapisan tambahan; tanpa fallback read-write | Plan D10 | SP-G | WP-16 | SEC-10–SEC-12 | TERBUKA |
-| DC-11 | Tenant raw SQL tanpa boundary DB terbukti ditolak; bukan string matching | Plan D11 | SP-H | WP-18 | E06, SEC-13 | TERBUKA |
+| DC-10 | Read-only SQL ditegakkan DB/connection; statement filter hanya lapisan tambahan; tanpa fallback read-write | Plan D10 | SP-G | WP-16 | SEC-10–SEC-12 | SELESAI (M4: reader PostgreSQL READ ONLY + role SELECT-only, SQLite proses readonly; policy hanya lapisan tambahan; tanpa reader/driver capability `CAPABILITY_UNSUPPORTED`, tidak pernah fallback ke pool app; `database.spec`) |
+| DC-11 | Tenant raw SQL tanpa boundary DB terbukti ditolak; bukan string matching | Plan D11 | SP-H | WP-18 | E06, SEC-13 | SELESAI (M4: `tenant` hanya untuk tabel FORCE RLS; tabel TenantScope tanpa RLS dan SQLite → `TENANT_SCOPE_REQUIRED`; `database.spec`) |
 | DC-12 | Tenant `http_request` lewat middleware tenant app dengan mapping tepercaya | Plan D12 | SP-H | WP-21 | E06 | TERBUKA |
 | DC-13 | Evidence `runtime`/`generated`/`source` dipisahkan pada metadata | Plan D13 | SP-I | WP-11, WP-23–WP-25 | golden fixture introspeksi | TERBUKA |
 | DC-14 | Hybrid ditentukan surface terkonfigurasi/teramati, bukan kehadiran package | Plan D14 | SP-I | WP-09, WP-21 | PF-06 | TERBUKA |
@@ -67,8 +67,8 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-25 | Inventory container parsial berlabel; events persistent-only; cache tidak hanya invalidasi saat ready | Plan D25 | SP-D | WP-12, WP-14, WP-37 | E01, E09 | TERBUKA |
 | DC-26 | Evaluator `vm` + callback importer framework; flag `--experimental-vm-modules` wajib (keputusan pengguna B-01); tanpa flag `CAPABILITY_UNSUPPORTED` | Plan D26 | SP-E | WP-28, WP-33, WP-35 | E08 | TERBUKA |
 | DC-27 | Impersonation: token handle + delete `finally`; cookie `e:` ber-expiry deadline call; semantik tanpa residu + replay terbatas, bukan revocation | Plan D27 | SP-F | WP-20, WP-35 | E04, E06 | TERBUKA |
-| DC-28 | Executor SQL milik MCP: PG reader least-privilege + extended protocol + READ ONLY + AST; SQLite child readonly + SIGKILL deadline; tanpa reader PG → capability nonaktif | Plan D28 | SP-G | WP-16, WP-36 | E03, SEC-10–SEC-12 | TERBUKA |
-| DC-29 | Raw SQL tenant hanya lewat FORCE RLS + reader NOBYPASSRLS + `set_config` parameterized milik MCP; tenant lookup/authorize sebelum run | Plan D29 | SP-H | WP-16, WP-18, WP-21 | E06, SEC-13 | TERBUKA |
+| DC-28 | Executor SQL milik MCP: PG reader least-privilege + extended protocol + READ ONLY + AST; SQLite child readonly + SIGKILL deadline; tanpa reader PG → capability nonaktif | Plan D28 | SP-G | WP-16, WP-36 | E03, SEC-10–SEC-12 | SELESAI dengan perubahan D46–D47 (M4: koneksi reader per call ditutup alih-alih `DISCARD ALL` + reuse; SQLite diperiksa lewat program terkompilasi native, bukan `sqlite-parser`; `database.spec`, `sql_policy.spec`) |
+| DC-29 | Raw SQL tenant hanya lewat FORCE RLS + reader NOBYPASSRLS + `set_config` parameterized milik MCP; tenant lookup/authorize sebelum run | Plan D29 | SP-H | WP-16, WP-18, WP-21 | E06, SEC-13 | SELESAI untuk WP-16/WP-18 (M4: lookup resolver app sebelum `TenantService.run`, `app.tenant_id` diset MCP, setiap relasi harus FORCE RLS, role BYPASSRLS ditolak; `database.spec`); mapping HTTP tetap WP-21 |
 | DC-30 | Sumber evidence introspeksi per artefak (Vine AST, Tuyau runtime vs type-only, Inertia TS AST, Edge mounted roots) | Plan D30 | SP-I | WP-23–WP-26 | golden fixture | TERBUKA |
 | DC-31 | Ace subprocess + process group + watchdog independen parent; outcome unknown saat hard restart | Plan D31 | SP-J | WP-29, WP-38 | E08 | TERBUKA |
 | DC-32 | Identitas paket opsional: tenant 1.0.2, `@adonisplus/permissions` 0.0.4 (privat), Bouncer 4 alternatif, queue 0.6.2 + boringnode 0.6.0 | Plan D32 | SP-K | WP-09, WP-18, WP-27 | PF-07 | TERBUKA |
@@ -80,7 +80,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | --- | --- | --- | --- | --- | --- | --- |
 | API-01 | Config input parsial typed (`McpConfig`) → config resolved tervalidasi oleh provider; `config/mcp.ts` memakai `import type` + `satisfies`, bukan runtime `defineConfig` (D21); `projectEval: false` dan `tools.disabled` berlaku | Plan §4.3, D21; Design config | SP-B | WP-03 | unit config merge, E10 | TERBUKA |
 | API-02 | `defineTool`: schema object Zod v4, nama snake_case, inferred input tanpa `any` publik | Plan §4.3 | SP-A | WP-03 | typecheck consumer tarball (M1: `verify:exports`, `tests/unit/define_tool.spec.ts`) | SELESAI |
-| API-03 | `ToolContext`: app, config/profile, log/exception services, `callId`, signal, tenant per call; tanpa credential singleton | Plan §4.3 | SP-C, SP-H | WP-03, WP-05 | E07 | TERBUKA |
+| API-03 | `ToolContext`: app, config/profile, log/exception services, `callId`, signal, tenant per call; tanpa credential singleton | Plan §4.3 | SP-C, SP-H | WP-03, WP-05 | E07 | SELESAI (M4: `ToolContext.tenancy` — lookup + `run` per call, `null` tanpa integrasi tenant; consumer strict di `verify:exports`, pemakaian di `database.spec`) |
 | API-04 | `available(ctx)` membedakan dependency absen vs integrasi rusak (diagnostic) | Plan §4.3 | SP-K | WP-09 | PF-01, PF-07 | SELESAI (M2: `src/server.ts` evaluasi per request, throw/invalid → `INTEGRATION_FAILED`; capability report `endpoint.spec`) |
 | API-05 | `registry.tool/resource/prompt`: tabrakan gagal sebelum serving; `disable` deny-set independen urutan | Plan §4.3; Design plugin | — | WP-05 | E07 | SELESAI (M2: `src/registry.ts`, `registry.spec`, `endpoint.spec` duplikat gagal boot) |
 | API-06 | `registry.extend`: urutan eksplisit, sekali per call, `next` tidak bisa dipanggil ulang, error tetap dinormalisasi | Plan §4.3 | — | WP-05 | E07 | SELESAI (M2: `src/invocation.ts`, `invocation.spec`, wrapper sekali per `callId` di `endpoint.spec`) |
@@ -104,7 +104,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | CF-01 | Endpoint dev-only, `enabled` kill switch, `allowRemoteAccess: false` | `/__adonis/mcp` | SP-B | WP-06 | PF-08 | SELESAI (M2: `endpoint.spec` disabled/test/console; M1 production prune) |
 | CF-02 | Allowlist peer loopback (IPv4, IPv6, mapped); Host loopback + port aktual; Origin lokal exact | — | SP-A | WP-08 | SEC-01–SEC-05 | SELESAI (M2: `network_guards.spec`, `endpoint.spec`) |
 | CF-03 | Eval timeout default/maks 30.000 ms; request tidak boleh melebihi config | 30.000 ms | SP-E | WP-28 | E08 | TERBUKA |
-| CF-04 | SQL/model `readOnly: true`, `maxRows: 100`, `allowCrossTenant: false`; connection harus ada; PostgreSQL memerlukan connection reader least-privilege terkonfigurasi (D28) | — | SP-G | WP-15, WP-16 | E03 | TERBUKA |
+| CF-04 | SQL/model `readOnly: true`, `maxRows: 100`, `allowCrossTenant: false`; connection harus ada; PostgreSQL memerlukan connection reader least-privilege terkonfigurasi (D28) | — | SP-G | WP-15, WP-16 | E03 | SELESAI (M4: default + `tools.sql.timeout` 10.000 ms dan `tools.sql.readers` aditif; connection tak dikenal `INPUT_INVALID`; `define_config.spec`, `database.spec`) |
 | CF-05 | Buffer 1.000 log / 100 exception + byte budget; tail default 100 | — | SP-C | WP-10 | ring wraparound | SELESAI (M3: default 1.000 log / 100 exception + `bufferBytes` 2 MiB / `exceptionBufferBytes` 1 MiB, entry dipendekkan ke 16/32 KiB, tail default 100; `ring_buffer.spec`, `capture.spec`) |
 | CF-06 | Deadline HTTP/Ace 30.000 ms; output dibatasi; tanpa auto-retry mutating | 30.000 ms | SP-J | WP-19, WP-29 | E02, E08 | TERBUKA |
 | CF-07 | Request maks 1 MiB, result maks 256 KiB, truncation JSON valid + flag | — | SP-A | WP-07, WP-08 | unit truncation | SELESAI (M2: 413 di `endpoint.spec`; truncation `invocation.spec`) |
@@ -125,11 +125,11 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | T07 | `get_events` | event + persistent listener tanpa emit; once/wildcard dilabel tidak tercakup | SP-D | WP-12 | E01 | SELESAI (M3: listener inline/lazy/class dari map persisten, `once()` tidak tercantum dan dilabel, `transportListenerCount`, listener tidak berjalan; `observability.spec`) |
 | T08 | `get_config` | dot key; subtree ter-redaksi, cycle/function aman | — | WP-13 | SEC-18 | SELESAI (M3: traversal own-data, key prototype ditolak, getter/config provider tidak dievaluasi, subtree sentinel ter-redaksi; `introspection.spec`, `redaction.spec`, `observability.spec`) |
 | T09 | `get_env` | prefix; key + presence, tanpa nilai | — | WP-13 | SEC-19 | SELESAI (M3: schema `Env.create` dibaca via AST TypeScript app, key/tipe/optional/secret/presence tanpa nilai, filter prefix; `observability.spec`) |
-| T10 | `get_models` | model/table/PK/connection/columns/relations/path dari scan model roots | SP-D | WP-14 | E03, E09 | TERBUKA |
-| T11 | `query_model` | predicate terstruktur, preload allowlist, scopes/serialization, limit, tenant | SP-H | WP-15, WP-18 | E03, E06 | TERBUKA |
-| T12 | `execute_sql_query` | bindings/connection/tenant; rows/dialect/returned count/duration; DB enforcement | SP-G, SP-H | WP-16, WP-18 | E03, E06, SEC-10–SEC-13 | TERBUKA |
-| T13 | `get_migrations` | ran/pending/batch/file tanpa menjalankan migration | — | WP-17 | E03 | TERBUKA |
-| T14 | `diff_schema` | model vs DB physical columns; computed tidak dianggap missing | SP-G | WP-17 | E03 | TERBUKA |
+| T10 | `get_models` | model/table/PK/connection/columns/relations/path dari scan model roots | SP-D | WP-14 | E03, E09 | SELESAI (M4: scan rekursif `app.modelsPath()` termasuk direktori kustom, model turunan, file non-model `skipped`, gagal import per file di `failures`, cache generation; `database.spec`) |
+| T11 | `query_model` | predicate terstruktur, preload allowlist, scopes/serialization, limit, tenant | SP-H | WP-15, WP-18 | E03, E06 | SELESAI (M4: hook soft-delete/tenant, `serializeAs`, computed, preload tervalidasi + batas fan-out, `limit`/`hasMore`, tenant lookup; `database.spec`) |
+| T12 | `execute_sql_query` | bindings/connection/tenant; rows/dialect/returned count/duration; DB enforcement | SP-G, SP-H | WP-16, WP-18 | E03, E06, SEC-10–SEC-13 | SELESAI (M4: `database.spec`, `sql_policy.spec`) |
+| T13 | `get_migrations` | ran/pending/batch/file tanpa menjalankan migration | — | WP-17 | E03 | SELESAI (M4: status dari `sourceFiles` Lucid + tabel histori, tabel histori tidak dibuat bila absen; `database.spec`) |
+| T14 | `diff_schema` | model vs DB physical columns; computed tidak dianggap missing | SP-G | WP-17 | E03 | SELESAI (M4: kolom hilang dari migration pending, kolom tak dideklarasikan, computed terpisah, tabel `schema.table` dan connection model; `database.spec`) |
 | T15 | `http_request` | loopback nyata; method/path/body/headers/as/surface/tenant; safe headers; logs | SP-F, SP-H, SP-A | WP-19–WP-22 | E02, E04–E06 | TERBUKA |
 | T16 | `get_validators` | field/rule/message/reference; dynamic → unknown | SP-I | WP-23 | golden fixture | TERBUKA |
 | T17 | `get_inertia_pages` | route → component/prop evidence tanpa menjalankan controller | SP-I | WP-24 | PF-03, PF-04 | TERBUKA |
@@ -151,7 +151,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | --- | --- | --- | --- | --- | --- | --- |
 | R01 | `adonis://profile` | service sama dengan T01; selalu ada saat dev enabled | SP-A | WP-09, WP-32 | E01 | SELESAI (M2: `src/resources/profile.ts`; data identik dengan tool di dua era, `endpoint.spec`) |
 | R02 | `adonis://routes` | route list tanpa filter, evidence domain/surface utuh | SP-D | WP-32 | E01 | SELESAI (M3: `adonis://routes` = `get_routes` tanpa filter, data identik; `observability.spec`) |
-| R03 | `adonis://models` | ringkasan model; hanya bila Lucid aktif; cache sama dengan T10 | SP-D | WP-32 | E03 | TERBUKA |
+| R03 | `adonis://models` | ringkasan model; hanya bila Lucid aktif; cache sama dengan T10 | SP-D | WP-32 | E03 | SELESAI (M4: data identik dengan `get_models` tanpa filter, `DEPENDENCY_UNAVAILABLE` tanpa Lucid; `database.spec`, `endpoint.spec`) |
 | R04 | `adonis://config/{key}` | subtree ter-redaksi; URI decoding tidak bypass policy | — | WP-32 | SEC-18 | SELESAI (M3: `adonis://config/{key}` memakai validasi key dan redaksi yang sama dengan `get_config`; key tak ada → resource error; `observability.spec`) |
 | R05 | `adonis://package` | manifest + rc metadata aman; secret/script/URL tidak mentah | — | WP-32 | SEC-18 | TERBUKA |
 | P01 | `debug_request` | profile → route → HTTP → exceptions/logs; tanpa side effect saat `prompts/get` | — | WP-32 | E01, E02 | TERBUKA |
@@ -161,7 +161,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Fixture | Yang harus terbukti | Gate | Status |
 | --- | --- | --- | --- | --- |
-| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2 (kit `api-bare`, `endpoint.spec`); availability tool DB/view/impersonation dibuktikan ulang saat tool tersebut ada (M4–M6) |
+| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2 dan tool database M4 (kit `api-bare`: lima tool database + `adonis://models` `DEPENDENCY_UNAVAILABLE`, `endpoint.spec`); availability view/impersonation dibuktikan ulang saat tool tersebut ada (M5–M6) |
 | PF-02 | API + Lucid + token auth + Tuyau | DB tools, JSON default, token cleanup | SP-F, SP-I | TERBUKA |
 | PF-03 | Inertia React + session/Shield | page/shared/transformer, X-Inertia/version, flash, CSRF | SP-F, SP-I | TERBUKA |
 | PF-04 | Inertia Vue | tanpa asumsi React | SP-I | TERBUKA |
@@ -185,11 +185,11 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | SEC-05 | Remote opt-in tetap Host/Origin policy; bind `0.0.0.0` tidak membuka MCP | — | WP-08 | SELESAI (M2: `network_guards.spec`, bind `0.0.0.0` + akses IP LAN di `endpoint.spec`) |
 | SEC-06 | Dokumentasi melarang exposure publik via proxy/tunnel | — | WP-35 | TERBUKA |
 | SEC-07 | Pengecualian Shield hanya exact endpoint MCP, guard sebelum dispatch | SP-A | WP-08 | SELESAI dengan perubahan D34 (M2: tidak ada exemption Shield; hanya path persis yang dilayani middleware MCP, guard pertama; CSRF app tetap menolak POST tanpa token di `endpoint.spec`) |
-| SEC-10 | Corpus SQL (komentar, multi-statement, CTE mutating, EXPLAIN ANALYZE, function side effect, PRAGMA, ATTACH/COPY/CALL) tidak menulis | SP-G | WP-16, WP-36 | TERBUKA |
-| SEC-11 | Construct yang tidak bisa dinyatakan aman ditolak dalam supported subset | SP-G | WP-16 | TERBUKA |
-| SEC-12 | Timeout, rollback, release connection, reset state pool pada success/error/cancel | SP-G | WP-16 | TERBUKA |
-| SEC-13 | Raw SQL tenant: komentar/string/OR/UNION/join/schema/quoted identifier tidak menjadi bypass; shared-table tanpa RLS ditolak | SP-H | WP-18, WP-36 | TERBUKA |
-| SEC-14 | `allowCrossTenant` eksplisit dan terlabel di output; `tenant` tidak memilih connection global diam-diam | SP-H | WP-18 | TERBUKA |
+| SEC-10 | Corpus SQL (komentar, multi-statement, CTE mutating, EXPLAIN ANALYZE, function side effect, PRAGMA, ATTACH/COPY/CALL) tidak menulis | SP-G | WP-16, WP-36 | SELESAI untuk corpus M4 (`database.spec` dua dialect + observer jumlah row/file/advisory lock, `sql_policy.spec`); perluasan adversarial WP-36 |
+| SEC-11 | Construct yang tidak bisa dinyatakan aman ditolak dalam supported subset | SP-G | WP-16 | SELESAI (M4: node AST di luar allowlist, fungsi di luar daftar, grammar tak dikenal, virtual table/opcode tulis SQLite → `READ_ONLY_VIOLATION`; `sql_policy.spec`) |
+| SEC-12 | Timeout, rollback, release connection, reset state pool pada success/error/cancel | SP-G | WP-16 | SELESAI (M4: PG `pg_cancel_backend` + ROLLBACK + tutup koneksi, tanpa koneksi `adonisjs-mcp%` tersisa, pool app tetap melayani; SQLite SIGKILL; `database.spec`) |
+| SEC-13 | Raw SQL tenant: komentar/string/OR/UNION/join/schema/quoted identifier tidak menjadi bypass; shared-table tanpa RLS ditolak | SP-H | WP-18, WP-36 | SELESAI untuk corpus M4 (OR/komentar/UNION hanya baris tenant via RLS, join ke tabel tanpa RLS dan tabel TenantScope tanpa RLS ditolak, `set_config` ditolak; `database.spec`) |
+| SEC-14 | `allowCrossTenant` eksplisit dan terlabel di output; `tenant` tidak memilih connection global diam-diam | SP-H | WP-18 | SELESAI (M4: tanpa opsi `TENANT_SCOPE_REQUIRED`; dengan opsi `crossTenant: true` + limitation; `database.spec`) |
 | SEC-15 | Batas `query_model` read-only (hooks/serializer app tetap tepercaya) terdokumentasi | — | WP-15, WP-35 | TERBUKA |
 | SEC-16 | HTTP hanya ke origin app; tanpa scheme/host/`//host`/port/unix/file; redirect manual; MCP path + alias encoded ditolak | SP-A | WP-19 | TERBUKA |
 | SEC-17 | Impersonation lewat adapter asli; tanpa token permanen; `Authorization`/`Cookie`/`Set-Cookie` tidak bocor; tenant header internal tidak dipercaya | SP-F, SP-H | WP-20, WP-21 | TERBUKA |
@@ -217,7 +217,7 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | --- | --- | --- | --- |
 | E01 | Basic runtime dua era → profile → routes → resources → prompt | SP-A, SP-D | SELESAI (M2 discovery/profile/prompt di `endpoint.spec`; M3 `get_routes` + `adonis://routes` di dua era, `observability.spec`) |
 | E02 | Debug request: status, exception matching, log correlation | SP-C, SP-F | TERBUKA |
-| E03 | Data semantics: scoped/soft-delete/serializeAs vs raw; schema diff; status tanpa migrasi | SP-G | TERBUKA |
+| E03 | Data semantics: scoped/soft-delete/serializeAs vs raw; schema diff; status tanpa migrasi | SP-G | SELESAI (M4: `database.spec`) |
 | E04 | Auth: anonymous ditolak, `as` valid, invalid gagal, cleanup success/error/abort | SP-F | TERBUKA |
 | E05 | Surface API JSON / Inertia / Edge, validation mapping, domain route | SP-F, SP-I | TERBUKA |
 | E06 | Tenant concurrency model/eval/HTTP; missing/wrong tenant; raw SQL bypass ditolak | SP-H | TERBUKA |
@@ -273,14 +273,14 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-24 | Inertia: kirim versi aktual, baca `inputErrorsBag`/props errors, pertahankan status redirect asli (302 teramati) | S-F | WP-21, WP-22 | TERBUKA |
 | OB-25 | Mapping Host/header tenant dari config tepercaya, middleware tenant berjalan sebelum auth; mapping bukan otorisasi; domain route tidak diasumsikan jatuh ke root | S-F, S-H | WP-19, WP-21 | TERBUKA |
 | OB-26 | Gate M5 mempertahankan corpus cross-tenant token/session, cleanup token success/error/abort, anonymous-after-call | S-F | WP-20, WP-21 | TERBUKA |
-| OB-27 | PostgreSQL: reader dedicated NOSUPERUSER SELECT-only, `queryMode:'extended'` untuk setiap statement (`values: []` tidak cukup), `BEGIN READ ONLY`, AST single SELECT/WITH | S-G | WP-16 | TERBUKA |
-| OB-28 | PostgreSQL deadline lewat control connection `pg_cancel_backend`, tunggu settlement, `ROLLBACK` lalu `DISCARD ALL`; tutup koneksi bila cleanup gagal; pool app tidak disentuh | S-G | WP-16 | TERBUKA |
-| OB-29 | SQLite: child process dengan koneksi `readonly` + `fileMustExist`, `stmt.readonly` + AST single SELECT, deny ATTACH/VACUUM/PRAGMA/function/UDF; JS `loadExtension` tidak diekspos; deadline SIGKILL + await exit; in-memory ditolak | S-G | WP-16 | TERBUKA |
-| OB-30 | AST policy dimatangkan: corpus regression keamanan, unknown node default-deny, boundary relation/view/operator, allowlist fungsi pure yang direview (aggregate/string/date) | S-G, S-H | WP-16, WP-18, WP-36 | TERBUKA |
-| OB-31 | Kontrak SQL membedakan response timeout vs cancellation DB; error `TIMEOUT`/`CANCELLED` jujur; row/output bounds tetap | S-G | WP-16 | TERBUKA |
-| OB-32 | Tenant di-lookup dan diotorisasi sebelum `TenantService.run`/`runWithTenant`; ID tidak dikenal error eksplisit | S-H, S-K | WP-18 | TERBUKA |
-| OB-33 | Raw SQL tenant: shared-table tanpa RLS ditolak; jalur RLS memakai reader MCP + `set_config('app.tenant_id', $1, true)` parameterized milik MCP di tx READ ONLY + recipe OB-27/OB-28; executor package tenant tidak dipakai pada pool app | S-H | WP-16, WP-18 | TERBUKA |
-| OB-34 | Strategi schema/database-per-tenant tidak didukung sampai ada adapter host dan bukti grants/isolasi/reset | S-H | WP-18 | TERBUKA |
+| OB-27 | PostgreSQL: reader dedicated NOSUPERUSER SELECT-only, `queryMode:'extended'` untuk setiap statement (`values: []` tidak cukup), `BEGIN READ ONLY`, AST single SELECT/WITH | S-G | WP-16 | SELESAI (M4: role superuser/punya hak tulis ditolak sebelum query; `database.spec`) |
+| OB-28 | PostgreSQL deadline lewat control connection `pg_cancel_backend`, tunggu settlement, `ROLLBACK` lalu `DISCARD ALL`; tutup koneksi bila cleanup gagal; pool app tidak disentuh | S-G | WP-16 | SELESAI dengan perubahan D46 (M4: koneksi reader per call selalu ditutup sesudah ROLLBACK, sehingga sesi tidak pernah dipakai ulang; `database.spec`) |
+| OB-29 | SQLite: child process dengan koneksi `readonly` + `fileMustExist`, `stmt.readonly` + AST single SELECT, deny ATTACH/VACUUM/PRAGMA/function/UDF; JS `loadExtension` tidak diekspos; deadline SIGKILL + await exit; in-memory ditolak | S-G | WP-16 | SELESAI dengan perubahan D47 (M4: AST JS diganti pemeriksaan program `EXPLAIN` native; `database.spec`) |
+| OB-30 | AST policy dimatangkan: corpus regression keamanan, unknown node default-deny, boundary relation/view/operator, allowlist fungsi pure yang direview (aggregate/string/date) | S-G, S-H | WP-16, WP-18, WP-36 | SELESAI untuk WP-16/WP-18 (M4: `sql_policy.spec`, view/operator/fungsi milik database dinyatakan trusted di limitation); perluasan adversarial WP-36 |
+| OB-31 | Kontrak SQL membedakan response timeout vs cancellation DB; error `TIMEOUT`/`CANCELLED` jujur; row/output bounds tetap | S-G | WP-16 | SELESAI (M4: pesan menyebut mekanisme pembatalan nyata; mode read-write SQLite menyatakan deadline tidak ditegakkan; `database.spec`) |
+| OB-32 | Tenant di-lookup dan diotorisasi sebelum `TenantService.run`/`runWithTenant`; ID tidak dikenal error eksplisit | S-H, S-K | WP-18 | SELESAI (M4: lookup callback/allowlist resolver default, `NOT_FOUND` untuk kunci tak dikenal, resolver jwt `CAPABILITY_UNSUPPORTED`; `database.spec`) |
+| OB-33 | Raw SQL tenant: shared-table tanpa RLS ditolak; jalur RLS memakai reader MCP + `set_config('app.tenant_id', $1, true)` parameterized milik MCP di tx READ ONLY + recipe OB-27/OB-28; executor package tenant tidak dipakai pada pool app | S-H | WP-16, WP-18 | SELESAI (M4: `database.spec`) |
+| OB-34 | Strategi schema/database-per-tenant tidak didukung sampai ada adapter host dan bukti grants/isolasi/reset | S-H | WP-18 | SELESAI (M4: hanya tabel FORCE RLS yang diterima untuk `tenant`; strategi lain ditolak `TENANT_SCOPE_REQUIRED`) |
 | OB-35 | Regression tenant eval (ALS, model query, concurrency A/B) diulang dengan evaluator final S-E | S-H, S-E | WP-18, WP-28 | TERBUKA |
 | OB-36 | Vine: compiled AST `toJSON().schema` sebagai authority required/nullability/rules; JSON Schema hanya projection; regression nullable-required Vine 4.4.0; callback tidak dieksekusi | S-I | WP-23 | TERBUKA |
 | OB-37 | Tuyau: route runtime dipisah dari shape type-only; missing/stale/filtered eksplisit; freshness shape butuh generation tracking | S-I | WP-25 | TERBUKA |
@@ -293,7 +293,7 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | OB-44 | Ace di bawah HMR: hard restart = outcome unknown, tanpa auto-retry; E08 mencakup generator HMR, held request, hard restart, cleanup, Linux | S-J | WP-29, WP-38 | TERBUKA |
 | OB-45 | Permission: `@adonisplus/permissions` (plural) dari modul aplikasi `#start/permissions`; CI memerlukan akses Plus berlisensi; tanpa redistribusi; Bouncer adapter eksplisit, bukan pengganti diam-diam | S-K | WP-27, WP-38 | TERBUKA |
 | OB-46 | Queue: pin `@adonisjs/queue@0.6.2` + `@boringnode/queue@0.6.0`; listing mengikuti semantik loader (glob relatif `process.cwd()`, URL `file://` mentah, nama `options.name` atau fallback `class.name`) + verifikasi identitas `Locator.get`; manual registration unknown; status non-pending lewat adapter versi-terikat | S-K | WP-27 | TERBUKA |
-| OB-47 | Tenant memakai `TenantService.run(context, cb)` atau export standalone `runWithTenant`; method `TenantService.runWithTenant` tidak ada | S-K | WP-18 | TERBUKA |
+| OB-47 | Tenant memakai `TenantService.run(context, cb)` atau export standalone `runWithTenant`; method `TenantService.runWithTenant` tidak ada | S-K | WP-18 | SELESAI (M4: `src/tenant.ts` memanggil `run()` dari binding `tenant.service`; `database.spec`) |
 | OB-48 | `extraTools` dan definisi tool app tidak boleh di-import saat runtime production (zod/package absen); bentuk lazy dibuktikan di WP-03 | Integrasi M0 | WP-03, WP-33 | SELESAI (M1: `ExtraToolLoader` + `loadExtraTools`; production prune dengan `() => import('#start/mcp_tools')` yang meng-import zod + package) |
 | OB-49 | Configure menawarkan penambahan `--experimental-vm-modules` ke proses dev (mis. `NODE_OPTIONS` pada script `dev`) dengan konfirmasi, idempotent, tanpa mengubah diam-diam; README/skill menjelaskan flag, ExperimentalWarning, dan perilaku tanpa flag | B-01 | WP-28, WP-33, WP-34, WP-35 | TERBUKA |
 
@@ -316,6 +316,7 @@ Belum ada pengurangan cakupan. M0 tidak menghapus tool, resource, atau prompt. K
 - Package permission adalah `@adonisplus/permissions` (privat, berlisensi), bukan `@adonisplus/permission`; queue memakai `@adonisjs/queue`, bukan `@rikology/adonisjs-queue` yang tidak terbit (D32).
 - M2 (plan §3.2): endpoint MCP dipasang sebagai server middleware, bukan route (D34), sehingga configure tidak menulis exemption Shield/`Accept`; route app pada path MCP membuat endpoint melepaskan path dengan error log, bukan gagal boot (D35). Tidak ada fitur yang dihapus.
 - M3 (plan §3.3): instrumentasi capture diekspor sebagai `@rikology/adonisjs-mcp/hooks` dan dipasang lewat gateway app-local (D38); observasi container dimulai dari gateway saat config load, bukan provider di posisi pertama (D39); resource `adonis://routes` dan `adonis://config/{key}` dibuat lebih awal dari WP-32 (D44). Tidak ada fitur yang dihapus.
+- M4 (plan §3.4): executor PostgreSQL membuka koneksi reader per call dan menutupnya, bukan `DISCARD ALL` + reuse (D46); SQLite diperiksa lewat program terkompilasi (`EXPLAIN`), bukan `sqlite-parser` (D47); `tenant` pada raw SQL hanya untuk tabel FORCE RLS, tanpa tenant tabel tenant-scoped memerlukan `allowCrossTenant` (D48); desain "tolak query tanpa `WHERE tenant_id`" diganti boundary database (D11/D29). Opsi `explain` menggantikan teks `EXPLAIN` bebas. Tidak ada fitur yang dihapus.
 
 ## 13. Progres M1 (13 Oktober 2026)
 
@@ -379,3 +380,24 @@ Bukti parsial; baris tetap `TERBUKA`:
 | SEC-19 | `get_env` hanya key/tipe/presence | Docs search tidak membaca `.env` (WP-31); configure tidak mencetak `.env` (WP-33) |
 | NF-02 | Append log O(1) amortized dengan batas bytes dan slot dialokasikan bertahap | Cache lazy berkunci generation (WP-14, WP-31) |
 | OB-07 | Production pruned dari app terinstrumentasi: hooks tidak dapat di-resolve, MCP 404, tanpa subscriber/observer | CI (WP-38) |
+
+## 16. Progres M4 (13 Oktober 2026)
+
+M4 (WP-14–WP-18) diimplementasikan; bukti pada macOS arm64, Node 24.21.0, npm 11.19.0, PostgreSQL 18.4 (cluster milik test), `@rikology/adonisjs-tenant` 1.0.2: `npm run lint`, `npm run typecheck`, `npm test` (130 unit), `npm run test:integration` (50 integration), `npm run verify:exports`. `database.spec` = `tests/integration/database.spec.ts`, `sql_policy.spec` = `tests/unit/sql_policy.spec.ts`. Baris yang berpindah ke `SELESAI`: DC-10, DC-11, DC-28 (perubahan D46–D47), DC-29 (WP-16/WP-18), API-03, CF-04, T10–T14, R03, E03, SEC-10–SEC-14 (corpus M4), OB-27–OB-34, OB-47; PF-01 diperkuat untuk tool database.
+
+Bukti parsial; baris tetap `TERBUKA`:
+
+| ID | Sudah terbukti di M4 | Sisa |
+| --- | --- | --- |
+| DC-18 | SQL default read-only; `readOnly: false` mengubah deskripsi dan annotations (`destructiveHint: true`) dan output `mode: 'read-write'` | Skill tidak mengklaim read-only setelah diubah (WP-34) |
+| DC-25 / OB-13 | Katalog model di-cache per generation (daftar file, ukuran, mtime), dibangun ulang saat generation berubah, file yang berubah setelah proses mulai dilabel `changedSinceProcessStart` | Regression HMR/restart (WP-37) |
+| DC-32 | Tenant 1.0.2 dipakai lewat binding `tenant.service` dan `config/tenancy.ts` | Permission/queue (WP-27) |
+| DC-33 | `pgsql-ast-parser` ^12.0.1 (MIT; dependency `moo`, `nearley`) sebagai dependency runtime, dimuat lazy hanya untuk PostgreSQL | Review lisensi distribusi (WP-38) |
+| LC-06 | Model di-import sekali lewat `app.import` tanpa query cache-busting | Regression memori HMR (WP-37) |
+| NF-01 | `tools/list` dan availability tool database hanya membaca binding/config, tanpa scan model atau koneksi DB | Docs index (WP-31) |
+| NF-02 | Cache model lazy berkunci generation | Docs index (WP-31) |
+| NF-04 | PostgreSQL FETCH maksimal `maxRows + 1` dari cursor server; SQLite iterasi berhenti di `maxRows + 1` (query rekursif tak terbatas kembali cepat); `query_model` `limit + 1`, preload dibatasi per query relasi | HTTP streaming (WP-19); mode read-write memuat hasil penuh dari driver (dilabel) |
+| SEC-15 | Deskripsi dan limitation `query_model` menyatakan hook/serializer app adalah kode tepercaya | README/API reference (WP-35) |
+| E06 | Model query A/B konkuren terisolasi, tenant hilang/tak dikenal gagal, raw SQL OR/komentar/UNION dibatasi RLS | Eval (WP-28, OB-35) dan HTTP (WP-21) |
+| PF-02 | Tool database dan schema tersedia pada kit API (Lucid SQLite) dan PostgreSQL | JSON default dan cleanup token (M5), Tuyau (WP-25) |
+| PF-07 | Positive adapter tenant 1.0.2 (lookup allowlist header, TenantScope, RLS) | Permission + queue (WP-27) |

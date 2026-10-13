@@ -44,9 +44,32 @@ export interface ProjectEvalConfig {
   timeout?: number
 }
 
+/**
+ * Dedicated PostgreSQL login used by `execute_sql_query` in read-only mode.
+ * It must be a least-privilege role: not a superuser, without write
+ * privileges, and without BYPASSRLS when tenant-scoped SQL is used. Fields
+ * not set here are inherited from the Lucid connection config.
+ */
+export type PostgresReaderConfig =
+  | {
+      user: string
+      password?: string
+      host?: string
+      port?: number
+      database?: string
+      ssl?: boolean | Record<string, unknown>
+    }
+  | {
+      /**
+       * Full connection string; nothing is inherited.
+       */
+      connectionString: string
+    }
+
 export interface SqlToolConfig {
   /**
-   * Run raw SQL with database-enforced read-only boundaries.
+   * Run raw SQL with database-enforced read-only boundaries. `false` runs
+   * statements on the application connection pool and can change data.
    */
   readOnly?: boolean
 
@@ -60,6 +83,18 @@ export interface SqlToolConfig {
    * produced this way is labelled as cross-tenant.
    */
   allowCrossTenant?: boolean
+
+  /**
+   * Default and maximum deadline of one SQL statement, in milliseconds.
+   */
+  timeout?: number
+
+  /**
+   * Read-only logins for PostgreSQL connections, keyed by Lucid
+   * connection name. Without one, read-only raw SQL is not available on
+   * that PostgreSQL connection.
+   */
+  readers?: Readonly<Record<string, PostgresReaderConfig>>
 }
 
 export interface LogsToolConfig {
@@ -251,6 +286,8 @@ export interface ResolvedMcpConfig {
       readonly readOnly: boolean
       readonly maxRows: number
       readonly allowCrossTenant: boolean
+      readonly timeout: number
+      readonly readers: Readonly<Record<string, Readonly<PostgresReaderConfig>>>
     }
     readonly logs: {
       readonly bufferSize: number
@@ -674,6 +711,35 @@ export interface ToolContext extends AvailabilityContext {
    * instrumented.
    */
   exceptions: ExceptionReader | null
+
+  /**
+   * Tenant lookup and context of `@rikology/adonisjs-tenant`, or `null`
+   * when that integration is not active.
+   */
+  tenancy: TenantAccess | null
+}
+
+/**
+ * Tenant identity, as `@rikology/adonisjs-tenant` defines it.
+ */
+export interface TenantIdentity {
+  id: string | number
+  name: string
+  slug: string
+}
+
+export interface TenantAccess {
+  /**
+   * Looks a tenant up with the application's configured resolver: its
+   * trusted `lookup` callback or its `tenants` allowlist. Unknown keys
+   * fail with `NOT_FOUND`; the identity is never invented.
+   */
+  resolve(key: string): Promise<TenantIdentity>
+
+  /**
+   * Runs `callback` inside the tenant context (`TenantService.run`).
+   */
+  run<T>(tenant: TenantIdentity, callback: () => T | Promise<T>): Promise<T>
 }
 
 /**

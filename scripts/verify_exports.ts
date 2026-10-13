@@ -43,6 +43,7 @@ const REQUIRED_FILES = [
   'build/src/types.d.ts',
   'build/providers/mcp_provider.js',
   'build/providers/mcp_provider.d.ts',
+  'build/src/database/sqlite_reader.js',
   'build/stubs/main.js',
   'build/stubs/config/mcp.stub',
   'build/stubs/providers/mcp_dev_provider.stub',
@@ -64,6 +65,7 @@ import type {
   ExtraToolLoader,
   ProjectProfile,
   ResourceDefinition,
+  TenantIdentity,
   ToolOutput,
 } from '@rikology/adonisjs-mcp/types'
 import McpProvider from '@rikology/adonisjs-mcp/providers/mcp_provider'
@@ -97,7 +99,12 @@ const loader: ExtraToolLoader = async () => ({ default: definitions })
 
 const config = {
   path: '/__adonis/mcp',
-  tools: { projectEval: false, disabled: ['project_eval'], docs: { include: ['@adonisjs/*'] } },
+  tools: {
+    projectEval: false,
+    disabled: ['project_eval'],
+    docs: { include: ['@adonisjs/*'] },
+    sql: { timeout: 5000, readers: { pg: { user: 'app_reader' } } },
+  },
   extraTools: [loader],
 } satisfies McpConfig
 
@@ -119,7 +126,10 @@ const resource: ResourceDefinition = {
   uri: 'consumer://state',
   async read(_request, context) {
     const profile: ProjectProfile = await context.profile()
-    return { data: { kind: profile.kind, lucid: profile.packages.lucid.active } }
+    const tenant: TenantIdentity | null = context.tenancy
+      ? await context.tenancy.run(await context.tenancy.resolve('a'), async () => null)
+      : null
+    return { data: { kind: profile.kind, lucid: profile.packages.lucid.active, tenant } }
   },
 }
 registry.resource(resource)

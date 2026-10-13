@@ -20,6 +20,7 @@ function context(signal = new AbortController().signal): ToolContext {
     signal,
     logs: null,
     exceptions: null,
+    tenancy: null,
   }
 }
 

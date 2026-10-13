@@ -5,6 +5,10 @@ import { containerObserver, subscribeExceptions, subscribeLogs } from '../src/bu
 import { LogCapture } from '../src/buffers/log_capture.js'
 import { resolveConfig } from '../src/define_config.js'
 import { loadExtraTools } from '../src/define_tool.js'
+import { LucidAccess } from '../src/database/lucid.js'
+import { ModelCatalog } from '../src/database/models.js'
+import { RawSql } from '../src/database/raw_sql.js'
+import { MigrationInspector, SchemaDiff } from '../src/database/schema.js'
 import { McpEndpoint } from '../src/handler.js'
 import { ConfigIntrospection } from '../src/introspection/config.js'
 import { ContainerIntrospection } from '../src/introspection/container.js'
@@ -28,8 +32,14 @@ import {
 } from '../src/tools/app/get_project_profile.js'
 import { getRoutesTool, routesResource } from '../src/tools/app/get_routes.js'
 import { CaptureSource } from '../src/tools/runtime/capture_source.js'
+import { diffSchemaTool } from '../src/tools/database/diff_schema.js'
+import { executeSqlQueryTool } from '../src/tools/database/execute_sql_query.js'
+import { getMigrationsTool } from '../src/tools/database/get_migrations.js'
+import { getModelsTool, modelsResource } from '../src/tools/database/get_models.js'
+import { ModelQuery, queryModelTool } from '../src/tools/database/query_model.js'
 import { getLastExceptionsTool } from '../src/tools/runtime/get_last_exceptions.js'
 import { getLogsTool } from '../src/tools/runtime/get_logs.js'
+import { TenantIntegration } from '../src/tenant.js'
 import type { ResolvedMcpConfig } from '../src/types.js'
 
 /**
@@ -167,6 +177,16 @@ export default class McpProvider {
     registry.resource(profileResource(describe))
     registry.resource(routesResource(routes))
     registry.resource(configResource(settings))
+
+    const lucid = new LucidAccess(app)
+    const models = new ModelCatalog(lucid)
+    const migrations = new MigrationInspector(lucid)
+    registry.tool(getModelsTool(models))
+    registry.tool(queryModelTool(new ModelQuery(lucid, models)))
+    registry.tool(executeSqlQueryTool(new RawSql(lucid, models), config))
+    registry.tool(getMigrationsTool(migrations))
+    registry.tool(diffSchemaTool(new SchemaDiff(lucid, models, migrations)))
+    registry.resource(modelsResource(models))
   }
 
   async start() {
@@ -224,6 +244,7 @@ export default class McpProvider {
       version: await packageVersion(),
       logs: this.#capture?.logs ?? null,
       exceptions: this.#capture?.exceptions ?? null,
+      tenancy: TenantIntegration.detect(app),
       detectProfile: () => detectProfile(app, config),
     }
     endpoint.activate(this.#runtime)

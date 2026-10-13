@@ -85,6 +85,23 @@ function isDocsPackagePattern(value: string): boolean {
 const positiveInteger = z.int().positive()
 const deadline = z.strictObject({ timeout: positiveInteger.optional() })
 
+const nonEmpty = z.string().min(1, { message: 'must be a non-empty string' })
+
+const postgresReader = z.union(
+  [
+    z.strictObject({
+      user: nonEmpty,
+      password: z.string().optional(),
+      host: nonEmpty.optional(),
+      port: z.int().min(1).max(65_535).optional(),
+      database: nonEmpty.optional(),
+      ssl: z.union([z.boolean(), z.record(z.string(), z.unknown())]).optional(),
+    }),
+    z.strictObject({ connectionString: nonEmpty }),
+  ],
+  { error: 'must be { user, password?, host?, port?, database?, ssl? } or { connectionString }' }
+)
+
 const surface = z.strictObject({
   prefix: z
     .string()
@@ -157,8 +174,10 @@ const configSchema = z.strictObject({
       sql: z
         .strictObject({
           readOnly: z.boolean().optional(),
-          maxRows: positiveInteger.optional(),
+          maxRows: positiveInteger.max(10_000).optional(),
           allowCrossTenant: z.boolean().optional(),
+          timeout: positiveInteger.optional(),
+          readers: z.record(nonEmpty, postgresReader).optional(),
         })
         .optional(),
       logs: z
@@ -277,6 +296,10 @@ export function resolveConfig(input: unknown): ResolvedMcpConfig {
         readOnly: tools.sql?.readOnly ?? true,
         maxRows: tools.sql?.maxRows ?? 100,
         allowCrossTenant: tools.sql?.allowCrossTenant ?? false,
+        timeout: tools.sql?.timeout ?? 10_000,
+        readers: Object.fromEntries(
+          Object.entries(tools.sql?.readers ?? {}).map(([name, reader]) => [name, { ...reader }])
+        ),
       },
       logs: {
         bufferSize: tools.logs?.bufferSize ?? 1000,
