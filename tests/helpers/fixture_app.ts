@@ -34,7 +34,7 @@ import {
 } from './process.js'
 import type { PostgresDatabase } from './postgres.js'
 
-export type FixtureKit = 'api'
+export type FixtureKit = 'api' | 'api-bare'
 export type NodeEnvironment = 'development' | 'test' | 'production'
 
 /**
@@ -308,12 +308,13 @@ export class FixtureApp {
   /**
    * Process environment for this fixture. NODE_ENV is always explicit;
    * values from `.env` (APP_KEY, database) are read by the application.
+   * `host` is the bind address.
    */
-  environment(nodeEnv: NodeEnvironment, port?: number): NodeJS.ProcessEnv {
+  environment(nodeEnv: NodeEnvironment, port?: number, host = '127.0.0.1'): NodeJS.ProcessEnv {
     return isolatedEnvironment({
       NODE_ENV: nodeEnv,
       TZ: 'UTC',
-      HOST: '127.0.0.1',
+      HOST: host,
       LOG_LEVEL: 'info',
       ...(port === undefined ? {} : { PORT: String(port), APP_URL: `http://127.0.0.1:${port}` }),
     })
@@ -351,11 +352,13 @@ export class FixtureApp {
 
   /**
    * Starts the HTTP server from source. Production runs from a build; use
-   * `buildProduction()` for that.
+   * `buildProduction()` for that. `host` is the bind address (default
+   * loopback).
    */
   async start(options: {
     nodeEnv: Exclude<NodeEnvironment, 'production'>
     runner?: DevRunner
+    host?: string
   }): Promise<RunningApp> {
     const port = await freePort()
     const args =
@@ -364,7 +367,7 @@ export class FixtureApp {
         : ['--import=@poppinss/ts-exec', 'bin/server.ts']
     const app = await RunningApp.launch(process.execPath, args, {
       cwd: this.root,
-      env: this.environment(options.nodeEnv, port),
+      env: this.environment(options.nodeEnv, port, options.host),
       port,
     })
     this.track(app)

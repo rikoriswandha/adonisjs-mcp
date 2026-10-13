@@ -1,0 +1,206 @@
+/*
+|--------------------------------------------------------------------------
+| Result envelope
+|--------------------------------------------------------------------------
+|
+| Tool and resource payloads are JSON text. Values are first converted to
+| JSON-safe data (BigInt, Map, Set, cycles, toJSON), then bounded by
+| `limits.maxResultBytes`: oversized results are shortened structurally so
+| the text stays valid JSON, and the envelope says so.
+|
+*/
+
+import type { ToolErrorCode, ToolOutput } from './types.js'
+
+const MAX_DEPTH = 32
+const MAX_MESSAGE_LENGTH = 4096
+
+/**
+ * Successively tighter bounds tried when a result exceeds the byte limit.
+ * `items` caps arrays and object keys, `chars` caps strings.
+ */
+const SHRINK_STEPS: ReadonlyArray<{ items: number; chars: number }> = [
+  { items: 1000, chars: 16_384 },
+  { items: 500, chars: 8192 },
+  { items: 200, chars: 4096 },
+  { items: 100, chars: 2048 },
+  { items: 50, chars: 1024 },
+  { items: 20, chars: 512 },
+  { items: 10, chars: 256 },
+  { items: 5, chars: 128 },
+  { items: 2, chars: 64 },
+  { items: 1, chars: 32 },
+  { items: 0, chars: 16 },
+]
+
+export interface EncodedResult {
+  text: string
+  truncated: boolean
+}
+
+export interface ToolFailure {
+  code: ToolErrorCode
+  message: string
+  details?: Record<string, unknown>
+}
+
+function byteLength(text: string): number {
+  return Buffer.byteLength(text, 'utf8')
+}
+
+function convert(value: unknown, depth: number, ancestors: Set<object>): unknown {
+  switch (typeof value) {
+    case 'string':
+    case 'boolean':
+      return value
+    case 'number':
+      return Number.isFinite(value) ? value : null
+    case 'bigint':
+      return value.toString()
+    case 'undefined':
+    case 'function':
+    case 'symbol':
+      return undefined
+  }
+  if (value === null) {
+    return null
+  }
+
+  const object = value as object
+  if (ancestors.has(object)) {
+    return '[Circular]'
+  }
+  if (depth >= MAX_DEPTH) {
+    return '[MaxDepth]'
+  }
+  if (object instanceof Date) {
+    return Number.isNaN(object.getTime()) ? null : object.toISOString()
+  }
+  if (ArrayBuffer.isView(object) || object instanceof ArrayBuffer) {
+    return `[Binary ${object.byteLength} bytes]`
+  }
+
+  ancestors.add(object)
+  try {
+    if ('toJSON' in object && typeof object.toJSON === 'function') {
+      try {
+        return convert(object.toJSON(), depth + 1, ancestors)
+      } catch (error) {
+        return `[toJSON failed: ${error instanceof Error ? error.message : String(error)}]`
+      }
+    }
+    if (object instanceof Error) {
+      return { name: object.name, message: object.message }
+    }
+    if (object instanceof Map) {
+      return Object.fromEntries(
+        [...object.entries()].flatMap(([key, item]) => {
+          const converted = convert(item, depth + 1, ancestors)
+          return converted === undefined ? [] : [[String(key), converted]]
+        })
+      )
+    }
+    if (object instanceof Set || Array.isArray(object)) {
+      return [...object].map((item) => convert(item, depth + 1, ancestors) ?? null)
+    }
+    return Object.fromEntries(
+      Object.entries(object).flatMap(([key, item]) => {
+        const converted = convert(item, depth + 1, ancestors)
+        return converted === undefined ? [] : [[key, converted]]
+      })
+    )
+  } finally {
+    ancestors.delete(object)
+  }
+}
+
+/**
+ * Converts any value to data `JSON.stringify` represents faithfully.
+ * `undefined` at the top level becomes `null`.
+ */
+export function toJsonValue(value: unknown): unknown {
+  return convert(value, 0, new Set()) ?? null
+}
+
+/**
+ * Shortens a JSON value produced by `toJsonValue`.
+ */
+function shrink(value: unknown, limits: { items: number; chars: number }): unknown {
+  if (typeof value === 'string') {
+    return value.length > limits.chars ? `${value.slice(0, limits.chars)}…` : value
+  }
+  if (Array.isArray(value)) {
+    return value.slice(0, limits.items).map((item) => shrink(item, limits))
+  }
+  if (typeof value === 'object' && value !== null) {
+    return Object.fromEntries(
+      Object.entries(value)
+        .slice(0, limits.items)
+        .map(([key, item]) => [key, shrink(item, limits)])
+    )
+  }
+  return value
+}
+
+/**
+ * Serializes a successful tool or resource payload within `maxBytes`.
+ */
+export function encodeOutput(
+  output: ToolOutput,
+  options: { maxBytes: number; durationMs: number }
+): EncodedResult {
+  const data = toJsonValue(output.data)
+  const evidence = output.evidence ? [...output.evidence] : undefined
+  const limitations = output.limitations ? [...output.limitations] : []
+  const durationMs = Math.round(options.durationMs)
+
+  const render = (payload: unknown, truncated: boolean, notes: string[]) =>
+    JSON.stringify({
+      data: payload,
+      ...(evidence ? { evidence } : {}),
+      ...(notes.length > 0 ? { limitations: notes } : {}),
+      durationMs,
+      truncated,
+    })
+
+  const full = render(data, false, limitations)
+  if (byteLength(full) <= options.maxBytes) {
+    return { text: full, truncated: false }
+  }
+
+  const notes = [
+    ...limitations,
+    `Result exceeded limits.maxResultBytes (${options.maxBytes} bytes); arrays, objects and strings were shortened.`,
+  ]
+  for (const limits of SHRINK_STEPS) {
+    const candidate = render(shrink(data, limits), true, notes)
+    if (byteLength(candidate) <= options.maxBytes) {
+      return { text: candidate, truncated: true }
+    }
+  }
+  return { text: render(null, true, notes), truncated: true }
+}
+
+/**
+ * Serializes a failed call. Details are dropped when they would exceed
+ * `maxBytes`.
+ */
+export function encodeFailure(
+  failure: ToolFailure,
+  options: { maxBytes: number; durationMs: number }
+): string {
+  const message =
+    failure.message.length > MAX_MESSAGE_LENGTH
+      ? `${failure.message.slice(0, MAX_MESSAGE_LENGTH)}…`
+      : failure.message
+  const durationMs = Math.round(options.durationMs)
+  const details = failure.details === undefined ? undefined : toJsonValue(failure.details)
+  const withDetails = JSON.stringify({
+    error: { code: failure.code, message, ...(details === undefined ? {} : { details }) },
+    durationMs,
+  })
+  if (details === undefined || byteLength(withDetails) <= options.maxBytes) {
+    return withDetails
+  }
+  return JSON.stringify({ error: { code: failure.code, message }, durationMs })
+}

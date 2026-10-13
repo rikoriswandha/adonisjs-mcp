@@ -55,3 +55,17 @@ export class InvalidDefinitionError extends Error {
     this.issues = issues
   }
 }
+
+/**
+ * A definition was registered after the registry was finalized.
+ */
+export class RegistryClosedError extends Error {
+  readonly code = 'E_MCP_REGISTRY_CLOSED'
+
+  constructor(action: string) {
+    super(
+      `Cannot ${action}: the MCP registry is finalized once the application is ready. Register MCP definitions from your provider boot() method.`
+    )
+    this.name = 'RegistryClosedError'
+  }
+}

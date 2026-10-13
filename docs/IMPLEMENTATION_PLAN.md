@@ -1,7 +1,7 @@
 # Implementation Plan — @rikology/adonisjs-mcp
 
 Tanggal: 13 Oktober 2026  
-Status: M0 (spike dan obligation ledger) dan M1 (fondasi package dan fixture, §6.1) selesai; M2 belum dimulai  
+Status: M0 (spike dan obligation ledger), M1 (fondasi package dan fixture, §6.1), dan M2 (registry, provider, transport, security boundary, §6.2) selesai; M3 belum dimulai
 Sumber kebutuhan: [DESIGN.md](./DESIGN.md)  
 Obligation ledger: [OBLIGATION_LEDGER.md](./OBLIGATION_LEDGER.md); bukti spike: [spikes/](./spikes/)  
 Target deliverable: package npm `@rikology/adonisjs-mcp@0.1.0`, MIT, untuk aplikasi AdonisJS v7 dalam development.
@@ -133,6 +133,17 @@ Keputusan berikut berasal dari bukti spike dan memperbarui baris D01–D20 yang 
 | D32 | S-K | Paket konkret: tenant `@rikology/adonisjs-tenant` 1.0.2 (`tenant.service`, `TenantService.run`/`runWithTenant`); permission `@adonisplus/permissions` 0.0.4 dari registry privat Plus (modul `#start/permissions`); Bouncer 4 adapter alternatif eksplisit; queue `@adonisjs/queue` 0.6.2 + `@boringnode/queue` 0.6.0 dengan listing via `queue.locations` mengikuti semantik loader | Nama paket di desain |
 | D33 | S-G, S-I | Dependency tambahan beralasan: parser SQL dialect-aware (kandidat `pgsql-ast-parser`; `sqlite-parser` 1.0.1 berumur dan perlu evaluasi ulang di WP-16) dan TypeScript compiler yang di-resolve dari app (optional) untuk ekstraksi source | §2.2 |
 
+### 3.2 Keputusan hasil M2
+
+Keputusan implementasi M2, dengan bukti di §6.2. Statusnya keputusan rencana, belum persetujuan pengguna.
+
+| ID | Bukti | Keputusan | Mengubah |
+| --- | --- | --- | --- |
+| D34 | `tests/integration/endpoint.spec.ts` | Endpoint dipasang sebagai **server middleware pertama** (`server.use` di `start()` provider, sebelum `server.boot()`), bukan route. Middleware hanya mengambil request dengan `request.url()` persis `config.path`; request lain diteruskan tanpa perubahan. Guard berjalan paling awal; bodyparser, session, Shield (CSRF), dan middleware `Accept` app tidak pernah melihat trafik MCP, sehingga tidak perlu exemption `csrf.exceptRoutes` maupun pengecualian force-JSON. SDK membaca body sendiri dengan `maxRequestBodySize = limits.maxRequestBytes` (413), menjawab JSON rusak dengan JSON-RPC `-32700` tanpa echo body, dan content type non-JSON dengan 415. CSRF app tetap aktif untuk semua route lain | D23, OB-01–OB-04, WP-08 "route-local Shield handling", WP-33 (exemption tidak lagi diperlukan) |
+| D35 | idem | Route app pada path MCP tidak di-shadow: saat `ready()` provider memeriksa `router.match` untuk semua method; bila ada, endpoint melepaskan path (request diteruskan ke route app) dan mencatat error berisi path dan method. Gagal boot tidak dipakai karena error di `ready()` terjadi setelah server listening dan tidak menghentikan proses | WP-06 "route name/path conflict handling" |
+| D36 | idem | Shutdown: provider mendaftarkan `app.terminating` di `ready()`, setelah hook close HTTP server milik Core, sehingga hook MCP berjalan lebih dulu (urutan terbalik) dan exchange MCP yang masih terbuka tidak menahan `server.close()`. Exchange modern dibatalkan lewat `handler.close()`; koneksi legacy yang tersisa di-destroy | D23 (penutupan handler) |
+| D37 | idem | Profile: `active` hanya dari sinyal runtime terverifikasi (binding container string/kelas yang diimpor lewat `app.import`, flag `app.usingEdgeJS`/`usingVineJS`); paket tanpa sinyal (Tuyau, Transmit, permissions, Bouncer) melaporkan `active: null`, bukan `false`. `kind` hybrid hanya bila surface web (renderer Inertia/Edge aktif) dan surface api (config, route `/api`/domain `api.*`) sama-sama ada. Profile dihitung lazy, paling banyak sekali per request MCP (`AvailabilityContext.profile()`), dan `available()` dievaluasi per request; `available()` yang throw atau mengembalikan nilai invalid menjadi `INTEGRATION_FAILED` | §4.5, D14 |
+
 ## 4. Arsitektur dan kontrak yang dibekukan sebelum ekspansi fitur
 
 ### 4.1 Ownership modul
@@ -155,7 +166,7 @@ Keputusan berikut berasal dari bukti spike dan memperbarui baris D01–D20 yang 
 ### 4.2 Lifecycle
 
 1. **Register:** bila dev/aktif, register `mcp.registry` dan dependency factories; tanpa I/O atau model import. Binding augmentation tersedia melalui export tipe.
-2. **Boot/start:** resolve config, tambah builtin definitions, dan register route sebelum router commit. Package lain boleh register saat `boot()`; urutan provider tidak boleh menentukan apakah builtin terhapus/terduplikasi.
+2. **Boot/start:** resolve config, tambah builtin definitions saat `boot()`, muat `extraTools` dan pasang endpoint sebagai server middleware saat `start()` sebelum HTTP server boot (D34). Package lain boleh register saat `boot()`; urutan provider tidak boleh menentukan apakah builtin terhapus/terduplikasi.
 3. **Ready/lazy first call:** ambil profile dari app yang sudah siap, attach listener yang memerlukan server aktif, finalisasi immutable registry snapshot. Development inspection/codegen tidak boleh memulai watcher atau worker.
 4. **Per request:** guards → body/protocol validation → factory server → registry snapshot → validated handler → bounded/redacted result. Versi protokol dan status JSON-RPC dikelola SDK.
 5. **Shutdown/HMR:** detach listener dan watcher, tutup handler-owned resources, batalkan operasi yang mendukung signal, kosongkan buffer/cache milik instance. Tidak menutup DB pool, logger, atau server milik aplikasi.
@@ -284,10 +295,10 @@ Keputusan implementasi M1 (keputusan rencana, belum persetujuan pengguna):
 - `extraTools` hanya menerima loader lazy `() => import('…')` (D22); definisi eager tidak didukung karena config dimuat di production.
 - `defineConfig` tetap export publik untuk konteks yang package-nya terpasang, tetapi stub memakai `satisfies McpConfig`; provider memanggil resolver yang sama di `register()` hanya saat `app.inDev`.
 - `available()` mengembalikan `{ available: true }` atau `{ available: false, code, reason }` dengan code `DEPENDENCY_UNAVAILABLE`, `CAPABILITY_UNSUPPORTED`, atau `INTEGRATION_FAILED` (integrasi rusak, API-04).
-- Configure M1 hanya menulis surface D21 (config, wrapper, rc entry) dan gagal jelas bila alias `#providers/*` tidak ada. Shield/Accept exemption, instrumentasi log, flag eval, skill, dan next steps tetap WP-33.
+- Configure M1 hanya menulis surface D21 (config, wrapper, rc entry) dan gagal jelas bila alias `#providers/*` tidak ada. Instrumentasi log, flag eval, skill, dan next steps tetap WP-33. Sejak D34 (M2) configure tidak perlu menulis exemption Shield/`Accept`.
 - Fixture berada di luar repository (`$TMPDIR/adonisjs-mcp-fixtures` atau `ADONISJS_MCP_FIXTURE_ROOT`) karena ancestor `node_modules` menutupi package absen (S-B). Dependency template di-cache per hash lockfile lalu di-clone copy-on-write. Proses fixture hanya mewarisi environment allowlist (tanpa `DATABASE_URL`, `PG*`, `NODE_OPTIONS`, `npm_config_*`) dan selalu memakai `NODE_ENV` eksplisit.
 - PostgreSQL test selalu cluster milik test (`initdb` + `pg_ctl` di direktori sementara, 127.0.0.1, port bebas, dihapus setelahnya); binary dicari lewat `ADONISJS_MCP_PG_BIN`, `pg_config`, lalu lokasi umum. Tanpa binary, test gagal dengan pesan, tidak pernah fallback ke server yang sudah ada.
-- Fixture saat ini hanya kit API. Kit Inertia/Edge/hybrid/tenant ditambahkan bersama WP konsumennya; kit Vite wajib mengoreksi ignore `**/tmp/**` (OB-40).
+- Kit fixture: API (M1) dan `api-bare` (M2, tanpa Lucid/auth/session/Shield/Vine/Tuyau/Edge, untuk PF-01). Kit Inertia/Edge/hybrid/tenant ditambahkan bersama WP konsumennya; kit Vite wajib mengoreksi ignore `**/tmp/**` (OB-40).
 
 ### M2 — Registry, provider, transport, security boundary
 
@@ -302,6 +313,25 @@ Prasyarat: M1, S-A, S-B.
 | WP-09 | `detectProfile`, `get_project_profile`, `adonis://profile`, capability diagnostics | API fixture tanpa Lucid/Edge/auth tetap boot; profile tidak membuat klaim optional integration palsu |
 
 **Exit gate M2:** client nyata connect/discover, list tools, call `get_project_profile`, read profile resource; malformed/hostile requests ditolak. Gunakan tool nyata ini sebagai vertical slice; `ping` dummy tidak menjadi deliverable permanen.
+
+#### 6.2 Hasil M2 (13 Oktober 2026)
+
+Exit gate M2 terpenuhi pada macOS arm64, Node 24.21.0, npm 11.19.0, tuple §2.3: tarball terpasang di kit API (force-JSON middleware, bodyparser, Shield dengan CSRF **diaktifkan**) dan di kit `api-bare` baru (tanpa Lucid/auth/session/Shield/Vine/Tuyau/Edge). Client resmi era modern (`2026-07-28`) dan legacy (`2025-11-25`) melakukan discovery/initialize, `tools/list`, `tools/call get_project_profile`, `resources/read adonis://profile`, resource template, dan `prompts/get`; request hostile/malformed ditolak sebelum SDK atau oleh SDK sesuai kepemilikannya. Arsitektur endpoint berubah dari route ke server middleware (D34–D37).
+
+| WP | Artefak | Bukti |
+| --- | --- | --- |
+| WP-05 | `src/registry.ts` (`DefinitionRegistry`, `RegistrySnapshot`, validasi resource/prompt), `src/errors.ts` (`RegistryClosedError`), `src/invocation.ts` (wrapper `extend` sekali per call, normalisasi error), `src/result.ts` (JSON-safe + truncation), `src/redaction.ts` (baseline env-secret/URL credential/bearer/`oat_`) | `tests/unit/registry.spec.ts`, `tests/unit/invocation.spec.ts`; integrasi: dua provider ekstensi dengan urutan dibalik memberi `tools/list` identik, tool `disable()` sebelum registrasi dan `tools.disabled` sesudahnya tidak disajikan, nama duplikat menggagalkan boot, wrapper tercatat tepat sekali per `callId` |
+| WP-06 | `providers/mcp_provider.ts` (register: validasi + binding hanya pada proses `web` development dengan `enabled`; boot: builtin; start: `extraTools` + mount; ready: finalisasi, conflict check, hook terminating) | Integrasi: `enabled: false`, proses `NODE_ENV=test`, dan perintah console (`list:routes` dengan entry rc diperluas ke `console`) tidak membind `mcp.registry` dan endpoint 404; route app `GET /__adonis/mcp` tetap dilayani app sementara endpoint mencatat error; custom path melayani hanya di path itu; SIGTERM dengan call modern + legacy in-flight 30 detik selesai < 10 detik dengan exit 0 |
+| WP-07 | `src/server.ts` (`McpServer` per request, availability per request, profile lazy, resource template, prompt), `src/handler.ts` (`createMcpHandler` + `toNodeHandler` bersama, middleware, close) | Integrasi: 4 client konkuren (2 per era) menerima nilainya sendiri dengan `callId` berbeda; client modern yang memutus koneksi membatalkan signal tool-nya sendiri (`FIXTURE_ECHO_ABORTED`) dan client kedua era tetap dilayani; JSON rusak 400 `-32700` tanpa echo body, body > 1 MiB 413, `text/plain` 415; dari SDK: header modern tanpa envelope 400 `-32602`, revisi tidak didukung 400 `-32022`, mismatch versi atau method header/body 400 `-32020` |
+| WP-08 | `src/guards/network.ts` (peer socket, Host tunggal + port aktual, Origin exact, header rekursi `x-adonisjs-mcp-call`), 405 + `Allow: POST` | `tests/unit/network_guards.spec.ts`; integrasi: request kontrol 200 dengan body yang sama, sedangkan Host asing/rebinding/port lain/userinfo/duplikat/absen, Origin `null`/asing/port lain, override Host via `X-Forwarded-Host`/`Forwarded`, dan header rekursi 403; GET/DELETE/PUT/OPTIONS 405 `Allow: POST`; app bind `0.0.0.0` diakses lewat IP LAN dengan `X-Forwarded-For: 127.0.0.1` tetap 403 sementara `/` app 200; POST route app tanpa token CSRF tetap ditolak Shield |
+| WP-09 | `src/profile.ts` (`detectProfile`), `src/tools/app/get_project_profile.ts`, `src/resources/profile.ts`, tipe `ProjectProfile`/`PackageReport`/`CapabilityReport`, `AvailabilityContext.profile()` | Integrasi kit API: Lucid/auth/session/Shield/Vine aktif dengan versi dan deklarasi, Tuyau terpasang `active: null`, auth `guards: ['api','web']` default `api`, surface api prefix `/api`, generated controllers/registry ada, capability `served`/`disabled`/`unavailable` (`DEPENDENCY_UNAVAILABLE` vs `INTEGRATION_FAILED`); tool dan resource memberi data identik. Kit `api-bare`: semua paket opsional `version: null`, `active: false`, tanpa `error`, auth/inertia/web `null`, tanpa limitation |
+
+Jumlah test setelah M2: 55 unit, 27 integration (termasuk 11 dari M1); `npm run lint`, `npm run typecheck`, `npm test`, `npm run test:integration`, dan `npm run verify:exports` (consumer strict memakai `ResourceDefinition` + `ProjectProfile`, runtime check gating environment provider) lulus.
+
+Batas yang tetap terbuka setelah M2:
+
+- Aturan profile Inertia/Edge/hybrid (renderer, adapter, SSR, hybrid tanpa default) sudah diimplementasikan tetapi belum diuji dengan fixture kit yang sesuai (WP-21, M6). Redaction M2 adalah baseline untuk pesan error; kebijakan config/log/HTTP milik M3/M5.
+- Rebuild registry atomik saat HMR tidak diimplementasikan: provider tidak dijalankan ulang oleh hot-hook, perubahan provider/`extraTools` memerlukan restart proses (LC-04, WP-37).
 
 ### M3 — Runtime observability dan metadata dasar
 
@@ -670,12 +700,12 @@ Bila post-publish smoke gagal, hentikan promosi dan terbitkan perbaikan versi ba
 
 1. ~~Buat fixture spike minimal dengan tuple SDK/Core yang dipilih~~ — selesai di M0 (`spikes/`, tuple §2.3). Manifest package tetap pekerjaan WP-01.
 2. ~~Buktikan S-A dan S-B~~ — selesai di M0 (§5.1).
-3. Bekukan public schema/config/result/error contracts dan lifecycle registry, memasukkan D21–D33 dan OB ledger yang mengikat WP-01–WP-08.
-4. Bangun vertical slice M2 dengan `get_project_profile` dan `adonis://profile` sebagai fitur nyata.
+3. ~~Bekukan public schema/config/result/error contracts dan lifecycle registry~~ — selesai di M1–M2 (§6.1, §6.2, D34–D37).
+4. ~~Bangun vertical slice M2 dengan `get_project_profile` dan `adonis://profile` sebagai fitur nyata~~ — selesai (§6.2).
 5. ~~Jalankan spike log/auth/SQL/tenant/eval/introspection yang tersisa~~ — selesai di M0; B-01 diputuskan (opsi a).
 6. Eksekusi M3–M8 sesuai dependensi, tutup dengan M9. Jangan memindahkan risiko keamanan ke akhir hanya karena tool sudah tampak bekerja.
 
-Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Sejak M1, tests dan smoke package mencakup fondasi saja (§6.1); belum ada endpoint MCP maupun tool.
+Pada penyusunan awal, dokumen ini tidak menyatakan spike, tests, atau smoke runtime telah lulus. Sejak M0, hasil spike pada §5.1 berasal dari eksekusi nyata dengan bukti di `docs/spikes/` dan `spikes/`; itu bukti kelayakan pendekatan, bukan bukti implementasi package. Sejak M1, tests dan smoke package mencakup fondasi (§6.1); sejak M2 juga endpoint MCP, registry, guard, dan satu tool + satu resource nyata (§6.2). Tool lain belum ada.
 
 ## 14. Referensi
 

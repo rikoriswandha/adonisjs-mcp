@@ -39,7 +39,7 @@ export function toolNameIssue(name: unknown): string | undefined {
  * libraries do not. Checked structurally so an application's own copy of
  * Zod v4 is accepted.
  */
-function isZodObjectSchema(value: unknown): value is ToolInputSchema {
+export function isZodObjectSchema(value: unknown): value is ToolInputSchema {
   if (!isPlainObject(value) || !isPlainObject(value._zod)) {
     return false
   }
@@ -47,7 +47,7 @@ function isZodObjectSchema(value: unknown): value is ToolInputSchema {
   return isPlainObject(definition) && definition.type === 'object'
 }
 
-function isPlainObject(value: unknown): value is Record<string, unknown> {
+export function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 

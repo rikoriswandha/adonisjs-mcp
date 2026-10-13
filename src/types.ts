@@ -290,11 +290,160 @@ export type Availability =
 export type EvidenceKind = 'runtime' | 'generated' | 'source'
 
 /**
+ * Optional integrations reported by the project profile.
+ */
+export type PackageKey =
+  | 'lucid'
+  | 'auth'
+  | 'session'
+  | 'shield'
+  | 'vine'
+  | 'edge'
+  | 'inertia'
+  | 'vite'
+  | 'tuyau'
+  | 'transmit'
+  | 'tenant'
+  | 'permissions'
+  | 'bouncer'
+  | 'queue'
+
+/**
+ * What the running process reveals about one optional package.
+ */
+export interface PackageReport {
+  /**
+   * npm package name.
+   */
+  name: string
+
+  /**
+   * Where the application `package.json` declares the package, if anywhere.
+   * Transitive installs are `null`.
+   */
+  declared: 'dependencies' | 'devDependencies' | null
+
+  /**
+   * Installed version resolved from the application root, or `null` when
+   * the package is not installed.
+   */
+  version: string | null
+
+  /**
+   * Whether the integration is wired into this process. `null` means no
+   * verified runtime signal exists for this package, so activity is
+   * unknown rather than false.
+   */
+  active: boolean | null
+
+  /**
+   * The runtime signal `active` was derived from, e.g. a container binding.
+   */
+  signal: string | null
+
+  /**
+   * Set when inspecting an installed integration failed. The integration is
+   * broken, not absent.
+   */
+  error?: string
+}
+
+/**
+ * One fact supporting a profile inference.
+ */
+export interface ProfileEvidence {
+  kind: EvidenceKind | 'config'
+  detail: string
+}
+
+export interface SurfaceReport {
+  /**
+   * Renderer of a `web` surface. Absent on `api` surfaces.
+   */
+  renderer?: 'inertia' | 'edge'
+
+  /**
+   * URL prefix owned by the surface, when configured or observed.
+   */
+  prefix: string | null
+
+  /**
+   * Auth guard used on the surface, when configured.
+   */
+  guard: string | null
+  evidence: readonly ProfileEvidence[]
+}
+
+/**
+ * The kind of application and the integrations active in the running
+ * process. Unknown facts are `null`, never guessed.
+ */
+export interface ProjectProfile {
+  /**
+   * `hybrid` means both a web and an api surface are configured or
+   * observed; an installed package alone never makes a project hybrid.
+   */
+  kind: 'api' | 'inertia' | 'edge' | 'hybrid'
+  app: {
+    name: string | null
+    root: string
+    environment: string
+    nodeVersion: string
+    coreVersion: string | null
+  }
+  surfaces: {
+    web: SurfaceReport | null
+    api: SurfaceReport | null
+
+    /**
+     * Surface assumed for requests that match neither surface. `null` when
+     * the project is hybrid and `profile.surfaces.default` is not set.
+     */
+    default: SurfaceName | null
+  }
+  inertia: {
+    adapter: 'react' | 'vue' | 'svelte' | null
+    ssr: boolean | null
+  } | null
+  auth: {
+    guards: readonly string[]
+    default: string | null
+  } | null
+  packages: Readonly<Record<PackageKey, PackageReport>>
+  generated: {
+    controllers: boolean
+    data: boolean
+    tuyauRegistry: boolean
+  }
+  endpoint: {
+    path: string
+    allowRemoteAccess: boolean
+  }
+  limitations: readonly string[]
+}
+
+/**
+ * Whether one registered definition is served, and why not.
+ */
+export interface CapabilityReport {
+  name: string
+  status: 'served' | 'disabled' | 'unavailable'
+  code?: UnavailableCode
+  reason?: string
+}
+
+/**
  * Context available when deciding whether a definition is served.
  */
 export interface AvailabilityContext {
   app: ApplicationService
   config: ResolvedMcpConfig
+
+  /**
+   * Profile of the running application. Computed on first use and shared
+   * by every definition served for the same MCP request.
+   */
+  profile(): Promise<ProjectProfile>
 }
 
 /**
@@ -308,7 +457,7 @@ export interface ToolContext extends AvailabilityContext {
   callId: string
 
   /**
-   * Aborted when the client cancels the call or its deadline expires.
+   * Aborted when the client cancels the call or disconnects.
    */
   signal: AbortSignal
 }
@@ -443,13 +592,24 @@ export interface PromptDefinition<Schema extends ToolInputSchema = ToolInputSche
  *   registry.tool(...)
  * }
  * ```
+ *
+ * Registration closes when the application is ready; later calls throw.
  */
 export interface McpRegistry {
   /**
-   * Registers a tool. Duplicate names fail before the endpoint serves.
+   * Registers a tool. A name already registered as a tool throws, so
+   * collisions fail the boot instead of replacing a definition.
    */
   tool<Schema extends ToolInputSchema>(definition: ToolDefinition<Schema>): void
+
+  /**
+   * Registers a resource. Names and URIs are unique across resources.
+   */
   resource(definition: ResourceDefinition): void
+
+  /**
+   * Registers a prompt. Names are unique across prompts.
+   */
   prompt<Schema extends ToolInputSchema>(definition: PromptDefinition<Schema>): void
 
   /**
@@ -459,7 +619,8 @@ export interface McpRegistry {
   extend(wrapper: ToolCallWrapper): void
 
   /**
-   * Never serve the named tool, regardless of registration order.
+   * Never serve the named tool, whether it is registered before or after
+   * this call.
    */
   disable(name: string): void
 }

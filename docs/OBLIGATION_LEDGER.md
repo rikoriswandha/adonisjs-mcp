@@ -40,13 +40,13 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Kewajiban | Sumber | Gate | WP | Verifikasi | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| DC-01 | `McpServer` per request dari factory; registry/buffer/cache milik app; handler bersama ditutup saat shutdown | Plan D01 | SP-A | WP-05, WP-07 | E01, E12; dua client konkuren | TERBUKA |
+| DC-01 | `McpServer` per request dari factory; registry/buffer/cache milik app; handler bersama ditutup saat shutdown | Plan D01 | SP-A | WP-05, WP-07 | E01, E12; dua client konkuren | SELESAI (M2: `src/server.ts`, `src/handler.ts`; `endpoint.spec` 4 client konkuren dua era, SIGTERM menutup call in-flight, D36) |
 | DC-02 | SDK v2 + Zod v4; tanpa shim API v1 | Plan D02 | SP-A | WP-01, WP-03 | build consumer tarball | TERBUKA |
 | DC-03 | Default path `/__adonis/mcp`, nama client `adonis`, tanpa alias Tidewave | Plan D03 | — | WP-06, WP-35 | E10 custom path | TERBUKA |
 | DC-04 | Production aman tanpa package: provider loading + config import kondisional; `app.inDev` defense-in-depth | Plan D04 | SP-B | WP-06, WP-33, WP-38 | E10 production prune | TERBUKA |
-| DC-05 | Peer address dari socket; Host/Origin divalidasi terpisah; forwarded header tidak dipercaya | Plan D05 | SP-A | WP-08 | SEC-01–SEC-03 | TERBUKA |
-| DC-06 | Origin absen diterima; `null`/malformed/opaque/foreign ditolak | Plan D06 | — | WP-08 | SEC-04 | TERBUKA |
-| DC-07 | `allowRemoteAccess` hanya membuka peer; Host/Origin tetap exact allowlist | Plan D07 | — | WP-08 | SEC-05 | TERBUKA |
+| DC-05 | Peer address dari socket; Host/Origin divalidasi terpisah; forwarded header tidak dipercaya | Plan D05 | SP-A | WP-08 | SEC-01–SEC-03 | SELESAI (M2: `src/guards/network.ts`, `network_guards.spec`, `endpoint.spec` LAN + `X-Forwarded-For`) |
+| DC-06 | Origin absen diterima; `null`/malformed/opaque/foreign ditolak | Plan D06 | — | WP-08 | SEC-04 | SELESAI (M2: `network_guards.spec`, `endpoint.spec`) |
+| DC-07 | `allowRemoteAccess` hanya membuka peer; Host/Origin tetap exact allowlist | Plan D07 | — | WP-08 | SEC-05 | SELESAI (M2: `network_guards.spec` "allowRemoteAccess opens the peer check only") |
 | DC-08 | Timeout eval kooperatif, didokumentasikan bukan preemption | Plan D08 | SP-E | WP-28, WP-34 | E08 | TERBUKA |
 | DC-09 | `await import('#models/user')` natural pada eval; tanpa chdir/regex rewrite | Plan D09, D26 | SP-E | WP-28 | E08 | TERBUKA |
 | DC-10 | Read-only SQL ditegakkan DB/connection; statement filter hanya lapisan tambahan; tanpa fallback read-write | Plan D10 | SP-G | WP-16 | SEC-10–SEC-12 | TERBUKA |
@@ -55,14 +55,14 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | DC-13 | Evidence `runtime`/`generated`/`source` dipisahkan pada metadata | Plan D13 | SP-I | WP-11, WP-23–WP-25 | golden fixture introspeksi | TERBUKA |
 | DC-14 | Hybrid ditentukan surface terkonfigurasi/teramati, bukan kehadiran package | Plan D14 | SP-I | WP-09, WP-21 | PF-06 | TERBUKA |
 | DC-15 | Origin binding hanya bila framework mengekspos bukti; selain itu `unknown` | Plan D15 | SP-D | WP-12 | E01 | TERBUKA |
-| DC-16 | Package ekstensi bisa memberi definisi tanpa runtime import; helper di-lazy-import setelah guard | Plan D16 | — | WP-03, WP-05 | E07 | TERBUKA |
+| DC-16 | Package ekstensi bisa memberi definisi tanpa runtime import; helper di-lazy-import setelah guard | Plan D16 | — | WP-03, WP-05 | E07 | SELESAI (M2: provider ekstensi fixture memberi object literal, `zod`/`ToolError` di-import di dalam `boot()` setelah `hasBinding`; `endpoint.spec`) |
 | DC-17 | Kredensial impersonation sementara via API nyata, cleanup `finally`, tanpa residu | Plan D17 | SP-F | WP-20 | E04 | TERBUKA |
 | DC-18 | SQL default read-only; write opt-in ditandai mutating di annotations dan skill | Plan D18 | SP-G | WP-16, WP-34 | E03 | TERBUKA |
 | DC-19 | Audit eval: status, durasi, call ID, excerpt ter-redaksi; tanpa kode penuh/secret | Plan D19 | SP-C | WP-28 | SEC-20 | TERBUKA |
 | DC-20 | `tools.docs.include` default `['@adonisjs/*', '@rikology/*']` identik di semua contoh/stub | Plan D20 | — | WP-31, WP-33 | E11 | TERBUKA |
 | DC-21 | Install production-safe: wrapper app-local `#providers/mcp_dev_provider`, config `import type` + `satisfies McpConfig`, deployment standalone sebagai release gate | Plan D21 | SP-B | WP-03, WP-06, WP-33, WP-38 | E10 | TERBUKA |
 | DC-22 | Artefak app yang dimuat di production tidak meng-import package/zod saat runtime, termasuk `extraTools` | Plan D22 | — (turunan SP-B, belum diuji) | WP-03, WP-33 | E07, E10 | TERBUKA |
-| DC-23 | Bridge transport: handler bersama, parsed body, `relayHeaders`, exemption Shield/Accept exact-path, limit 1 MiB eksplisit, normalisasi malformed body | Plan D23 | SP-A | WP-07, WP-08 | E01, E12 | TERBUKA |
+| DC-23 | Bridge transport: handler bersama, parsed body, `relayHeaders`, exemption Shield/Accept exact-path, limit 1 MiB eksplisit, normalisasi malformed body | Plan D23 | SP-A | WP-07, WP-08 | E01, E12 | SELESAI dengan perubahan D34 (M2: handler bersama + `relayHeaders`; endpoint sebagai server middleware sehingga parsed body dan exemption tidak diperlukan; SDK membaca body dengan limit 1 MiB, JSON rusak `-32700` tanpa echo; `endpoint.spec`) |
 | DC-24 | Capture log/exception lewat instrumentasi opt-in yang dibuat configure; tidak diklaim zero-config | Plan D24 | SP-C | WP-10, WP-33, WP-35 | E02 | TERBUKA |
 | DC-25 | Inventory container parsial berlabel; events persistent-only; cache tidak hanya invalidasi saat ready | Plan D25 | SP-D | WP-12, WP-14, WP-37 | E01, E09 | TERBUKA |
 | DC-26 | Evaluator `vm` + callback importer framework; flag `--experimental-vm-modules` wajib (keputusan pengguna B-01); tanpa flag `CAPABILITY_UNSUPPORTED` | Plan D26 | SP-E | WP-28, WP-33, WP-35 | E08 | TERBUKA |
@@ -81,17 +81,17 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 | API-01 | Config input parsial typed (`McpConfig`) → config resolved tervalidasi oleh provider; `config/mcp.ts` memakai `import type` + `satisfies`, bukan runtime `defineConfig` (D21); `projectEval: false` dan `tools.disabled` berlaku | Plan §4.3, D21; Design config | SP-B | WP-03 | unit config merge, E10 | TERBUKA |
 | API-02 | `defineTool`: schema object Zod v4, nama snake_case, inferred input tanpa `any` publik | Plan §4.3 | SP-A | WP-03 | typecheck consumer tarball (M1: `verify:exports`, `tests/unit/define_tool.spec.ts`) | SELESAI |
 | API-03 | `ToolContext`: app, config/profile, log/exception services, `callId`, signal, tenant per call; tanpa credential singleton | Plan §4.3 | SP-C, SP-H | WP-03, WP-05 | E07 | TERBUKA |
-| API-04 | `available(ctx)` membedakan dependency absen vs integrasi rusak (diagnostic) | Plan §4.3 | SP-K | WP-09 | PF-01, PF-07 | TERBUKA |
-| API-05 | `registry.tool/resource/prompt`: tabrakan gagal sebelum serving; `disable` deny-set independen urutan | Plan §4.3; Design plugin | — | WP-05 | E07 | TERBUKA |
-| API-06 | `registry.extend`: urutan eksplisit, sekali per call, `next` tidak bisa dipanggil ulang, error tetap dinormalisasi | Plan §4.3 | — | WP-05 | E07 | TERBUKA |
-| API-07 | Result sukses: text JSON terstruktur + `durationMs`, `truncated`, evidence/limitations | Plan §4.3 | — | WP-05, WP-07 | E01 | TERBUKA |
-| API-08 | Result gagal: `isError: true`, stable code, pesan ter-redaksi; error protokol tetap milik SDK | Plan §4.3 | SP-A | WP-07 | E12 | TERBUKA |
+| API-04 | `available(ctx)` membedakan dependency absen vs integrasi rusak (diagnostic) | Plan §4.3 | SP-K | WP-09 | PF-01, PF-07 | SELESAI (M2: `src/server.ts` evaluasi per request, throw/invalid → `INTEGRATION_FAILED`; capability report `endpoint.spec`) |
+| API-05 | `registry.tool/resource/prompt`: tabrakan gagal sebelum serving; `disable` deny-set independen urutan | Plan §4.3; Design plugin | — | WP-05 | E07 | SELESAI (M2: `src/registry.ts`, `registry.spec`, `endpoint.spec` duplikat gagal boot) |
+| API-06 | `registry.extend`: urutan eksplisit, sekali per call, `next` tidak bisa dipanggil ulang, error tetap dinormalisasi | Plan §4.3 | — | WP-05 | E07 | SELESAI (M2: `src/invocation.ts`, `invocation.spec`, wrapper sekali per `callId` di `endpoint.spec`) |
+| API-07 | Result sukses: text JSON terstruktur + `durationMs`, `truncated`, evidence/limitations | Plan §4.3 | — | WP-05, WP-07 | E01 | SELESAI (M2: `src/result.ts`, `invocation.spec`, `endpoint.spec`) |
+| API-08 | Result gagal: `isError: true`, stable code, pesan ter-redaksi; error protokol tetap milik SDK | Plan §4.3 | SP-A | WP-07 | E12 | SELESAI (M2: `invocation.spec`, `fixture_fail` tanpa APP_KEY; error protokol `-32602`/`-32022`/`-32020`/`-32700` dari SDK di `endpoint.spec`) |
 | API-09 | Annotations sesuai perilaku aktual; tool mutating tidak diberi `readOnlyHint` | Plan §4.3 | — | semua tool WP | review katalog | TERBUKA |
 | API-10 | Error codes minimum: `DEPENDENCY_UNAVAILABLE`, `CAPABILITY_UNSUPPORTED`, `INPUT_INVALID`, `NOT_FOUND`, `READ_ONLY_VIOLATION`, `TENANT_SCOPE_REQUIRED`, `TIMEOUT`, `CANCELLED`, `EXECUTION_FAILED` | Plan §4.3 | — | WP-05 | unit + E02 | TERBUKA |
 | API-11 | Exports `.`, `./configure`, `./types`, `./providers/mcp_provider` resolve dari tarball | Plan WP-02; Design exports | SP-B | WP-02 | `verify:exports`, `smoke:pack` | TERBUKA |
 | API-12 | Optional peer tidak di-import eager pada public entry | Plan §4.1 | SP-B | WP-01–WP-03 | PF-01, production prune | TERBUKA |
-| LC-01 | Register tanpa I/O/model import; `mcp.registry` tersedia untuk package lain saat `boot()` | Plan §4.2 | SP-D | WP-05, WP-06 | E07 | TERBUKA |
-| LC-02 | Route MCP terdaftar sebelum router commit; urutan provider tidak mengubah builtin | Plan §4.2 | SP-D | WP-06 | dua urutan provider | TERBUKA |
+| LC-01 | Register tanpa I/O/model import; `mcp.registry` tersedia untuk package lain saat `boot()` | Plan §4.2 | SP-D | WP-05, WP-06 | E07 | SELESAI (M2: `providers/mcp_provider.ts`; dua provider ekstensi register dari `boot()`) |
+| LC-02 | Route MCP terdaftar sebelum router commit; urutan provider tidak mengubah builtin | Plan §4.2 | SP-D | WP-06 | dua urutan provider | SELESAI dengan perubahan D34 (M2: endpoint dipasang sebagai server middleware di `start()` sebelum server boot, gagal jelas bila router sudah commit; urutan provider dibalik memberi `tools/list` identik) |
 | LC-03 | Profile/listener/registry snapshot difinalisasi setelah app siap; inspeksi tidak memulai watcher/worker | Plan §4.2 | SP-D | WP-05, WP-09 | E01 | TERBUKA |
 | LC-04 | Registrasi setelah finalisasi ditolak jelas; HMR rebuild atomik; request berjalan memakai snapshot lama | Plan §4.2 | SP-D | WP-05, WP-37 | E09 | TERBUKA |
 | LC-05 | Shutdown/HMR melepas listener, watcher, handler resources milik package saja; tidak menutup DB/logger/server app | Plan §4.2 | SP-C, SP-D | WP-06, WP-37 | E09, handle count | TERBUKA |
@@ -101,15 +101,15 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Kewajiban | Default | Gate | WP | Verifikasi | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| CF-01 | Endpoint dev-only, `enabled` kill switch, `allowRemoteAccess: false` | `/__adonis/mcp` | SP-B | WP-06 | PF-08 | TERBUKA |
-| CF-02 | Allowlist peer loopback (IPv4, IPv6, mapped); Host loopback + port aktual; Origin lokal exact | — | SP-A | WP-08 | SEC-01–SEC-05 | TERBUKA |
+| CF-01 | Endpoint dev-only, `enabled` kill switch, `allowRemoteAccess: false` | `/__adonis/mcp` | SP-B | WP-06 | PF-08 | SELESAI (M2: `endpoint.spec` disabled/test/console; M1 production prune) |
+| CF-02 | Allowlist peer loopback (IPv4, IPv6, mapped); Host loopback + port aktual; Origin lokal exact | — | SP-A | WP-08 | SEC-01–SEC-05 | SELESAI (M2: `network_guards.spec`, `endpoint.spec`) |
 | CF-03 | Eval timeout default/maks 30.000 ms; request tidak boleh melebihi config | 30.000 ms | SP-E | WP-28 | E08 | TERBUKA |
 | CF-04 | SQL/model `readOnly: true`, `maxRows: 100`, `allowCrossTenant: false`; connection harus ada; PostgreSQL memerlukan connection reader least-privilege terkonfigurasi (D28) | — | SP-G | WP-15, WP-16 | E03 | TERBUKA |
 | CF-05 | Buffer 1.000 log / 100 exception + byte budget; tail default 100 | — | SP-C | WP-10 | ring wraparound | TERBUKA |
 | CF-06 | Deadline HTTP/Ace 30.000 ms; output dibatasi; tanpa auto-retry mutating | 30.000 ms | SP-J | WP-19, WP-29 | E02, E08 | TERBUKA |
-| CF-07 | Request maks 1 MiB, result maks 256 KiB, truncation JSON valid + flag | — | SP-A | WP-07, WP-08 | unit truncation | TERBUKA |
+| CF-07 | Request maks 1 MiB, result maks 256 KiB, truncation JSON valid + flag | — | SP-A | WP-07, WP-08 | unit truncation | SELESAI (M2: 413 di `endpoint.spec`; truncation `invocation.spec`) |
 | CF-08 | Docs: include D20, maks 5 snippet, cache lazy | — | — | WP-31 | E11 | TERBUKA |
-| CF-09 | `extraTools: []`, `tools.disabled: []`; tool mutating bisa dimatikan | — | — | WP-05 | E07 | TERBUKA |
+| CF-09 | `extraTools: []`, `tools.disabled: []`; tool mutating bisa dimatikan | — | — | WP-05 | E07 | SELESAI (M2: `tools.disabled` dan `registry.disable()` sebelum/sesudah registrasi, `registry.spec`, `endpoint.spec`) |
 | CF-10 | `allowedHosts`, `allowedOrigins`, mapping surface/tenant, byte limits minimal + terdokumentasi; tanpa wildcard jaringan | — | SP-A, SP-H | WP-08, WP-21 | SEC-05 | TERBUKA |
 
 ## 6. Tools (28)
@@ -149,7 +149,7 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Identitas | Kontrak | Gate | WP | Verifikasi | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| R01 | `adonis://profile` | service sama dengan T01; selalu ada saat dev enabled | SP-A | WP-09, WP-32 | E01 | TERBUKA |
+| R01 | `adonis://profile` | service sama dengan T01; selalu ada saat dev enabled | SP-A | WP-09, WP-32 | E01 | SELESAI (M2: `src/resources/profile.ts`; data identik dengan tool di dua era, `endpoint.spec`) |
 | R02 | `adonis://routes` | route list tanpa filter, evidence domain/surface utuh | SP-D | WP-32 | E01 | TERBUKA |
 | R03 | `adonis://models` | ringkasan model; hanya bila Lucid aktif; cache sama dengan T10 | SP-D | WP-32 | E03 | TERBUKA |
 | R04 | `adonis://config/{key}` | subtree ter-redaksi; URI decoding tidak bypass policy | — | WP-32 | SEC-18 | TERBUKA |
@@ -161,14 +161,14 @@ Dijalankan 13 Oktober 2026 pada fixture create-adonisjs 3.4.0 (Core 7.6.0, Node 
 
 | ID | Fixture | Yang harus terbukti | Gate | Status |
 | --- | --- | --- | --- | --- |
-| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | TERBUKA |
+| PF-01 | API tanpa Lucid/auth/view | core tools aktif; DB/view/impersonation absen dengan alasan; app boot | SP-B | SELESAI untuk profile M2 (kit `api-bare`, `endpoint.spec`); availability tool DB/view/impersonation dibuktikan ulang saat tool tersebut ada (M4–M6) |
 | PF-02 | API + Lucid + token auth + Tuyau | DB tools, JSON default, token cleanup | SP-F, SP-I | TERBUKA |
 | PF-03 | Inertia React + session/Shield | page/shared/transformer, X-Inertia/version, flash, CSRF | SP-F, SP-I | TERBUKA |
 | PF-04 | Inertia Vue | tanpa asumsi React | SP-I | TERBUKA |
 | PF-05 | Edge + session | views/render, HTML bound, web guard, tanpa X-Inertia | SP-I | TERBUKA |
 | PF-06 | Hybrid API + Inertia + domain routes | surface per route, tenant/domain mapping | SP-D, SP-H | TERBUKA |
 | PF-07 | Tenant + permission + queue | positive adapter, isolasi dua tenant | SP-H, SP-K | TERBUKA |
-| PF-08 | Config disabled / production | tanpa endpoint/listener/buffer/import failure | SP-B | TERBUKA |
+| PF-08 | Config disabled / production | tanpa endpoint/listener/buffer/import failure | SP-B | SELESAI (M1 production prune `package_install.spec`; M2 `enabled: false` tanpa binding/endpoint, `endpoint.spec`). Listener/buffer M3 wajib menjaga baris ini |
 
 Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 
@@ -178,13 +178,13 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 
 | ID | Kewajiban | Gate | WP | Status |
 | --- | --- | --- | --- | --- |
-| SEC-01 | Route absen di production/disabled; loader aman walau module tidak terpasang | SP-B | WP-06, WP-38 | TERBUKA |
-| SEC-02 | Peer dari socket; uji XFF, `Forwarded`, trusted proxy, mapped IPv6, `::1` | SP-A | WP-08 | TERBUKA |
-| SEC-03 | Host menolak `localhost.evil.example`, userinfo, port malformed, duplikat, hostname resolve-loopback | — | WP-08 | TERBUKA |
-| SEC-04 | Origin diparse sebagai URL; asing/`null`/mismatch port ditolak; absen boleh | — | WP-08 | TERBUKA |
-| SEC-05 | Remote opt-in tetap Host/Origin policy; bind `0.0.0.0` tidak membuka MCP | — | WP-08 | TERBUKA |
+| SEC-01 | Route absen di production/disabled; loader aman walau module tidak terpasang | SP-B | WP-06, WP-38 | SELESAI (M1 production prune, M2 disabled/test/console); gate CI tetap OB-07/PK-02 |
+| SEC-02 | Peer dari socket; uji XFF, `Forwarded`, trusted proxy, mapped IPv6, `::1` | SP-A | WP-08 | SELESAI (M2: `network_guards.spec`, LAN di `endpoint.spec`; guard tidak memakai `request.ip()` sehingga `trustProxy` tidak berpengaruh) |
+| SEC-03 | Host menolak `localhost.evil.example`, userinfo, port malformed, duplikat, hostname resolve-loopback | — | WP-08 | SELESAI (M2: hanya nama `localhost` dan literal IP loopback diterima; `network_guards.spec`, `endpoint.spec`) |
+| SEC-04 | Origin diparse sebagai URL; asing/`null`/mismatch port ditolak; absen boleh | — | WP-08 | SELESAI (M2: `network_guards.spec`, `endpoint.spec`) |
+| SEC-05 | Remote opt-in tetap Host/Origin policy; bind `0.0.0.0` tidak membuka MCP | — | WP-08 | SELESAI (M2: `network_guards.spec`, bind `0.0.0.0` + akses IP LAN di `endpoint.spec`) |
 | SEC-06 | Dokumentasi melarang exposure publik via proxy/tunnel | — | WP-35 | TERBUKA |
-| SEC-07 | Pengecualian Shield hanya exact endpoint MCP, guard sebelum dispatch | SP-A | WP-08 | TERBUKA |
+| SEC-07 | Pengecualian Shield hanya exact endpoint MCP, guard sebelum dispatch | SP-A | WP-08 | SELESAI dengan perubahan D34 (M2: tidak ada exemption Shield; hanya path persis yang dilayani middleware MCP, guard pertama; CSRF app tetap menolak POST tanpa token di `endpoint.spec`) |
 | SEC-10 | Corpus SQL (komentar, multi-statement, CTE mutating, EXPLAIN ANALYZE, function side effect, PRAGMA, ATTACH/COPY/CALL) tidak menulis | SP-G | WP-16, WP-36 | TERBUKA |
 | SEC-11 | Construct yang tidak bisa dinyatakan aman ditolak dalam supported subset | SP-G | WP-16 | TERBUKA |
 | SEC-12 | Timeout, rollback, release connection, reset state pool pada success/error/cancel | SP-G | WP-16 | TERBUKA |
@@ -221,12 +221,12 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | E04 | Auth: anonymous ditolak, `as` valid, invalid gagal, cleanup success/error/abort | SP-F | TERBUKA |
 | E05 | Surface API JSON / Inertia / Edge, validation mapping, domain route | SP-F, SP-I | TERBUKA |
 | E06 | Tenant concurrency model/eval/HTTP; missing/wrong tenant; raw SQL bypass ditolak | SP-H | TERBUKA |
-| E07 | Extensibility: provider domain register, wrapper sekali, disable menang, duplicate gagal boot | — | TERBUKA |
+| E07 | Extensibility: provider domain register, wrapper sekali, disable menang, duplicate gagal boot | — | SELESAI (M2: `endpoint.spec`) |
 | E08 | Eval/Ace: alias import, service, console, timeout jujur; generator; nonzero exit | SP-E, SP-J | TERBUKA |
 | E09 | Lifecycle: edit model/page, HMR/restart, metadata baru, shutdown bersih | SP-D, SP-I | TERBUKA |
 | E10 | Install/production: configure 2x, custom path/port, tarball, production prune | SP-B | TERBUKA |
 | E11 | Offline docs: network diblok, docs + source reference benar, non-allowlist tidak diindex | — | TERBUKA |
-| E12 | Protocol eras: modern + legacy; invalid version/header/malformed JSON sesuai SDK | SP-A | TERBUKA |
+| E12 | Protocol eras: modern + legacy; invalid version/header/malformed JSON sesuai SDK | SP-A | SELESAI (M2: `endpoint.spec`) |
 
 ### 9.4 Packaging dan release (plan §9.4, §12)
 
@@ -247,10 +247,10 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 
 | ID | Kewajiban | Asal | WP | Status |
 | --- | --- | --- | --- | --- |
-| OB-01 | Configure mengecualikan exact endpoint dari middleware app yang mengubah `Accept` (API kit `force_json_response_middleware`); tanpa itu legacy client gagal 406. Tidak menonaktifkan middleware global | S-A | WP-07, WP-08, WP-33 | TERBUKA |
-| OB-02 | Byte limit endpoint 1 MiB ditegakkan eksplisit; limit SDK tidak berlaku untuk parsed body dan limit bodyparser app bisa lebih besar | S-A | WP-08 | TERBUKA |
-| OB-03 | Malformed JSON ditolak bodyparser Adonis sebelum SDK (400, debug raw body); normalisasi + redaction endpoint ditetapkan, tidak diklaim milik SDK | S-A | WP-07, WP-08 | TERBUKA |
-| OB-04 | Pertahankan Shield `exceptRoutes` exact, `relayHeaders()` sebelum bridge, `await` bridge, tanpa payload return; contract test `isPending`/`headersSent`/finalizer per versi http-server | S-A | WP-07, WP-38 | TERBUKA |
+| OB-01 | Configure mengecualikan exact endpoint dari middleware app yang mengubah `Accept` (API kit `force_json_response_middleware`); tanpa itu legacy client gagal 406. Tidak menonaktifkan middleware global | S-A | WP-07, WP-08, WP-33 | SELESAI dengan perubahan D34 (M2: middleware MCP berjalan sebelum force-JSON sehingga exemption tidak diperlukan; client legacy lulus pada kit API tanpa perubahan middleware app) |
+| OB-02 | Byte limit endpoint 1 MiB ditegakkan eksplisit; limit SDK tidak berlaku untuk parsed body dan limit bodyparser app bisa lebih besar | S-A | WP-08 | SELESAI (M2: SDK membaca body sendiri dengan `limits.maxRequestBytes`, bodyparser app tidak terlibat; 413 di `endpoint.spec`) |
+| OB-03 | Malformed JSON ditolak bodyparser Adonis sebelum SDK (400, debug raw body); normalisasi + redaction endpoint ditetapkan, tidak diklaim milik SDK | S-A | WP-07, WP-08 | SELESAI dengan perubahan D34 (M2: bodyparser tidak melihat trafik MCP; SDK menjawab 400 `-32700` tanpa echo body, `endpoint.spec`) |
+| OB-04 | Pertahankan Shield `exceptRoutes` exact, `relayHeaders()` sebelum bridge, `await` bridge, tanpa payload return; contract test `isPending`/`headersSent`/finalizer per versi http-server | S-A | WP-07, WP-38 | TERBUKA (M2: exemption Shield tidak lagi dipakai, D34; `relayHeaders` + `await` bridge dari middleware, satu response per request di `endpoint.spec`. Sisa: matriks versi http-server di WP-38) |
 | OB-05 | Rc entry `{ file: () => import('#providers/mcp_dev_provider'), environment: ['web'] }` via `rcFile.addProvider`; wrapper app-local meng-import package hanya bila `app.inDev`; provider package tetap punya guard | S-B | WP-06, WP-33 | SELESAI (M1: `configure.ts`, `tests/integration/package_install.spec.ts`) |
 | OB-06 | Stub config `import type { McpConfig }` + `satisfies McpConfig`; provider melakukan default/validation; tidak ada runtime import dev package dari config | S-B | WP-03, WP-33 | SELESAI (M1: `stubs/config/mcp.stub`, provider `register()`, `package_install.spec.ts`) |
 | OB-07 | Release gate: tarball → `npm ci --omit=dev` → deployment standalone di luar ancestor `node_modules` → `/` 200, MCP 404, tanpa binding/listener/marker, `ace list` dan `migration:status` exit 0 | S-B | WP-38 | TERBUKA |
@@ -314,6 +314,7 @@ Belum ada pengurangan cakupan. M0 tidak menghapus tool, resource, atau prompt. K
 - `execute_sql_query` hanya menerima subset SELECT/WITH terbatas pada executor milik MCP; PostgreSQL membutuhkan reader role terkonfigurasi, SQLite in-memory tidak didukung (D28).
 - Impersonation cookie session memberi replay window terbatas, bukan revocation instan (D27).
 - Package permission adalah `@adonisplus/permissions` (privat, berlisensi), bukan `@adonisplus/permission`; queue memakai `@adonisjs/queue`, bukan `@rikology/adonisjs-queue` yang tidak terbit (D32).
+- M2 (plan §3.2): endpoint MCP dipasang sebagai server middleware, bukan route (D34), sehingga configure tidak menulis exemption Shield/`Accept`; route app pada path MCP membuat endpoint melepaskan path dengan error log, bukan gagal boot (D35). Tidak ada fitur yang dihapus.
 
 ## 13. Progres M1 (13 Oktober 2026)
 
@@ -333,3 +334,27 @@ Bukti parsial; baris tetap `TERBUKA` sampai WP konsumennya selesai:
 | OB-07 | Skenario release gate dijalankan di integration test | Asersi binding/listener setelah ada (M2–M3); CI (WP-38) |
 | OB-15 / OB-40 | Fixture factory mendukung runner `hmr` (`node ace serve --hmr`) dengan stop process group | Regression HMR (WP-37); koreksi ignore Vite `**/tmp/**` saat fixture kit Vite ditambahkan |
 | PK-02 | Script `lint`, `typecheck`, `test`, `test:integration`, `build`, `verify:exports` | `test:security`, `smoke:pack`, `smoke:clients` (WP-38) |
+
+## 14. Progres M2 (13 Oktober 2026)
+
+M2 (WP-05–WP-09) diimplementasikan; bukti pada macOS arm64, Node 24.21.0, npm 11.19.0: `npm run lint`, `npm run typecheck`, `npm test` (55 unit), `npm run test:integration` (27 integration), `npm run verify:exports`. `endpoint.spec` = `tests/integration/endpoint.spec.ts`; `*.spec` unit ada di `tests/unit/`. Baris yang berpindah ke `SELESAI`: DC-01, DC-05, DC-06, DC-07, DC-16, DC-23, API-04–API-08, LC-01, LC-02, CF-01, CF-02, CF-07, CF-09, R01, PF-01 (profile), PF-08, SEC-01–SEC-05, SEC-07, E07, E12, OB-01–OB-03.
+
+Bukti parsial; baris tetap `TERBUKA`:
+
+| ID | Sudah terbukti di M2 | Sisa |
+| --- | --- | --- |
+| DC-03 | Default `/__adonis/mcp`, server MCP bernama `adonis`, custom path melayani hanya di path itu | Recipe client (WP-35), E10 penuh |
+| DC-14 | Aturan hybrid = surface web (renderer aktif) + surface api; paket terpasang saja tidak cukup | Fixture hybrid PF-06 (WP-21) |
+| API-03 | `ToolContext` membawa `profile()` lazy per request, `callId`, signal pembatalan client | Log/exception service (WP-10), tenant (WP-18) |
+| API-10 | Kode stabil dinormalisasi ke `isError` (`EXECUTION_FAILED`, `CANCELLED`, kode `ToolError`) | E02 (WP-19–WP-22) |
+| API-11 | Consumer strict memakai `ResourceDefinition`, `ProjectProfile`, `context.profile()` dari tarball | `smoke:pack` (WP-38) |
+| API-12 | Profile meng-import paket opsional hanya lewat `app.import` setelah versi terpasang ditemukan; kit `api-bare` boot dan profile bersih | Adapter opsional M4–M6 |
+| LC-03 | Snapshot registry final di `ready()`; profile lazy per request tanpa watcher/worker | Listener M3 |
+| LC-04 | Registrasi setelah `ready()` melempar `RegistryClosedError` | Rebuild atomik saat HMR (WP-37); saat ini perubahan provider/`extraTools` memerlukan restart proses |
+| LC-05 | Shutdown menutup handler MCP dan koneksi MCP in-flight saja (D36); exit 0 | HMR, listener, handle count (WP-37) |
+| CF-10 | `allowedHosts`/`allowedOrigins` exact tanpa wildcard | Mapping surface/tenant (WP-21), dokumentasi (WP-35) |
+| T01 | `get_project_profile` pada kit API dan `api-bare`: installed vs active, `active: null` tanpa sinyal, capability reasons | Kit Inertia/Edge/hybrid/tenant (PF-02–PF-07) |
+| NF-03 | Client yang memutus koneksi membatalkan call-nya sendiri; client lain tetap dilayani | Timeout tool (WP-28, WP-29) |
+| E01 | Dua era: discovery/initialize, `tools/list`, profile tool + resource, `prompts/get` | Routes tool/resource (M3) |
+| OB-04 | `relayHeaders` + `await` bridge dari middleware; satu response per request | Matriks versi http-server (WP-38) |
+| OB-07 | Production prune M1 tetap lulus dengan endpoint M2 terpasang | Asersi listener/buffer (M3), CI (WP-38) |

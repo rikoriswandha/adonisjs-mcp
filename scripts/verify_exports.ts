@@ -57,7 +57,13 @@ const CONSUMER_SOURCE = `import {
 } from '@rikology/adonisjs-mcp'
 import type { McpConfig, McpRegistry, ResolvedMcpConfig, ToolContext } from '@rikology/adonisjs-mcp'
 import { configure as configureHook } from '@rikology/adonisjs-mcp/configure'
-import type { AnyToolDefinition, ExtraToolLoader, ToolOutput } from '@rikology/adonisjs-mcp/types'
+import type {
+  AnyToolDefinition,
+  ExtraToolLoader,
+  ProjectProfile,
+  ResourceDefinition,
+  ToolOutput,
+} from '@rikology/adonisjs-mcp/types'
 import McpProvider from '@rikology/adonisjs-mcp/providers/mcp_provider'
 import type { ApplicationService } from '@adonisjs/core/types'
 import { z } from 'zod'
@@ -99,6 +105,16 @@ declare const app: ApplicationService
 const registry: McpRegistry = await app.container.make('mcp.registry')
 registry.tool(tool)
 
+const resource: ResourceDefinition = {
+  name: 'consumer_state',
+  uri: 'consumer://state',
+  async read(_request, context) {
+    const profile: ProjectProfile = await context.profile()
+    return { data: { kind: profile.kind, lucid: profile.packages.lucid.active } }
+  },
+}
+registry.resource(resource)
+
 const provider = new McpProvider(app)
 const providerConfig: ResolvedMcpConfig | undefined = provider.config
 const hook: typeof configure = configureHook
@@ -132,15 +148,25 @@ assert.ok(existsSync(join(root.stubsRoot, 'providers', 'mcp_dev_provider.stub'))
 assert.equal(root.defineConfig({}).path, '/__adonis/mcp')
 assert.throws(() => root.defineConfig({ path: 'x' }), root.InvalidMcpConfigError)
 
-const configFor = (inDev, mcp) => ({ inDev, config: { get: () => mcp } })
-const production = new McpProvider(configFor(false, { path: 'invalid' }))
+const bindings = new Map()
+const appFor = (inDev, environment, mcp) => ({
+  inDev,
+  getEnvironment: () => environment,
+  config: { get: () => mcp },
+  container: { bindValue: (key, value) => bindings.set(key, value) },
+})
+const production = new McpProvider(appFor(false, 'web', { path: 'invalid' }))
 production.register()
 assert.equal(production.config, undefined)
 
-const development = new McpProvider(configFor(true, { path: '/_mcp' }))
-development.register()
-assert.equal(development.config.path, '/_mcp')
-assert.throws(() => new McpProvider(configFor(true, { path: 'x' })).register(), /config\\/mcp\\.ts/)
+const consoleProvider = new McpProvider(appFor(true, 'console', { path: '/_mcp' }))
+consoleProvider.register()
+assert.equal(consoleProvider.config.path, '/_mcp')
+assert.equal(bindings.size, 0)
+
+new McpProvider(appFor(true, 'web', { path: '/_mcp' })).register()
+assert.deepEqual([...bindings.keys()], ['mcp.registry'])
+assert.throws(() => new McpProvider(appFor(true, 'web', { path: 'x' })).register(), /config\\/mcp\\.ts/)
 console.log('runtime exports ok')
 `
 

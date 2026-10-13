@@ -30,7 +30,7 @@ function isExactPath(value: string, allowRoot: boolean): boolean {
  * Normalized `Host` value (`hostname[:port]`), or `undefined` when the value
  * is not an exact host.
  */
-function normalizeHost(value: string): string | undefined {
+export function normalizeHost(value: string): string | undefined {
   if (value.length === 0 || /[\s*/\\@?#]/.test(value)) {
     return undefined
   }
@@ -45,7 +45,7 @@ function normalizeHost(value: string): string | undefined {
  * Normalized origin (`scheme://host[:port]`), or `undefined` when the value
  * is not an exact http(s) origin.
  */
-function normalizeOrigin(value: string): string | undefined {
+export function normalizeOrigin(value: string): string | undefined {
   if (value.includes('*')) {
     return undefined
   }
