@@ -239,7 +239,7 @@ Adapter Inertia Svelte/Solid tidak boleh diklaim sebelum diuji (plan §8.3).
 | PK-05 | README, config reference, compatibility, troubleshooting, changelog, recipes Claude Code/Cursor/VS Code/Zed yang diuji | WP-35 | TERBUKA (M9 bagian docs/compatibility dan Claude Code 2.1.295 selesai; Cursor 2026.05.20 Auto timeout tanpa call, VS Code 1.125.1/Zed 1.23.3 window hilang sebelum MCP start. Sisa: ketiga recipe belum terverifikasi, tetap "not verified", D81) |
 | PK-06 | Tarball tanpa fixture DB/.env/log/coverage/test code; lisensi dependency direview | WP-38 | SELESAI (M9: `check_licenses.ts` runtime tree 14 deps + tarball path allowlist, audit production 0 vulnerabilities; CI checks) |
 | PK-07 | Matriks Linux+macOS, Node minimum + Node 24 terkini, Core/Lucid min/current, SQLite + PostgreSQL | WP-38 | SELESAI (M9: CI Ubuntu x64/macOS arm64 × Node 24.11.1/24; compat-min Core 7.5.2/Lucid 22.4.0, fixture current 7.6.0/22.4.2; Linux arm64 SQLite/PostgreSQL; D78–D79) |
-| PK-08 | Publish CI dengan provenance; post-publish install/connect/call di fixture bersih | WP-39 | TERBUKA (M9 bagian repo publik + CI/release workflow exact tarball/SHA-512 dan `smoke_published.ts --tarball` selesai. Sisa: npm publish, provenance attestation dan registry post-publish smoke menunggu keputusan pengguna repo + CI tanpa publish, D80) |
+| PK-08 | Publish CI dengan provenance; post-publish install/connect/call di fixture bersih | WP-39 | SELESAI (14 Oktober 2026: `@rikology/adonisjs-mcp@0.1.0` dipublish oleh `release.yml` run `38485855997` dari tarball yang diverifikasi seluruh CI, provenance SLSA v1 + Sigstore; GitHub release `v0.1.0`; post-publish smoke Ubuntu/macOS: SHA-512 registry = artefak verified, `npm audit signatures`, fresh consumer configure + dua era. Trusted publisher dikonfigurasi setelah publish pertama, D80) |
 
 ## 10. Kewajiban baru hasil spike
 
@@ -303,7 +303,7 @@ Konsolidasi baris `OBL:` dari putaran final setiap laporan; OBL putaran awal yan
 | --- | --- | --- | --- | --- | --- |
 | B-01 | Natural `import()` di eval untuk fresh controller/service dan identitas hot-swap hanya terbukti lewat callback importer framework yang memerlukan `--experimental-vm-modules`; main-context default loader gagal untuk fresh import | S-E putaran 2–3 | WP-28, T25, DC-09, DC-26, OB-16, OB-17, OB-35 | Pengguna memilih (a) pada 13 Oktober 2026: flag wajib pada proses dev, ditawarkan configure (OB-49), tanpa flag `CAPABILITY_UNSUPPORTED` + remediasi. Opsi (b) loader lain tanpa flag dan (c) helper import eksplisit tidak dipakai | DIPUTUSKAN |
 
-Tidak ada blocker teknis yang terbuka. Prasyarat lisensi Plus (OB-45) dihapus oleh keputusan pengguna D75; publikasi npm dan pembuktian tiga recipe client tetap terbuka (PK-08, PK-05).
+Tidak ada blocker teknis yang terbuka. Prasyarat lisensi Plus (OB-45) dihapus oleh keputusan pengguna D75; 0.1.0 sudah terbit (PK-08). Pembuktian tiga recipe client tetap terbuka (PK-05).
 
 ## 12. Perubahan cakupan dan koreksi klaim
 
@@ -486,5 +486,5 @@ Baris yang berpindah ke `SELESAI`: DC-02, DC-04, DC-21, DC-25, DC-31, DC-33, API
 | ID | Sudah terbukti di M9 | Sisa |
 | --- | --- | --- |
 | PK-05 | README/config/compatibility lengkap; Claude Code 2.1.295 teruji M8; percobaan Cursor 2026.05.20 timeout tanpa call, VS Code 1.125.1/Zed 1.23.3 window hilang sebelum MCP start; ketiganya tidak dipromosikan supported | Tool call nyata pada ketiga client belum terverifikasi, D81 |
-| PK-08 | Repo publik + CI reusable artefak yang sama; release workflow satu tarball/SHA-512, min-tuple/integration/security kedua OS; `smoke_published.ts --tarball` lulus | Publish npm, provenance attestation dan registry post-publish smoke menunggu keputusan pengguna; trusted publisher baru setelah publish pertama, D80 |
+| PK-08 | Selesai 14 Oktober 2026: publish 0.1.0 dengan provenance dan post-publish smoke kedua OS lulus (lihat baris PK-08) | — |
 

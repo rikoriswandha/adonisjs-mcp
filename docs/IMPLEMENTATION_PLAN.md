@@ -1,7 +1,7 @@
 # Implementation Plan — @rikology/adonisjs-mcp
 
 Tanggal: 13 Oktober 2026  
-Status: M0–M8 selesai (§6.1–§6.8); M9 selesai kecuali publikasi npm (§6.9): repository publik [GitHub](https://github.com/rikoriswandha/adonisjs-mcp) dan CI tersedia; WP-39 publish + post-publish smoke dengan provenance menunggu keputusan pengguna.
+Status: M0–M9 selesai (§6.1–§6.9). `@rikology/adonisjs-mcp@0.1.0` terbit di npm pada 14 Oktober 2026 lewat `release.yml` dengan provenance; post-publish smoke Ubuntu/macOS lulus. Recipe Cursor/VS Code/Zed belum terverifikasi (PK-05).
 Sumber kebutuhan: [DESIGN.md](./DESIGN.md)  
 Obligation ledger: [OBLIGATION_LEDGER.md](./OBLIGATION_LEDGER.md); bukti spike: [spikes/](./spikes/)  
 Target deliverable: package npm `@rikology/adonisjs-mcp@0.1.0`, MIT, untuk aplikasi AdonisJS v7 dalam development.
@@ -961,7 +961,7 @@ Jika dependency API belum tersedia, hasil pekerjaan adalah blocker dengan bukti 
 ### Release gates
 
 - [x] S-A–S-K memiliki hasil nyata dan tidak ada blocker terbuka pada fitur yang diklaim; bagian adapter dihapus dengan D75.
-- [ ] WP-01–WP-39 selesai beserta evidence; matriks 28 tool, 5 resource, 2 prompt tercakup — WP-39 publish/registry smoke menunggu pengguna.
+- [x] WP-01–WP-39 selesai beserta evidence; matriks 28 tool, 5 resource, 2 prompt tercakup — 0.1.0 terbit 14 Oktober 2026.
 - [x] Positive optional-integration tests tersedia; `matrix.spec` tenant/Bouncer/queue, bukan hanya absence tests.
 - [x] E01–E12 lulus pada fixture terkait dan dua era protokol; lifecycle dan offline gates M9.
 - [x] Core/Lucid version range dan adapter compatibility sesuai bukti minimum/current (D78–D79).
@@ -970,8 +970,8 @@ Jika dependency API belum tersedia, hasil pekerjaan adalah blocker dengan bukti 
 - [x] Tarball consumer, configure rerun dan production-pruned standalone boot lulus (`smoke_pack.ts`).
 - [ ] Client recipes dipakai pada versi yang disebut — Cursor/VS Code/Zed belum terverifikasi (D81); syarat tidak mempromosikan recipe unsupported terpenuhi.
 - [x] Skill/docs tidak mengklaim hard timeout, sandbox, global model registry, atau full dynamic schema inference.
-- [ ] Publish CI tepercaya dengan provenance dan tag/artefak cocok — workflow tersedia; publish/provenance belum dilakukan, keputusan pengguna D80.
-- [ ] Post-publish install/connect/call fixture bersih — script tersedia, registry mode belum dijalankan (PK-08).
+- [x] Publish CI tepercaya dengan provenance dan tag/artefak cocok — run `38485855997`: tarball yang dipublish adalah artefak yang diverifikasi seluruh CI (SHA-512), provenance SLSA v1 di Sigstore. Run pertama gagal sebelum mencapai registry (path tarball tanpa `./` dibaca npm sebagai spec GitHub); tag dibuat ulang karena belum ada yang terbit (RELEASING.md).
+- [x] Post-publish install/connect/call fixture bersih — Ubuntu/macOS lulus setelah registry menyajikan paket (±5,5 menit setelah publish); retry smoke diperpanjang menjadi 30 menit untuk rilis berikutnya.
 
 Bila post-publish smoke gagal, hentikan promosi dan terbitkan perbaikan versi baru atau deprecate versi rusak sesuai kebijakan npm; jangan mengubah tag/artefak lama diam-diam.
 
