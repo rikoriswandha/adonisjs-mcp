@@ -43,8 +43,9 @@ let fixture: FixtureApp | undefined
 try {
   let tarball = local ? specifier : undefined
   if (!local) {
-    // Registry propagation is bounded to six attempts, not an indefinite retry.
-    for (let attempt = 1; attempt <= 6; attempt++) {
+    // npm processes a fresh publish for minutes before serving it (0.1.0 took several);
+    // retry for up to 30 minutes, never indefinitely.
+    for (let attempt = 1; attempt <= 60; attempt++) {
       try {
         const result = await runChecked('npm', ['view', specifier, 'dist', '--json'], {
           cwd: downloadRoot,
@@ -69,9 +70,9 @@ try {
         tarball = join(downloadRoot, files[0].filename)
         break
       } catch (error) {
-        if (attempt === 6) throw error
-        console.log(`Registry/provenance not ready (${attempt}/6); retrying in 10 seconds`)
-        await delay(10_000)
+        if (attempt === 60) throw error
+        console.log(`Registry/provenance not ready (${attempt}/60); retrying in 30 seconds`)
+        await delay(30_000)
       }
     }
   }

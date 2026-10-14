@@ -114,7 +114,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -127,5 +127,5 @@ jobs:
           name: release-tarball
           path: release-artifact
       - name: Verify registry install, provenance and live MCP calls
-        # smoke_published retries registry/provenance propagation six times.
+        # smoke_published retries registry/provenance propagation for up to 30 minutes.
         run: npm run smoke:published -- "${GITHUB_REF_NAME#v}" --expected-sha512 release-artifact/*.sha512
